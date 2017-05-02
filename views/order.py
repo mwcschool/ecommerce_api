@@ -16,7 +16,7 @@ def is_decimal(price):
 class OrdersResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('total_price', type=is_decimal required=True)
+        parser.add_argument('total_price', type=is_decimal, required=True)
         parser.add_argument('user', type=int, required=True)
         args = parser.parse_args(strict=True)
 
