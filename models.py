@@ -58,6 +58,13 @@ class Order(BaseModel):
     total_price = DecimalField()
     user = ForeignKeyField(User, related_name="orders")
 
+    def json(self):
+        return {
+            'order_id': str(self.order_id),
+            'total_price': self.total_price,
+            'user': self.user
+        }
+
 
 class OrderItem(BaseModel):
     order = ForeignKeyField(Order)
