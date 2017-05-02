@@ -5,6 +5,6 @@ import uuid
 from models import Order
 
 
-class Orders(Resource):
+class OrdersResource(Resource):
     def get(self):
         return [order.json() for order in Order.select()], OK
