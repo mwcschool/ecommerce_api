@@ -18,9 +18,7 @@ class TestOrders:
 	def setup_method(self):
 		Order.delete().execute()
 
-	def test_get_order__empty(self):
+	def test_get_orders__empty(self):
 		resp = self.app.get('/orders/')
 		assert resp.status_code == 	OK
 		assert json.loads(resp.data.decode()) == []
-
-
