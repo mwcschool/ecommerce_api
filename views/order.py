@@ -1,11 +1,32 @@
 from flask_restful import reqparse, Resource
-from http.client import OK, NOT_FOUND, NO_CONTENT
+from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED
 import uuid
+import decimal
 
 from models import Order
 
 
+def is_decimal(price):
+    try:
+        return decimal.Decimal(price)
+    except decimal.InvalidOperation:
+        raise
+
+
 class OrdersResource(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('total_price', type=is_decimal required=True)
+        parser.add_argument('user', type=int, required=True)
+        args = parser.parse_args(strict=True)
+
+        instance = Order.create(
+            order_id=uuid.uuid4(),
+            total_price=args['total_price'],
+            user=args['user']
+        )
+        return instance.json(), CREATED
+
     def get(self):
         return [order.json() for order in Order.select()], OK
 
