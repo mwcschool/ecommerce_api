@@ -6,5 +6,5 @@ from models import Order
 
 
 class Orders(Resource):
-    def get():
+    def get(self):
         return [order.json() for order in Order.select()], OK
