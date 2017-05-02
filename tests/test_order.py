@@ -1,5 +1,7 @@
 import pytest
 import uuid
+import json
+from peewee import SqliteDatabase
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED
 
 from app import app
@@ -12,5 +14,13 @@ class TestOrders:
 		Order.create_table()
 		app.config['TESTING'] = True
 		cls.app = app.test_client()
+
+	def setup_method(self):
+		Order.delete().execute()
+
+	def test_get_order__empty(self):
+		resp = self.app.get('/orders/')
+		assert resp.status_code == 	OK
+		assert json.loads(resp.data.decode()) == []
 
 
