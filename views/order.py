@@ -38,6 +38,23 @@ class OrderResource(Resource):
         except Order.DoesNotExist:
             return None, NOT_FOUND
 
+    def put(self, order_id):
+        try:
+            instance = Order.get(order_id=order_id)
+        except Order.DoesNotExist:
+            return None, NOT_FOUND
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('total_price', type=is_decimal required=True)
+        parser.add_argument('user', type=int, required=True)  # TODO User can change?
+        args = parser.parse_args(strict=True)
+
+        instance.total_price = args['total_price']
+        instance.user = args['user']
+        instance.save()
+
+        return instance.json(), OK
+
     def delete(self, order_id):
         try:
             instance = Order.get(order_id=order_id)
