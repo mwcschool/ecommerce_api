@@ -1,16 +1,16 @@
 from flask_restful import reqparse, Resource
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED
 import uuid
-import decimal
 
 from models import Order
 
 
 def is_decimal(price):
     try:
-        return decimal.Decimal(price)
-    except decimal.InvalidOperation:
-        raise
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 
 class OrdersResource(Resource):
