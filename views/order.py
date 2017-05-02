@@ -1,7 +1,10 @@
 from flask_restful import reqparse, Resource
-from models import Order
+from http.client import OK
 import uuid
+
+from models import Order
 
 
 class Order(Resource):
     def get():
+        return [order.json() for order in Order.select()], OK
