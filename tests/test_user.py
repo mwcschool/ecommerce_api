@@ -16,7 +16,7 @@ class Testuser:
     def setup_method(self):
         User.delete().execute()
 
-    def test_post__empty(self):
+    def test_post__success_empty_db(self):
         data = {
             'first_name': 'Alessandro',
             'last_name': 'Cappellini',
@@ -42,7 +42,7 @@ class Testuser:
             last_name='Mariani',
             email='giovanni@mariani.com',
             password='1234'
-            )
+        )
         resp = self.app.post('/users/', data=data)
         query = User.select()
         assert resp.status_code == CREATED
@@ -59,7 +59,7 @@ class Testuser:
         resp = self.app.post('/users/', data=data)
         assert resp.status_code == BAD_REQUEST
 
-    def test_post__field_not_exist(self):
+    def test_post__field_not_exists(self):
         data = {
             'last_name': 'Pippo',
             'email': 'mark@pippo.it',
@@ -85,12 +85,12 @@ class Testuser:
             'password': '1234567'
         }
 
-        resp = self.app.put('/user/{}'.format(obj1.user_id), data=data)
+        resp = self.app.put('/users/{}'.format(obj1.user_id), data=data)
         query = User.select()
         assert resp.status_code == CREATED
         assert query == json.loads(resp.data.decode())
 
-    def test_put__one_field(self):
+    def test_put__modify_one_field(self):
         obj1 = User.create(
             user_id=uuid.uuid4(),
             first_name='Giovanni',
@@ -103,7 +103,7 @@ class Testuser:
             'first_name': 'Anna',
         }
 
-        resp = self.app.put('/user/{}'.format(obj1.user_id), data=data)
+        resp = self.app.put('/users/{}'.format(obj1.user_id), data=data)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__empty_fields(self):
@@ -122,7 +122,7 @@ class Testuser:
             'password': ''
         }
 
-        resp = self.app.put('/user/{}'.format(obj1.user_id), data=data)
+        resp = self.app.put('/users/{}'.format(obj1.user_id), data=data)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__userid_not_exist(self):
@@ -133,37 +133,25 @@ class Testuser:
             'password': '12345'
         }
 
-        resp = self.app.put('/user/{}'.format(uuid.uuid4()), data=data)
+        resp = self.app.put('/users/{}'.format(uuid.uuid4()), data=data)
         assert resp.status_code == NOT_FOUND
 
     def test_delete_user__success(self):
-        data_1 = {
-            'first_name': 'Alessandro',
-            'last_name': 'Cappellinni',
-            'email': 'prova@pippo.com',
-            'password': '1234'
-        }
-        data_2 = {
-            'first_name': 'Jonh',
-            'last_name': 'Smith',
-            'email': "jonh@smith.com",
-            'password': "1234"
-        }
         obj1 = User.create(
             user_id=uuid.uuid4(),
-            first_name=data_1['first_name'],
-            last_name=data_1['last_name'],
-            email=data_1['email'],
-            password=data_1['password']
+            first_name='Alessandro',
+            last_name='Cappellini',
+            email='prova@pippo.com',
+            password='1234'
             )
         obj2 = User.create(
             user_id=uuid.uuid4(),
-            first_name=data_2['first_name'],
-            last_name=data_2['last_name'],
-            email=data_2['email'],
-            password=data_2['password']
+            first_name='Jonh',
+            last_name='Smith',
+            email='jonh@smith.com',
+            password='1234'
             )
-        resp = self.app.delete('/user/{}'.format(obj1.user_id))
+        resp = self.app.delete('/users/{}'.format(obj1.user_id))
         assert resp.status_code == NO_CONTENT
         assert len(User.select()) == 1
         assert len(User.select().where(User.user_id == obj2.user_id)) == 1
@@ -180,6 +168,6 @@ class Testuser:
             email='a@b.it',
             password='ciaociao'
         )
-        resp = self.app.delete('/user/{}'.format(uuid.uuid4()))
+        resp = self.app.delete('/users/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
         assert len(User.select()) == 1
