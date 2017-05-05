@@ -22,7 +22,7 @@ class UsersResource(Resource):
 
         regex = re.compile('[a-z]{3,}(?P<chiocciola>@)[a-z]{3,}\.[a-z]{2,}')
 
-        if regex.match(args['email']) != None and len(args['password']) > 6:
+        if regex.match(args['email']) is not None and len(args['password']) > 6:
             obj = User.create(
                 user_id=uuid.uuid4(),
                 first_name=args['first_name'],
@@ -52,7 +52,7 @@ class UserResource(Resource):
 
         regex = re.compile('[a-z]{3,}(?P<chiocciola>@)[a-z]{3,}\.[a-z]{2,}')
 
-        if regex.match(args['email']) != None  and len(args['password']) > 6:
+        if regex.match(args['email']) is not None and len(args['password']) > 6:
             obj.first_name = args['first_name']
             obj.last_name = args['last_name']
             obj.email = args['email']
