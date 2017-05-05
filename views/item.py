@@ -8,7 +8,6 @@ from http.client import NOT_FOUND
 from http.client import OK
 import uuid
 
-import app as p
 import models as m
 
 
