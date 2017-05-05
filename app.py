@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restful import Api
 
 from models import database
-from views.user import UserResource
+from views.user import UserResource, UsersResource
 
 app = Flask(__name__)
 api = Api(app)
@@ -20,4 +20,6 @@ def database_disconnect(response):
         database.close()
     return response
 
-api.add_resource(UserResource, '/user/')
+
+api.add_resource(UsersResource, '/users/')
+api.add_resource(UserResource, '/user/<uuid:user_id>')
