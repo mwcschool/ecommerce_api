@@ -23,5 +23,5 @@ def database_disconnect(response):
     return response
 
 
-api.add_resource(vi.Items, '/items')
+api.add_resource(vi.Items, '/items/')
 api.add_resource(vi.Item, '/item/<uuid:item_id>')
