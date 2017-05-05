@@ -24,6 +24,15 @@ class User(BaseModel):
     email = CharField(unique=True)
     password = CharField()
 
+    def json(self):
+        return {
+            'user_id': str(self.user_id),
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'password': self.password
+        }
+
 
 class Order(BaseModel):
     order_id = UUIDField(unique=True)
