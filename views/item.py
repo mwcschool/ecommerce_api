@@ -1,57 +1,63 @@
-import flask as f
-import flask_restful as rest
+from flask import Flask
+from flask_restful import Resource, reqparse
 import json
-import peewee as p
+import peewee
 from http.client import CREATED
 from http.client import NO_CONTENT
 from http.client import NOT_FOUND
 from http.client import OK
+from http.client import BAD_REQUEST
 import uuid
 
-import models as m
+import models
 
 
 def json(self):
     return {
         'item_id': str(self.item_id),
         'name': self.name,
-        'price': self.price,
+        'price': int(self.price),
         'description': self.description
     }
 
 
-class Items(rest.Resource):
+class Items(Resource):
     def get(self):
-        return [obj.json() for obj in m.Item.select()], OK
+        return [obj.json() for obj in models.Item.select()], OK
 
     def post(self):
-        parser = rest.reqparse.RequestParser()
+        parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
         parser.add_argument('price', type=int, required=True)
         parser.add_argument('description', type=str, required=True)
+        try:
+            args = parser.parse_args()
+        except ValueError:
+            return None, BAD_REQUEST
 
-        obj = m.Item.create(
+        obj = models.Item.create(
             item_id=uuid.uuid4(),
             name=args["name"],
             price=args["price"],
             description=args["description"]
         )
 
-        return obj.json(), OK
+
+        return obj.json(), CREATED
 
 
-class Item(rest.Resource):
+class Item(Resource):
 
     def get(self, item_id):
         try:
-            return m.Item.get(m.Item.item_id == item_id)
-        except m.Item.DoesNotExist:
+            return models.Item.get(models.Item.item_id == item_id)
+        except models.Item.DoesNotExist:
             return None, NOT_FOUND
 
     def delete(self, item_id):
         try:
-            item = m.Item.get(m.Item.item_id == item_id)
-        except m.Item.DoesNotExist:
+            item = models.Item.get(models.Item.item_id == item_id)
+        except models.Item.DoesNotExist:
             return None, NOT_FOUND
 
         item.delete_instance()
@@ -59,11 +65,11 @@ class Item(rest.Resource):
 
     def put(self, item_id):
         try:
-            obj = m.Item.get(item_id=item_id)
-        except m.Item.DoesNotExist:
+            obj = models.Item.get(item_id=item_id)
+        except models.Item.DoesNotExist:
             return None, NOT_FOUND
 
-        parser = rest.reqparse.RequestParser()
+        parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
         parser.add_argument('price', type=str, required=True)
         parser.add_argument('description', type=str, required=True)
@@ -73,4 +79,4 @@ class Item(rest.Resource):
         obj.description = args["description"]
         obj.save()
 
-        return ogj.json(), OK
+        return obj.json(), OK
