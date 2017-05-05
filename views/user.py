@@ -1,67 +1,73 @@
 import uuid
 from models import User
-import json
-from http.client import OK, CREATED, NOT_FOUND, NO_CONTENT
-from flask_restful import Api, Resource, reqparse
+from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST
+from flask_restful import Resource, reqparse
+import re
+
 
 def non_empty_str(val, name):
-	if not str(val).strip():
-		raise ValueError('The argument {} is not empty'.format(name))
-	return str(val)
+    if not str(val).strip():
+        raise ValueError('The argument {} is not empty'.format(name))
+    return str(val)
+
+
+class UsersResource(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('first_name', type=non_empty_str, required=True)
+        parser.add_argument('last_name', type=non_empty_str, required=True)
+        parser.add_argument('email', type=non_empty_str, required=True)
+        parser.add_argument('password', type=non_empty_str, required=True)
+        args = parser.parse_args(strict=True)
+
+        regex = re.compile('[a-z]{3,}(?P<chiocciola>@)[a-z]{3,}\.[a-z]{2,}')
+
+        if regex.match(args['email']) != None and len(args['password']) > 6:
+            obj = User.create(
+                user_id=uuid.uuid4(),
+                first_name=args['first_name'],
+                last_name=args['last_name'],
+                email=args['email'],
+                password=args['password']
+            )
+
+            return obj.json(), CREATED
+        else:
+            return '', BAD_REQUEST
+
 
 class UserResource(Resource):
-	def post(self):
-		parser = reqparse.RequestParser()
-		parser.add_argument('first_name', type=non_empty_str, required=True)
-		parser.add_argument('last_name', type=non_empty_str, required=True)
-		parser.add_argument('email', type=non_empty_str, required=True)
-		parser.add_argument('password', type=non_empty_str, required=True)
-		args = parser.parse_args(strict=True)
-		obj = User.create(
-			user_id=uuid.uuid4(),
-			first_name=args['first_name'],
-			last_name=args['last_name'],
-			email=args['email'],
-			password=args['password']
-		)
+    def put(self, user_id):
+        try:
+            obj = User.get(user_id=user_id)
+        except User.DoesNotExist:
+            return None, NOT_FOUND
 
-		return {'user_id': obj.user_id}, CREATED
+        parser = reqparse.RequestParser()
+        parser.add_argument('first_name', type=non_empty_str, required=True)
+        parser.add_argument('last_name', type=non_empty_str, required=True)
+        parser.add_argument('email', type=non_empty_str, required=True)
+        parser.add_argument('password', type=non_empty_str, required=True)
+        args = parser.parse_args(strict=True)
 
+        regex = re.compile('[a-z]{3,}(?P<chiocciola>@)[a-z]{3,}\.[a-z]{2,}')
 
-	def put(self, user_id):
-		try:
-			obj = User.get(user_id=user_id)
-		except User.DoesNotExist:
-			return None, NOT_FOUND
+        if regex.match(args['email']) != None  and len(args['password']) > 6:
+            obj.first_name = args['first_name']
+            obj.last_name = args['last_name']
+            obj.email = args['email']
+            obj.password = args['password']
+            obj.save()
 
-		parser = reqparse.RequestParser()
-		parser.add_argument('first_name', type=non_empty_str, required=True)
-		parser.add_argument('last_name', type=non_empty_str, required=True)
-		parser.add_argument('email', type=non_empty_str, required=True)
-		parser.add_argument('password', type=non_empty_str, required=True)
-		args = parser.parse_args(strict=True)
+            return obj.json(), CREATED
+        else:
+            return '', BAD_REQUEST
 
-		obj.first_name=args['first_name']
-		obj.last_name=args['last_name']
-		obj.email=args['email']
-		obj.password=['password']
-		obj.save()
+    def delete(self, user_id):
+        try:
+            obj = User.get(user_id=user_id)
+        except User.DoesNotExist:
+            return None, NOT_FOUND
 
-		return obj.json(), CREATED
-
-
-	def delete(self, user_id):
-		try:
-			obj = User.get(user_id=user_id)
-		except User.DoesNotExist:
-			return None, NOT_FOUND
-
-		obj.delete_instance()
-		return None, NO_CONTENT
-
-
-
-
-
-
-
+        obj.delete_instance()
+        return None, NO_CONTENT
