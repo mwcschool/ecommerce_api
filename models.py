@@ -36,9 +36,3 @@ class OrderItem(BaseModel):
     item = ForeignKeyField(Item)
     quantity = IntegerField()
     subtotal = DecimalField()
-
-
-User.create_table(fail_silently=True)
-Item.create_table(fail_silently=True)
-Order.create_table(fail_silently=True)
-OrderItem.create_table(fail_silently=True)
