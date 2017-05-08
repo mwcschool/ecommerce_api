@@ -103,3 +103,30 @@ class TestOrders:
 
         resp = self.app.post('/orders/', data=source_order)
         assert resp.status_code == BAD_REQUEST
+
+    def test_modify_order__success(self):
+        usr1 = User.create(
+                user_id=str(uuid.uuid4()),
+                first_name='Name',
+                last_name='Surname',
+                email='email@domain.com',
+                password='password'
+            )
+        ord1 = Order.create(
+                order_id=str(uuid.uuid4()),
+                total_price=10,
+                user=usr1.id
+            )
+
+        updates = {
+            'total_price': 7
+        }
+
+        resp = self.app.put(
+            '/orders/{}'.format(ord1.order_id),
+            data=updates
+            )
+        assert resp.status_code == OK
+        ord1_upd = json.loads(resp.data.decode())
+
+        assert ord1_upd['total_price'] == updates['total_price']
