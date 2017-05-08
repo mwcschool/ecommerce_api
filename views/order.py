@@ -7,7 +7,7 @@ from models import Order
 
 def is_decimal(price):
     try:
-        float(s)
+        float(price)
         return True
     except ValueError:
         return False
@@ -46,7 +46,7 @@ class OrderResource(Resource):
 
         parser = reqparse.RequestParser()
         parser.add_argument('total_price', type=is_decimal, required=True)
-        parser.add_argument('user', type=int, required=True)  # TODO User can change?
+        parser.add_argument('user', type=int, required=True) # TODO User can change?
         args = parser.parse_args(strict=True)
 
         instance.total_price = args['total_price']
