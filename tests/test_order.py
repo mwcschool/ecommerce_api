@@ -131,9 +131,12 @@ class TestOrders:
             data=updates
             )
         assert resp.status_code == OK
-        ord1_upd = Order.get(Order.order_id == ord1.order_id).json()
 
+        ord1_upd = Order.get(Order.order_id == ord1.order_id).json()
         assert ord1_upd['total_price'] == updates['total_price']
+
+        ord2_db = Order.get(Order.order_id == ord2.order_id).json()
+        assert ord2_db == ord2.json()
 
     def test_modify_order__failure_non_existing(self):
         usr1 = User.create(
