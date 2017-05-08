@@ -62,6 +62,7 @@ class Testuser:
 
         resp = self.app.post('/users/', data=data)
         assert resp.status_code == BAD_REQUEST
+        assert len(User.select()) == 0
 
     def test_post__field_not_exists(self):
         data = {
@@ -74,7 +75,7 @@ class Testuser:
         assert resp.status_code == BAD_REQUEST
 
     def test_put__success(self):
-        obj1 = User.create(
+        user = User.create(
             user_id=uuid.uuid4(),
             first_name='Giovanni',
             last_name='Mariani',
@@ -89,13 +90,21 @@ class Testuser:
             'password': '1234567'
         }
 
-        resp = self.app.put('/users/{}'.format(obj1.user_id), data=data)
+        resp = self.app.put('/users/{}'.format(user.user_id), data=data)
         query = User.select()
+        user_from_db = query.get()
+        expected_data = {
+            'first_name': user_from_db.first_name,
+            'last_name': user_from_db.last_name,
+            'email': user_from_db.email,
+            'password': user_from_db.password
+        }
+        assert expected_data == data
         assert resp.status_code == CREATED
         assert query.get().json() == json.loads(resp.data.decode())
 
     def test_put__modify_one_field(self):
-        obj1 = User.create(
+        user = User.create(
             user_id=uuid.uuid4(),
             first_name='Giovanni',
             last_name='Mariani',
@@ -107,11 +116,11 @@ class Testuser:
             'first_name': 'Anna',
         }
 
-        resp = self.app.put('/users/{}'.format(obj1.user_id), data=data)
+        resp = self.app.put('/users/{}'.format(user.user_id), data=data)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__empty_fields(self):
-        obj1 = User.create(
+        user = User.create(
             user_id=uuid.uuid4(),
             first_name='Giovanni',
             last_name='Mariani',
@@ -126,7 +135,7 @@ class Testuser:
             'password': ''
         }
 
-        resp = self.app.put('/users/{}'.format(obj1.user_id), data=data)
+        resp = self.app.put('/users/{}'.format(user.user_id), data=data)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__userid_not_exist(self):
@@ -141,24 +150,24 @@ class Testuser:
         assert resp.status_code == NOT_FOUND
 
     def test_delete_user__success(self):
-        obj1 = User.create(
+        user = User.create(
             user_id=uuid.uuid4(),
             first_name='Alessandro',
             last_name='Cappellini',
             email='prova@pippo.com',
             password='1234'
             )
-        obj2 = User.create(
+        user2 = User.create(
             user_id=uuid.uuid4(),
             first_name='Jonh',
             last_name='Smith',
             email='jonh@smith.com',
             password='1234'
             )
-        resp = self.app.delete('/users/{}'.format(obj1.user_id))
+        resp = self.app.delete('/users/{}'.format(user.user_id))
         assert resp.status_code == NO_CONTENT
         assert len(User.select()) == 1
-        assert len(User.select().where(User.user_id == obj2.user_id)) == 1
+        assert len(User.select().where(User.user_id == user2.user_id)) == 1
 
     def test_delete__emptydb_userid_not_exist(self):
         resp = self.app.delete('/user/{}'.format(uuid.uuid4()))
