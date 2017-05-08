@@ -13,7 +13,7 @@ def drop_tables():
     database.close()
 
 
-def create_tables()
+def create_tables():
     database.connect()
 
     # Create new table with the same name
@@ -23,6 +23,7 @@ def create_tables()
     OrderItem.create_table()
 
     database.close()
+
 
 def main():
     drop_tables()

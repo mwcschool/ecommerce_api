@@ -13,20 +13,17 @@ def main():
     items_list = []
     users_list = []
 
-
     for _ in range(10):
         item = Item.create(
             item_id=fake.uuid4(), name=fake.word(),
             price=fake.random_int(), description=fake.sentence())
         items_list.append(item)
 
-
     for _ in range(20):
         user = User.create(
             user_id=fake.uuid4(), first_name=fake.first_name(),
             last_name=fake.last_name(), email=fake.email(), password=fake.password())
         users_list.append(user)
-
 
     for user in users_list:
         # User has three chance on four to make an order
@@ -50,7 +47,7 @@ def main():
                     order_item_subtotal = item.price * order_item_quantity
                     order_total_price += order_item_subtotal
 
-                    order_item = OrderItem.create(
+                    OrderItem.create(
                         order=order, item=item,
                         quantity=item.price, subtotal=order_item_subtotal)
 
