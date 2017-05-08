@@ -120,3 +120,56 @@ class TestItems:
 
         resp = self.app.delete('item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
+
+    def test_item__modified_successfully(self):
+        id = uuid.uuid4()
+
+        obj1 = Item.create(
+            item_id=id,
+            name='cubo',
+            price=5,
+            description='dhfsdjòfgjasdògj'
+        )
+
+        obj2 = {
+            'name': 'triangolo',
+            'price': 10,
+            'description': 'Descrizione sensata'
+        }
+
+        resp = self.app.put('item/{}'.format(id), data=obj2)
+        assert resp.status_code == OK
+        resp = self.app.get('item/{}'.format(id))
+
+        db_data = {
+            'name': json.loads(resp.data.decode())['name'],
+            'price': json.loads(resp.data.decode())['price'],
+            'description': json.loads(resp.data.decode())['description']
+        }
+
+        assert obj2 == db_data
+
+    def test_put_item__malformed(self):
+        id = uuid.uuid4()
+
+        obj1 = Item.create(
+            item_id=id,
+            name='cubo',
+            price=5,
+            description='dhfsdjòfgjasdògj'
+        )
+
+        modified_content = {
+            'name': 'rombo',
+            'description': 'desc2'
+        }
+        resp = self.app.put('/item/{}'.format(id), data=modified_content)
+        assert resp.status_code == BAD_REQUEST
+
+        modified_content = {
+            'name': 'rombo',
+            'price': 'asdasd',
+            'description': 'Ciaociao'
+        }
+        resp = self.app.put('/item/{}'.format(id), data=modified_content)
+        assert resp.status_code == BAD_REQUEST
