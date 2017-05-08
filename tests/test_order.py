@@ -268,3 +268,26 @@ class TestOrders:
         orders = Order.select()
         assert len(orders) == 1
         assert Order.get(Order.order_id == ord2.order_id)
+
+    def test_delete_order__failure_non_existing(self):
+        usr1 = User.create(
+                user_id=str(uuid.uuid4()),
+                first_name='Name',
+                last_name='Surname',
+                email='email@domain.com',
+                password='password'
+            )
+        ord1 = Order.create(
+                order_id=str(uuid.uuid4()),
+                total_price=10,
+                user=usr1.id
+            )
+        ord2 = Order.create(
+                order_id=str(uuid.uuid4()),
+                total_price=12,
+                user=usr1.id
+            )
+
+        resp = self.app.delete('/orders/{}'.format(str(uuid.uuid4())))
+        assert resp.status_code == NOT_FOUND
+        assert len(Order.select()) == 2
