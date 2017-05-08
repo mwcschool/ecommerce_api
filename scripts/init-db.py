@@ -24,6 +24,7 @@ def create_tables():
 
     database.close()
 
+
 def main():
     drop_tables()
     create_tables()
