@@ -34,7 +34,7 @@ class Order(BaseModel):
         return {
             'order_id': str(self.order_id),
             'total_price': float(self.total_price),
-            'user': self.user.id
+            'user': str(self.user.user_id)
         }
 
 
