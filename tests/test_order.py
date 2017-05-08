@@ -146,7 +146,7 @@ class TestOrders:
                 email='email@domain.com',
                 password='password'
             )
-        ord1 = Order.create(
+        Order.create(
                 order_id=str(uuid.uuid4()),
                 total_price=10,
                 user=usr1.id
@@ -279,12 +279,12 @@ class TestOrders:
                 email='email@domain.com',
                 password='password'
             )
-        ord1 = Order.create(
+        Order.create(
                 order_id=str(uuid.uuid4()),
                 total_price=10,
                 user=usr1.id
             )
-        ord2 = Order.create(
+        Order.create(
                 order_id=str(uuid.uuid4()),
                 total_price=12,
                 user=usr1.id
