@@ -80,6 +80,7 @@ class Testuser:
 
         resp = self.app.post('/users/', data=data)
         assert resp.status_code == BAD_REQUEST
+        assert len(User.select()) == 0
 
     def test_put__success(self):
         user = User.create(
@@ -155,6 +156,7 @@ class Testuser:
 
         resp = self.app.put('/users/{}'.format(uuid.uuid4()), data=data)
         assert resp.status_code == NOT_FOUND
+        assert len(User.select()) == 0
 
     def test_delete_user__success(self):
         user = User.create(
@@ -181,6 +183,7 @@ class Testuser:
     def test_delete__emptydb_userid_not_exist(self):
         resp = self.app.delete('/user/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
+        assert len(User.select()) == 0
 
     def test_delete__userid_not_exist(self):
         User.create(
