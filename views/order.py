@@ -42,11 +42,10 @@ class OrderResource(Resource):
             return None, NOT_FOUND
 
         parser = reqparse.RequestParser()
-        parser.add_argument('total_price', type=is_decimal, required=True)
+        parser.add_argument('total_price', type=float, required=True)
         args = parser.parse_args(strict=True)
 
         instance.total_price = args['total_price']
-        instance.user = args['user']
         instance.save()
 
         return instance.json(), OK
