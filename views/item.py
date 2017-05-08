@@ -70,8 +70,13 @@ class Item(Resource):
 
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
-        parser.add_argument('price', type=str, required=True)
+        parser.add_argument('price', type=int, required=True)
         parser.add_argument('description', type=str, required=True)
+
+        try:
+            args = parser.parse_args()
+        except ValueError:
+            return None, BAD_REQUEST
 
         obj.name = args["name"]
         obj.price = args["price"]
