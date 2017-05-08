@@ -87,3 +87,19 @@ class TestOrders:
 
         resp = self.app.post('/orders/', data=source_order)
         assert resp.status_code == BAD_REQUEST
+
+    def test_create_order__failure_empty_field__total_price(self):
+        usr1 = User.create(
+                user_id=str(uuid.uuid4()),
+                first_name='Name',
+                last_name='Surname',
+                email='email@domain.com',
+                password='password'
+            )
+        source_order = {
+            'total_price': None,
+            'user': usr1.id
+        }
+
+        resp = self.app.post('/orders/', data=source_order)
+        assert resp.status_code == BAD_REQUEST
