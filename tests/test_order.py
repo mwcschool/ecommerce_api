@@ -2,7 +2,7 @@ import pytest
 import uuid
 import json
 from peewee import SqliteDatabase
-from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED
+from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 
 from app import app
 from models import Order, User
@@ -72,3 +72,18 @@ class TestOrders:
         assert Order.get(order_id=order['order_id']).json() == order
         order.pop('order_id')
         assert order == source_order
+
+    def test_create_order__failure_missing_field(self):
+        usr1 = User.create(
+                user_id=str(uuid.uuid4()),
+                first_name='Name',
+                last_name='Surname',
+                email='email@domain.com',
+                password='password'
+            )
+        source_order = {
+            'user': usr1.id
+        }
+
+        resp = self.app.post('/orders/', data=source_order)
+        assert resp.status_code == BAD_REQUEST
