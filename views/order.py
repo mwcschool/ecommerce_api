@@ -2,20 +2,25 @@ from flask_restful import reqparse, Resource
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED
 import uuid
 
-from models import Order
+from models import Order, User
+
+def is_valid_uuid(user_id):
+    return uuid.UUID(user_id, version=4)
 
 
 class OrdersResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('total_price', type=float, required=True)
-        parser.add_argument('user', type=int, required=True)
+        parser.add_argument('user', type=is_valid_uuid, required=True)
         args = parser.parse_args(strict=True)
+
+        user = User.get(User.user_id == args['user'])
 
         instance = Order.create(
             order_id=uuid.uuid4(),
             total_price=float(args['total_price']),
-            user=args['user']
+            user=user.id
         )
         return instance.json(), CREATED
 
@@ -38,7 +43,6 @@ class OrderResource(Resource):
 
         parser = reqparse.RequestParser()
         parser.add_argument('total_price', type=is_decimal, required=True)
-        parser.add_argument('user', type=int, required=True) # TODO User can change?
         args = parser.parse_args(strict=True)
 
         instance.total_price = args['total_price']
