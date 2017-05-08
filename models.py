@@ -33,7 +33,7 @@ class Order(BaseModel):
     def json(self):
         return {
             'order_id': str(self.order_id),
-            'total_price': str(self.total_price),
+            'total_price': float(self.total_price),
             'user': self.user.id
         }
 
