@@ -42,7 +42,6 @@ class Items(Resource):
             description=args["description"]
         )
 
-
         return obj.json(), CREATED
 
 
@@ -50,7 +49,7 @@ class Item(Resource):
 
     def get(self, item_id):
         try:
-            return models.Item.get(models.Item.item_id == item_id)
+            return models.Item.get(models.Item.item_id == item_id).json(), OK
         except models.Item.DoesNotExist:
             return None, NOT_FOUND
 
