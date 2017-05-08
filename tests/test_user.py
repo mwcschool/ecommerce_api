@@ -25,9 +25,16 @@ class Testuser:
         }
         resp = self.app.post('/users/', data=data)
         query = User.select()
+        user_from_db = User.get()
+        expected_data = {
+            'first_name': user_from_db.first_name,
+            'last_name': user_from_db.last_name,
+            'email': user_from_db.email,
+            'password': user_from_db.password
+        }
+        assert expected_data == data
         assert resp.status_code == CREATED
         assert len(query) == 1
-        print(resp.data.decode())
         assert query.get().json() == json.loads(resp.data.decode())
 
     def test_post__success(self):
@@ -40,7 +47,7 @@ class Testuser:
 
         id_user_created = uuid.uuid4()
 
-        user = User.create(
+        User.create(
             user_id=id_user_created,
             first_name='Giovanni',
             last_name='Mariani',
@@ -165,9 +172,11 @@ class Testuser:
             password='1234'
             )
         resp = self.app.delete('/users/{}'.format(user.user_id))
+        all_users = User.select()
+        user_from_db = all_users.get()
         assert resp.status_code == NO_CONTENT
-        assert len(User.select()) == 1
-        assert len(User.select().where(User.user_id == user2.user_id)) == 1
+        assert len(all_users) == 1
+        assert user_from_db.user_id == user2.user_id
 
     def test_delete__emptydb_userid_not_exist(self):
         resp = self.app.delete('/user/{}'.format(uuid.uuid4()))
