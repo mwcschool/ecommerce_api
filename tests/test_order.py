@@ -117,6 +117,11 @@ class TestOrders:
                 total_price=10,
                 user=usr1.id
             )
+        ord2 = Order.create(
+                order_id=str(uuid.uuid4()),
+                total_price=12,
+                user=usr1.id
+            )
 
         updates = {
             'total_price': 7
@@ -127,6 +132,6 @@ class TestOrders:
             data=updates
             )
         assert resp.status_code == OK
-        ord1_upd = json.loads(resp.data.decode())
+        ord1_upd = Order.get(Order.order_id == ord1.order_id).json()
 
         assert ord1_upd['total_price'] == updates['total_price']
