@@ -98,7 +98,7 @@ class TestOrders:
             )
         source_order = {
             'total_price': None,
-            'user': usr1.id
+            'user': usr1.user_id
         }
 
         resp = self.app.post('/orders/', data=source_order)
