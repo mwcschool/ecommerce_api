@@ -1,20 +1,33 @@
 from models import database, Item, User, Order, OrderItem
 
-database.connect()
+
+def drop_tables():
+    database.connect()
+
+    # Initialize db by deleting all tables
+    Item.drop_table(fail_silently=True)
+    User.drop_table(fail_silently=True)
+    Order.drop_table(fail_silently=True)
+    OrderItem.drop_table(fail_silently=True)
+
+    database.close()
 
 
-# Inizializzo il db cancellando tutte le tabelle
-Item.drop_table(fail_silently=True)
-User.drop_table(fail_silently=True)
-Order.drop_table(fail_silently=True)
-OrderItem.drop_table(fail_silently=True)
+def create_tables()
+    database.connect()
+
+    # Create new table with the same name
+    Item.create_table()
+    User.create_table()
+    Order.create_table()
+    OrderItem.create_table()
+
+    database.close()
+
+def main():
+    drop_tables()
+    create_tables()
 
 
-# Ricreo le tabelle nel db
-Item.create_table(fail_silently=True)
-User.create_table(fail_silently=True)
-Order.create_table(fail_silently=True)
-OrderItem.create_table(fail_silently=True)
-
-
-database.close()
+if __name__ == '__main__':
+    main()
