@@ -291,3 +291,7 @@ class TestOrders:
         resp = self.app.delete('/orders/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
         assert len(Order.select()) == 2
+
+    def test_delete_order__failure_non_existing_empty_orders(self):
+        resp = self.app.delete('/orders/{}'.format(str(uuid.uuid4())))
+        assert resp.status_code == NOT_FOUND
