@@ -96,3 +96,27 @@ class TestItems:
 
         resp = self.app.get('/item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
+
+    def test_item__deleted_successfully(self):
+        obj1 = Item.create(
+            item_id=uuid.uuid4(),
+            name='cubo',
+            price=5,
+            description='dhfsdjòfgjasdògj'
+        )
+
+        resp = self.app.delete('item/{}'.format(obj1.json()['item_id']))
+        assert resp.status_code == NO_CONTENT
+        resp = self.app.get('item/{}'.format(obj1.json()['item_id']))
+        assert resp.status_code == NOT_FOUND
+
+    def test_item__delete_not_found(self):
+        obj1 = Item.create(
+            item_id=uuid.uuid4(),
+            name='cubo',
+            price=5,
+            description='dhfsdjòfgjasdògj'
+        )
+
+        resp = self.app.delete('item/{}'.format(uuid.uuid4()))
+        assert resp.status_code == NOT_FOUND
