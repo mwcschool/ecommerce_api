@@ -61,7 +61,7 @@ class TestOrders:
 
         source_order = {
             'total_price': 10,
-            'user': usr1.id
+            'user': usr1.user_id
         }
 
         resp = self.app.post('/orders/', data=source_order)
@@ -82,7 +82,7 @@ class TestOrders:
                 password='password'
             )
         source_order = {
-            'user': usr1.id
+            'user': usr1.user_id
         }
 
         resp = self.app.post('/orders/', data=source_order)
