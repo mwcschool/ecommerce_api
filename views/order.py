@@ -4,6 +4,7 @@ import uuid
 
 from models import Order, User
 
+
 def is_valid_uuid(user_id):
     return uuid.UUID(user_id, version=4)
 
