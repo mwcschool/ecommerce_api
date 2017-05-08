@@ -5,24 +5,16 @@ import uuid
 from models import Order
 
 
-def is_decimal(price):
-    try:
-        float(price)
-        return True
-    except ValueError:
-        return False
-
-
 class OrdersResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('total_price', type=is_decimal, required=True)
+        parser.add_argument('total_price', type=float, required=True)
         parser.add_argument('user', type=int, required=True)
         args = parser.parse_args(strict=True)
 
         instance = Order.create(
             order_id=uuid.uuid4(),
-            total_price=args['total_price'],
+            total_price=float(args['total_price']),
             user=args['user']
         )
         return instance.json(), CREATED
