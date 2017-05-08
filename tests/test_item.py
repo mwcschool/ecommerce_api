@@ -12,6 +12,7 @@ from models import Item
 from app import app
 import uuid
 
+
 class TestItems:
     def setup_class(cls):
         Item._meta.database = SqliteDatabase(':memory:')
@@ -28,18 +29,18 @@ class TestItems:
 
     def test_get_items__not_empty(self):
         obj1 = Item.create(
-            item_id = uuid.uuid4(),
-            name = 'cubo',
-            price = 5,
-            description = 'dhfsdjòfgjasdògj'
-            )
+            item_id=uuid.uuid4(),
+            name='cubo',
+            price=5,
+            description='dhfsdjòfgjasdògj'
+        )
 
         obj2 = Item.create(
-            item_id = uuid.uuid4(),
-            name = 'cubo',
-            price = 15,
-            description = 'desc2'
-            )
+            item_id=uuid.uuid4(),
+            name='cubo',
+            price=15,
+            description='desc2'
+        )
 
         resp = self.app.get('/items/')
         assert resp.status_code == OK
@@ -47,27 +48,51 @@ class TestItems:
 
     def test_post_create_item__success(self):
         source_item = {
-            'name' : 'cubo',
-            'price' : 15,
-            'description' : 'desc1'
-            }
+            'name': 'cubo',
+            'price': 15,
+            'description': 'desc1'
+        }
 
         resp = self.app.post('/items/', data=source_item)
         assert resp.status_code == CREATED
+        resp2 = self.app.get('/items/')
 
-        # TODO Inserimento riuscito ?
+        db_data = {
+            'name': json.loads(resp2.data.decode())[0]['name'],
+            'price': json.loads(resp2.data.decode())[0]['price'],
+            'description': json.loads(resp2.data.decode())[0]['description']
+        }
+
+        assert source_item == db_data
 
     def test_post__malformed_input_type(self):
         source_item = {
-            'name' : 'cubo',
-            'price' : 'asd',
-            'description' : 'desc1'
-            }
+            'name': 'cubo',
+            'price': 'banana',
+            'description': 'desc1'
+        }
 
         source_item_2 = {
-            'name' : 'rombo',
-            'description' : 'desc2'
+            'name': 'rombo',
+            'description': 'desc2'
         }
         resp = self.app.post('/items/', data=source_item)
+        assert resp.status_code == BAD_REQUEST
         resp = self.app.post('/items/', data=source_item_2)
         assert resp.status_code == BAD_REQUEST
+
+    def test_get_item__find(self):
+        obj1 = Item.create(
+            item_id=uuid.uuid4(),
+            name='cubo',
+            price=5,
+            description='dhfsdjòfgjasdògj'
+        )
+
+        resp = self.app.get('/item/{}'.format(obj1.json()['item_id']))
+        assert resp.status_code == OK
+
+    def test_get_item__not_found(self):
+
+        resp = self.app.get('/item/{}'.format(uuid.uuid4()))
+        assert resp.status_code == NOT_FOUND
