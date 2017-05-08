@@ -159,3 +159,14 @@ class TestOrders:
             data=updates
             )
         assert resp.status_code == NOT_FOUND
+
+    def test_modify_order__failure_non_existing_empty_orders(self):
+        updates = {
+            'total_price': 7
+        }
+
+        resp = self.app.put(
+            '/orders/{}'.format(str(uuid.uuid4())),
+            data=updates
+            )
+        assert resp.status_code == NOT_FOUND
