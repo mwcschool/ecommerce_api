@@ -26,7 +26,9 @@ class Testuser:
         resp = self.app.post('/users/', data=data)
         query = User.select()
         assert resp.status_code == CREATED
-        assert query == json.loads(resp.data.decode())
+        assert len(query) == 1
+        print(resp.data.decode())
+        assert query.get().json() == json.loads(resp.data.decode())
 
     def test_post__success(self):
         data = {
@@ -36,17 +38,19 @@ class Testuser:
             'password': '1234567'
         }
 
-        User.create(
-            user_id=uuid.uuid4(),
+        id_user_created = uuid.uuid4()
+
+        user = User.create(
+            user_id=id_user_created,
             first_name='Giovanni',
             last_name='Mariani',
             email='giovanni@mariani.com',
             password='1234'
         )
         resp = self.app.post('/users/', data=data)
-        query = User.select()
+        query = User.select().where(User.user_id != id_user_created)
         assert resp.status_code == CREATED
-        assert query == json.loads(resp.data.decode())
+        assert query.get().json() == json.loads(resp.data.decode())
 
     def test_post__empty_field(self):
         data = {
@@ -88,7 +92,7 @@ class Testuser:
         resp = self.app.put('/users/{}'.format(obj1.user_id), data=data)
         query = User.select()
         assert resp.status_code == CREATED
-        assert query == json.loads(resp.data.decode())
+        assert query.get().json() == json.loads(resp.data.decode())
 
     def test_put__modify_one_field(self):
         obj1 = User.create(
