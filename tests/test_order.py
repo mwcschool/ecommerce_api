@@ -1,4 +1,3 @@
-import pytest
 import uuid
 import json
 from peewee import SqliteDatabase
@@ -6,6 +5,7 @@ from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 
 from app import app
 from models import Order, User
+
 
 class TestOrders:
     @classmethod
@@ -48,7 +48,6 @@ class TestOrders:
         resp = self.app.get('/orders/')
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == [ord1.json(), ord2.json()]
-
 
     def test_create_order__success(self):
         usr1 = User.create(
