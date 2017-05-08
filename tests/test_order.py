@@ -135,3 +135,27 @@ class TestOrders:
         ord1_upd = Order.get(Order.order_id == ord1.order_id).json()
 
         assert ord1_upd['total_price'] == updates['total_price']
+
+    def test_modify_order__failure_non_existing(self):
+        usr1 = User.create(
+                user_id=str(uuid.uuid4()),
+                first_name='Name',
+                last_name='Surname',
+                email='email@domain.com',
+                password='password'
+            )
+        ord1 = Order.create(
+                order_id=str(uuid.uuid4()),
+                total_price=10,
+                user=usr1.id
+            )
+
+        updates = {
+            'total_price': 7
+        }
+
+        resp = self.app.put(
+            '/orders/{}'.format(str(uuid.uuid4())),
+            data=updates
+            )
+        assert resp.status_code == NOT_FOUND
