@@ -62,12 +62,13 @@ class Order(BaseModel):
         return {
             'order_id': str(self.order_id),
             'total_price': float(self.total_price),
-            'user': str(self.user.user_id)
+            'user': str(self.user.user_id),
+            'items': self.items
         }
 
 
 class OrderItem(BaseModel):
-    order = ForeignKeyField(Order)
+    order = ForeignKeyField(Order, related_name="items")
     item = ForeignKeyField(Item)
     quantity = IntegerField()
     subtotal = DecimalField()
