@@ -1,4 +1,4 @@
-from models import database, Item, User, Order, OrderItem
+from models import database, Item, User, Address, Order, OrderItem
 
 
 def drop_tables():
@@ -7,6 +7,7 @@ def drop_tables():
     # Initialize db by deleting all tables
     Item.drop_table(fail_silently=True)
     User.drop_table(fail_silently=True)
+    Address.drop_table(fail_silently=True)
     Order.drop_table(fail_silently=True)
     OrderItem.drop_table(fail_silently=True)
 
@@ -19,6 +20,7 @@ def create_tables():
     # Create new table with the same name
     Item.create_table()
     User.create_table()
+    Address.create_table()
     Order.create_table()
     OrderItem.create_table()
 
