@@ -5,6 +5,8 @@ from http.client import NO_CONTENT
 from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
+import pdb
+pdb.set_trace()
 from models import Item
 from app import app
 import uuid
