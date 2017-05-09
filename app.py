@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Api
 
 from models import database
+from views.user import UserResource, UsersResource
 
 app = Flask(__name__)
 api = Api(app)
@@ -18,3 +19,7 @@ def database_disconnect(response):
     if not database.is_closed():
         database.close()
     return response
+
+
+api.add_resource(UsersResource, '/users/')
+api.add_resource(UserResource, '/users/<uuid:user_id>')
