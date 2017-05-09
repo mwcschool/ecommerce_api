@@ -24,6 +24,12 @@ class User(BaseModel):
     email = CharField(unique=True)
     password = CharField()
 
+    def json(self):
+        return {
+            'user_id': str(self.user_id)
+        }
+
+
 class Address(BaseModel):
     user = ForeignKeyField(User, related_name="address")
     nation = CharField()
