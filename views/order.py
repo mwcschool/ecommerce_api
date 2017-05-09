@@ -1,5 +1,5 @@
 from flask_restful import reqparse, Resource
-from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED
+from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 import uuid
 
 from models import Order, User
@@ -16,7 +16,10 @@ class OrdersResource(Resource):
         parser.add_argument('user', type=is_valid_uuid, required=True)
         args = parser.parse_args(strict=True)
 
-        user = User.get(User.user_id == args['user'])
+        try:
+            user = User.get(User.user_id == args['user'])
+        except User.DoesNotExist:
+            return None, BAD_REQUEST
 
         instance = Order.create(
             order_id=uuid.uuid4(),
