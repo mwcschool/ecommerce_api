@@ -25,7 +25,7 @@ class Testuser:
         }
         resp = self.app.post('/users/', data=data)
         query = User.select()
-        user_from_db = User.get()
+        user_from_db = query.get()
         expected_data = {
             'first_name': user_from_db.first_name,
             'last_name': user_from_db.last_name,
