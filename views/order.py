@@ -21,12 +21,12 @@ class OrdersResource(Resource):
         except User.DoesNotExist:
             return None, BAD_REQUEST
 
-        instance = Order.create(
+        order = Order.create(
             order_id=uuid.uuid4(),
             total_price=float(args['total_price']),
             user=user.id
         )
-        return instance.json(), CREATED
+        return order.json(), CREATED
 
     def get(self):
         return [order.json() for order in Order.select()], OK
@@ -41,7 +41,7 @@ class OrderResource(Resource):
 
     def put(self, order_id):
         try:
-            instance = Order.get(order_id=order_id)
+            order = Order.get(order_id=order_id)
         except Order.DoesNotExist:
             return None, NOT_FOUND
 
@@ -49,16 +49,16 @@ class OrderResource(Resource):
         parser.add_argument('total_price', type=float, required=True)
         args = parser.parse_args(strict=True)
 
-        instance.total_price = args['total_price']
-        instance.save()
+        order.total_price = args['total_price']
+        order.save()
 
-        return instance.json(), OK
+        return order.json(), OK
 
     def delete(self, order_id):
         try:
-            instance = Order.get(order_id=order_id)
+            order = Order.get(order_id=order_id)
         except Order.DoesNotExist:
             return None, NOT_FOUND
 
-        instance.delete_instance()
+        order.delete_instance()
         return None, NO_CONTENT
