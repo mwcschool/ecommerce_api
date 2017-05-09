@@ -196,3 +196,15 @@ class Testuser:
         resp = self.app.delete('/users/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
         assert len(User.select()) == 1
+
+    def test_post_regex__failure(self):
+        data = {
+            'first_name': 'Alessandro',
+            'last_name': 'Cappellini',
+            'email': 'testciao.it',
+            'password': 'testregex'
+        }
+        resp = self.app.post('/users/', data=data)
+        assert resp.status_code == BAD_REQUEST
+        assert json.loads(resp.data.decode()) == ''
+        assert len(User.select()) == 0
