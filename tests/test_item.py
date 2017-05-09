@@ -1,7 +1,4 @@
-import flask as f
-import flask_restful as rest
 import json
-import peewee as p
 from peewee import SqliteDatabase
 from http.client import CREATED
 from http.client import NO_CONTENT
@@ -81,16 +78,19 @@ class TestItems:
         resp = self.app.post('/items/', data=source_item_2)
         assert resp.status_code == BAD_REQUEST
 
-    def test_get_item__find(self):
+    def test_get_item__has_found(self):
         obj1 = Item.create(
             item_id=uuid.uuid4(),
             name='cubo',
             price=5,
-            description='dhfsdjòfgjasdògj'
+            description='dhfsdjofgjasdogj'
         )
 
-        resp = self.app.get('/item/{}'.format(obj1.json()['item_id']))
+        resp = self.app.get('/item/{}'.format(obj1.item_id))
         assert resp.status_code == OK
+
+        item = json.loads(resp.data.decode())
+        assert item == obj1.json()
 
     def test_get_item__not_found(self):
 
@@ -105,13 +105,21 @@ class TestItems:
             description='dhfsdjòfgjasdògj'
         )
 
-        resp = self.app.delete('item/{}'.format(obj1.json()['item_id']))
+        obj2 = Item.create(
+            item_id=uuid.uuid4(),
+            name='triangolo',
+            price=10,
+            description='Roba a caso, totally random'
+        )
+        resp = self.app.delete('item/{}'.format(obj1.item_id))
         assert resp.status_code == NO_CONTENT
-        resp = self.app.get('item/{}'.format(obj1.json()['item_id']))
+        assert len(Item.select()) == 1
+        resp = self.app.get('item/{}'.format(obj1.item_id))
         assert resp.status_code == NOT_FOUND
+        assert Item.get(item_id=obj2.item_id)
 
     def test_item__delete_not_found(self):
-        obj1 = Item.create(
+        Item.create(
             item_id=uuid.uuid4(),
             name='cubo',
             price=5,
@@ -121,10 +129,14 @@ class TestItems:
         resp = self.app.delete('item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
+    def test_item__delete_without_any_existing_item(self):
+        resp = self.app.delete('item/{}'.format(uuid.uuid4()))
+        assert resp.status_code == NOT_FOUND
+
     def test_item__modified_successfully(self):
         id = uuid.uuid4()
 
-        obj1 = Item.create(
+        Item.create(
             item_id=id,
             name='cubo',
             price=5,
@@ -152,7 +164,7 @@ class TestItems:
     def test_put_item__malformed(self):
         id = uuid.uuid4()
 
-        obj1 = Item.create(
+        Item.create(
             item_id=id,
             name='cubo',
             price=5,
