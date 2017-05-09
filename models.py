@@ -63,8 +63,20 @@ class Order(BaseModel):
             'order_id': str(self.order_id),
             'total_price': float(self.total_price),
             'user': str(self.user.user_id),
-            'items': self.items
+            'items': self._get_order_items()
         }
+
+    def _get_order_items(self):
+        data = []
+        for order_item in self.items:
+            item = order_item.item
+            data.append({
+                'item_id': str(item.item_id),
+                'name': item.name,
+                'quantity': order_item.quantity,
+                'subtotal': float(order_item.subtotal)
+            })
+        return data
 
 
 class OrderItem(BaseModel):
