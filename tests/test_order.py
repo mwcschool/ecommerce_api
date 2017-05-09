@@ -4,22 +4,28 @@ from peewee import SqliteDatabase
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 
 from app import app
-from models import Order, User
+from models import Order, OrderItem, Item, User
 
 
 class TestOrders:
     @classmethod
     def setup_class(cls):
         database = SqliteDatabase(':memory:')
+
         Order._meta.database = database
+        Item._meta.database = database
         User._meta.database = database
+
         Order.create_table()
+        Item.create_table()
         User.create_table()
+
         app.config['TESTING'] = True
         cls.app = app.test_client()
 
     def setup_method(self):
         Order.delete().execute()
+        Item.delete().execute()
         User.delete().execute()
 
     def test_get_orders__empty(self):
@@ -35,15 +41,34 @@ class TestOrders:
             email='email@domain.com',
             password='password'
         )
+        itm1 = Item.create(
+            item_id=str(uuid.uuid4()),
+            name='Item one',
+            price=10,
+            description='Item one description'
+        )
         ord1 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=10,
             user=usr1.id
         )
+        OrderItem.create(
+            order=ord1.id,
+            item=itm1.id,
+            quantity=1,
+            subtotal=itm1.price
+        )
+
         ord2 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=7,
             user=usr1.id
+        )
+        OrderItem.create(
+            order=ord2.id,
+            item=itm1.id,
+            quantity=1,
+            subtotal=itm1.price
         )
 
         resp = self.app.get('/orders/')
