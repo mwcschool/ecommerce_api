@@ -1,24 +1,11 @@
-from flask import Flask
 from flask_restful import Resource, reqparse
-import json
-import peewee
 from http.client import CREATED
 from http.client import NO_CONTENT
 from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
 import uuid
-
 import models
-
-
-def json(self):
-    return {
-        'item_id': str(self.item_id),
-        'name': self.name,
-        'price': int(self.price),
-        'description': self.description
-    }
 
 
 class Items(Resource):
