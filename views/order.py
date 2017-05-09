@@ -23,8 +23,9 @@ class OrdersResource(Resource):
 
         total_price = 0
 
+        items = args['items']
         items_id = [i[0] for i in items]
-        items_query = Items.select().where(Item.item_id << items_id)
+        items_query = Item.select().where(Item.item_id << items_id)
 
         if items_query.count() != len(items):
             return None, BAD_REQUEST
