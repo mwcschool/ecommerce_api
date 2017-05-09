@@ -1,4 +1,4 @@
-from models import database, Item, User, Order, OrderItem
+from models import database, Item, User, Address, Order, OrderItem
 from faker import Factory
 from random import seed, randint
 
@@ -24,6 +24,13 @@ def main():
             user_id=fake.uuid4(), first_name=fake.first_name(),
             last_name=fake.last_name(), email=fake.email(), password=fake.password())
         users_list.append(user)
+
+    for user in users_list:
+        for x in range(3):
+            temp_address = Address.create(
+                user=user, nation=fake.country(), city=fake.city(), postal_code=fake.postcode(), 
+                local_address=fake.address(), phone=fake.phone_number())
+            temp_address.save()
 
     for user in users_list:
         # User has three chance on four to make an order
