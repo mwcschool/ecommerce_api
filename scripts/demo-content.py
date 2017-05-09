@@ -30,7 +30,6 @@ def main():
             temp_address = Address.create(
                 user=user, nation=fake.country(), city=fake.city(), postal_code=fake.postcode(), 
                 local_address=fake.address(), phone=fake.phone_number())
-            temp_address.save()
 
     for user in users_list:
         # User has three chance on four to make an order
