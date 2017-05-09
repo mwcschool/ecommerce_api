@@ -2,7 +2,7 @@ from flask_restful import reqparse, Resource
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 import uuid
 
-from models import Order, User
+from models import Order, OrderItem, Item, User, database
 
 
 def is_valid_uuid(user_id):
@@ -12,8 +12,8 @@ def is_valid_uuid(user_id):
 class OrdersResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('total_price', type=float, required=True)
         parser.add_argument('user', type=is_valid_uuid, required=True)
+        parser.add_argument('items', type=list, required=True)
         args = parser.parse_args(strict=True)
 
         try:
@@ -21,11 +21,33 @@ class OrdersResource(Resource):
         except User.DoesNotExist:
             return None, BAD_REQUEST
 
-        order = Order.create(
-            order_id=uuid.uuid4(),
-            total_price=float(args['total_price']),
-            user=user.id
-        )
+        total_price = 0
+
+        items_id = [i[0] for i in items]
+        items_query = Items.select().where(Item.item_id << items_id)
+
+        if items_query.count() != len(items):
+            return None, BAD_REQUEST
+
+        for item in items_query:
+            total_price += item.price
+
+        with database.transaction():
+            order = Order.create(
+                order_id=uuid.uuid4(),
+                total_price=float(total_price),
+                user=user.id
+            )
+
+            for item in items_query:
+                item_qty = [x[1] for x in items if x[0] == item.item_id][0]
+                OrderItem.create(
+                    order=order.id,
+                    item=item.id,
+                    quantity=item_qty,
+                    subtotal=float(item.price * item_qty)
+                )
+
         return order.json(), CREATED
 
     def get(self):
