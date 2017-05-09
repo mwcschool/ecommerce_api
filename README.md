@@ -1,30 +1,30 @@
 # ecommerce API
 
 ## Setup
-
-Before you start, you must create a new virtualenv for the application
+Before you start, it's recommended to create a new virtualenv for the application
 ### Linux Ubuntu
 ```
 mkvirtualenv -p python3 ecommerce
 ```
+
 ### macOS
 ```
-virtualenv ecommerce
+virtualenv -p python3 ecommerce
 source ecommerce/bin/activate
 ```
-Then, install required modules with command
+
+Then, install the required modules with the command
 ```
 pip3 install -r requirements.txt
 ```
 
 ## Demo scripts
+These scripts create fake contents in the database for testing purpose.
 
-These scripts create fake content in database for testing purpose.
+`init-db.py` initialize the database by deleting existing tables and creating new ones.
+`demo-content.py` inserts random contents in database tables created by `init-db.py`.
 
-`init-db.py` initialize database by deleting existing tables and creating new ones.
-`demo-content.py` inserts random contents in database tables created by init-db.py.
-
-You must first run init-db.py before to launch demo-content.py.
+You must first run `init-db.py` before launch `demo-content.py`.
 Enter in the virtualenv and run scripts by command line:
 ```
 PYTHONPATH=. python scripts/init-db.py
