@@ -4,7 +4,6 @@ import uuid
 from peewee import SqliteDatabase
 from models import User
 from app import app
-from passlib.hash import pbkdf2_sha256
 
 
 class Testuser:
