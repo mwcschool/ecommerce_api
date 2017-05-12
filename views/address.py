@@ -11,7 +11,7 @@ def non_empty_str(val, name):
     return str(val)
 
 
-class AddressGenResource(Resource):
+class AddressesResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user_id', type=non_empty_str, required=True)
