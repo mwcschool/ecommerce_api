@@ -4,12 +4,7 @@ from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST
 from flask_restful import Resource, reqparse
 import re
 from passlib.hash import pbkdf2_sha256
-
-
-def non_empty_str(val, name):
-    if not str(val).strip():
-        raise ValueError('The argument {} is not empty'.format(name))
-    return str(val)
+import utils
 
 
 def valid_email(email):
@@ -25,10 +20,10 @@ def crypt_password(password):
 class UsersResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('first_name', type=non_empty_str, required=True)
-        parser.add_argument('last_name', type=non_empty_str, required=True)
-        parser.add_argument('email', type=non_empty_str, required=True)
-        parser.add_argument('password', type=non_empty_str, required=True)
+        parser.add_argument('first_name', type=utils.non_empty_str, required=True)
+        parser.add_argument('last_name', type=utils.non_empty_str, required=True)
+        parser.add_argument('email', type=utils.non_empty_str, required=True)
+        parser.add_argument('password', type=utils.non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
         if valid_email(args['email']) is not None and len(args['password']) > 6:
@@ -53,10 +48,10 @@ class UserResource(Resource):
             return None, NOT_FOUND
 
         parser = reqparse.RequestParser()
-        parser.add_argument('first_name', type=non_empty_str, required=True)
-        parser.add_argument('last_name', type=non_empty_str, required=True)
-        parser.add_argument('email', type=non_empty_str, required=True)
-        parser.add_argument('password', type=non_empty_str, required=True)
+        parser.add_argument('first_name', type=utils.non_empty_str, required=True)
+        parser.add_argument('last_name', type=utils.non_empty_str, required=True)
+        parser.add_argument('email', type=utils.non_empty_str, required=True)
+        parser.add_argument('password', type=utils.non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
         if valid_email(args['email']) is not None and len(args['password']) > 6:
