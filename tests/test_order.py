@@ -29,6 +29,18 @@ class TestOrders:
             email='email@domain.com',
             password='password'
         )
+        cls.item1 = Item.create(
+            item_id=str(uuid.uuid4()),
+            name='Item one',
+            price=10,
+            description='Item one description'
+        )
+        cls.item2 = Item.create(
+            item_id=str(uuid.uuid4()),
+            name='Item two',
+            price=10,
+            description='Item two description'
+        )
 
         app.config['TESTING'] = True
         cls.app = app.test_client()
@@ -36,8 +48,6 @@ class TestOrders:
     def setup_method(self):
         OrderItem.delete().execute()
         Order.delete().execute()
-        Item.delete().execute()
-        User.delete().execute()
 
     def test_get_orders__empty(self):
         resp = self.app.get('/orders/')
@@ -45,12 +55,6 @@ class TestOrders:
         assert json.loads(resp.data.decode()) == []
 
     def test_get_orders(self):
-        itm1 = Item.create(
-            item_id=str(uuid.uuid4()),
-            name='Item one',
-            price=10,
-            description='Item one description'
-        )
         order1 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=10,
@@ -58,9 +62,9 @@ class TestOrders:
         )
         OrderItem.create(
             order=order1.id,
-            item=itm1.id,
+            item=self.item1.id,
             quantity=1,
-            subtotal=itm1.price
+            subtotal=self.item1.price
         )
 
         order2 = Order.create(
@@ -70,9 +74,9 @@ class TestOrders:
         )
         OrderItem.create(
             order=order2.id,
-            item=itm1.id,
+            item=self.item1.id,
             quantity=1,
-            subtotal=itm1.price
+            subtotal=self.item1.price
         )
 
         resp = self.app.get('/orders/')
@@ -81,8 +85,10 @@ class TestOrders:
 
     def test_create_order__success(self):
         new_order_data = {
-            'total_price': 10,
-            'user': user1.user_id
+            'user': self.user1.user_id,
+            'items': json.dumps([
+                [self.item1.item_id, 1], [self.item2.item_id, 1]
+            ])
         }
 
         resp = self.app.post('/orders/', data=new_order_data)
@@ -93,8 +99,13 @@ class TestOrders:
 
         assert len(Order.select()) == 1
         assert order_from_db == order_from_server
+
         order_from_server.pop('order_id')
-        assert order_from_server == new_order_data
+        assert order_from_server['user'] == new_order_data['user']
+        assert len(order_from_server['items']) == 2
+        order_items_ids = [self.item1.item_id, self.item2.item_id]
+        assert order_from_server['items'][0]['item_id'] in order_items_ids
+        assert order_from_server['items'][1]['item_id'] in order_items_ids
 
     def test_create_order__failure_missing_field(self):
         new_order_data = {
@@ -237,7 +248,7 @@ class TestOrders:
             total_price=10,
             user=self.user1.id
         )
-        itm1 = Item.create(
+        item1 = Item.create(
             item_id=str(uuid.uuid4()),
             name='Item one',
             price=10,
@@ -245,9 +256,9 @@ class TestOrders:
         )
         OrderItem.create(
             order=order1.id,
-            item=itm1.id,
+            item=self.item1.id,
             quantity=1,
-            subtotal=itm1.price
+            subtotal=self.item1.price
         )
         order2 = Order.create(
             order_id=str(uuid.uuid4()),
@@ -256,9 +267,9 @@ class TestOrders:
         )
         OrderItem.create(
             order=order2.id,
-            item=itm1.id,
+            item=self.item1.id,
             quantity=1,
-            subtotal=itm1.price
+            subtotal=self.item1.price
         )
 
         resp = self.app.delete('/orders/{}'.format(order1.order_id))
