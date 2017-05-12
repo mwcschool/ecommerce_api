@@ -126,6 +126,18 @@ class TestOrders:
         assert resp.status_code == BAD_REQUEST
         assert len(Order.select()) == 0
 
+    def test_create_order__failure_non_existing_items(self):
+        new_order_data = {
+            'user': self.user1.user_id,
+            'items': json.dumps([
+                [str(uuid.uuid4()), 1], [str(uuid.uuid4()), 1]
+            ])
+        }
+
+        resp = self.app.post('/orders/', data=new_order_data)
+        assert resp.status_code == BAD_REQUEST
+        assert len(Order.select()) == 0
+
     def test_create_order__failure_non_existing_user(self):
         new_order_data = {
             'total_price': 10,
