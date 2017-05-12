@@ -13,12 +13,7 @@ def non_empty_str(val, name):
 
 
 def valid_email(email):
-    regex = re.compile('[a-z]{3,}(?P<at>@)[a-z]{3,}(?P<point>\.)[a-z]{2,}')
-
-    if regex.match(email) is None:
-        return False
-    else:
-        return True
+    return re.match('[a-z]{3,}(?P<at>@)[a-z]{3,}(?P<point>\.)[a-z]{2,}',email)
 
 
 def crypt_password(password):
