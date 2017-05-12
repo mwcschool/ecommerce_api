@@ -41,7 +41,7 @@ class OrdersResource(Resource):
         with database.transaction():
             order = Order.create(
                 order_id=uuid.uuid4(),
-                total_price=float(total_price),
+                total_price=total_price,
                 user=user.id
             )
 
