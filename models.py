@@ -45,12 +45,24 @@ class User(BaseModel):
 
 
 class Address(BaseModel):
+    address_id = UUIDField(unique=True)
     user = ForeignKeyField(User, related_name="address")
     nation = CharField()
     city = CharField()
     postal_code = CharField()
     local_address = CharField()
     phone = CharField()
+
+    def json(self):
+        return {
+            'address_id': self.address_id,
+            'user': self.user,
+            'nation': self.nation,
+            'city': self.city,
+            'postal_code': self.postal_code,
+            'local_address': self.local_address,
+            'phone': self.phone
+        }
 
 
 class Order(BaseModel):
