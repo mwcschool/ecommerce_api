@@ -2,7 +2,6 @@ import uuid
 from models import User, Address
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, OK
 from flask_restful import Resource, reqparse
-import re
 
 
 def non_empty_str(val, name):
