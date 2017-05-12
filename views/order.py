@@ -36,7 +36,8 @@ class OrdersResource(Resource):
             return None, BAD_REQUEST
 
         for item in items_query:
-            total_price += item.price
+            item_qty = [x[1] for x in items if x[0] == str(item.item_id)][0]
+            total_price += float(item.price * item_qty)
 
         with database.transaction():
             order = Order.create(
