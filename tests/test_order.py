@@ -87,7 +87,7 @@ class TestOrders:
         new_order_data = {
             'user': self.user1.user_id,
             'items': json.dumps([
-                [self.item1.item_id, 1], [self.item2.item_id, 1]
+                [self.item1.item_id, 2], [self.item2.item_id, 1]
             ])
         }
 
@@ -103,9 +103,13 @@ class TestOrders:
         order_from_server.pop('order_id')
         assert order_from_server['user'] == new_order_data['user']
         assert len(order_from_server['items']) == 2
+
         order_items_ids = [self.item1.item_id, self.item2.item_id]
         assert order_from_server['items'][0]['item_id'] in order_items_ids
         assert order_from_server['items'][1]['item_id'] in order_items_ids
+
+        order_total = (self.item1.price * 2) + self.item2.price
+        assert order_from_server['total_price'] == order_total
 
     def test_create_order__failure_missing_field(self):
         new_order_data = {
