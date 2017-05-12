@@ -22,9 +22,7 @@ class AddressesResource(Resource):
         parser.add_argument('phone', type=non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
-
         query = User.select().where(User.user_id == args['user_id'])
-
 
         if query.exists():
             obj = Address.create(
@@ -75,11 +73,11 @@ class AddressResource(Resource):
         elif len(args['phone'] < 3):
             return '', BAD_REQUEST
 
-        obj.nation=args['nation']
-        obj.city=args['city']
-        obj.postal_code=args['postal_code']
-        obj.local_address=args['local_address']
-        obj.phone=args['phone']
+        obj.nation = args['nation']
+        obj.city = args['city']
+        obj.postal_code = args['postal_code']
+        obj.local_address = args['local_address']
+        obj.phone = args['phone']
 
         obj.save()
 
