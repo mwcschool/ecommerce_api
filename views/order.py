@@ -32,7 +32,7 @@ class OrdersResource(Resource):
         items_id = [i[0] for i in items]
         items_query = Item.select().where(Item.item_id << items_id)
 
-        if items_query.count() != len(items):
+        if items_query.count() != len(items) or len(items) == 0:
             return None, BAD_REQUEST
 
         for item in items_query:
