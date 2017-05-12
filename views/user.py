@@ -36,9 +36,7 @@ class UsersResource(Resource):
         parser.add_argument('password', type=non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
-        regex = re.compile('[a-z]{3,}(?P<at>@)[a-z]{3,}\.[a-z]{2,}')
-
-        if regex.match(args['email']) is not None and len(args['password']) > 6:
+        if valid_email(args['email']) is not None and len(args['password']) > 6:
             obj = User.create(
                 user_id=uuid.uuid4(),
                 first_name=args['first_name'],
@@ -66,9 +64,7 @@ class UserResource(Resource):
         parser.add_argument('password', type=non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
-        regex = re.compile('[a-z]{3,}(?P<at>@)[a-z]{3,}\.[a-z]{2,}')
-
-        if regex.match(args['email']) is not None and len(args['password']) > 6:
+        if valid_email(args['email']) is not None and len(args['password']) > 6:
             obj.first_name = args['first_name']
             obj.last_name = args['last_name']
             obj.email = args['email']
