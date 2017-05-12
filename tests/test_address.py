@@ -119,7 +119,7 @@ class Testaddress:
 
         resp = self.app.put('/addresses/{}'.format(address.address_id), data=data)
         query = Address.select()
-        user_from_db = query.get()
+        address_from_db = query.get()
         expected_data = {
             'user': address_from_db.user,
             'nation': address_from_db.nation,
@@ -184,7 +184,6 @@ class Testaddress:
         resp = self.app.put('/adresses/{}'.format(uuid.uuid4()), data=data)
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 0
-
 
     def test_delete_address__success(self):
         u_query = User.get()
