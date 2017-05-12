@@ -109,7 +109,7 @@ class TestOrders:
 
     def test_create_order__failure_missing_field(self):
         new_order_data = {
-            'user': user1.user_id
+            'user': self.user1.user_id
         }
 
         resp = self.app.post('/orders/', data=new_order_data)
