@@ -29,6 +29,9 @@ class User(BaseModel):
             'user_id': str(self.user_id)
         }
 
+    def verify_email(self):
+        pbkdf2_sha256.verify(origin_password, self.password)
+
 
 class Address(BaseModel):
     user = ForeignKeyField(User, related_name="address")
