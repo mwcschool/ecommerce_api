@@ -2,7 +2,6 @@ import uuid
 from models import User, Address
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, OK
 from flask_restful import Resource, reqparse
-import re
 
 
 def non_empty_str(val, name):
@@ -20,6 +19,17 @@ class AddressesResource(Resource):
         parser.add_argument('local_address', type=non_empty_str, required=True)
         parser.add_argument('phone', type=non_empty_str, required=True)
         args = parser.parse_args(strict=True)
+
+        if len(args['nation']) < 3:
+            return '', BAD_REQUEST
+        elif len(args['city']) < 3:
+            return '', BAD_REQUEST
+        elif len(args['postal_code']) < 3:
+            return '', BAD_REQUEST
+        elif len(args['local_address']) < 3:
+            return '', BAD_REQUEST
+        elif len(args['phone']) < 3:
+            return '', BAD_REQUEST
 
         check_user = User.select().where(User.user_id == user_id)
 
