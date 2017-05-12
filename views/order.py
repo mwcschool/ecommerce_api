@@ -79,9 +79,17 @@ class OrderResource(Resource):
 
     def delete(self, order_id):
         try:
-            order = Order.get(order_id=order_id)
+            order = Order.get(Order.order_id == order_id)
         except Order.DoesNotExist:
             return None, NOT_FOUND
 
-        order.delete_instance()
+        with database.transaction():
+            order_items = OrderItem.select().where(
+                    OrderItem.order_id == order.id)
+
+            for order_item in order_items:
+                order_item.delete_instance()
+
+            order.delete_instance()
+
         return None, NO_CONTENT
