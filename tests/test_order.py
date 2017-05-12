@@ -151,7 +151,7 @@ class TestOrders:
     def test_create_order__failure_empty_field(self):
         new_order_data = {
             'total_price': None,
-            'user': user1.user_id
+            'user': self.user1.user_id
         }
 
         resp = self.app.post('/orders/', data=new_order_data)
