@@ -24,6 +24,7 @@ class TestOrders:
         cls.app = app.test_client()
 
     def setup_method(self):
+        OrderItem.delete().execute()
         Order.delete().execute()
         Item.delete().execute()
         User.delete().execute()
@@ -298,10 +299,28 @@ class TestOrders:
             total_price=10,
             user=usr1.id
         )
+        itm1 = Item.create(
+            item_id=str(uuid.uuid4()),
+            name='Item one',
+            price=10,
+            description='Item one description'
+        )
+        OrderItem.create(
+            order=ord1.id,
+            item=itm1.id,
+            quantity=1,
+            subtotal=itm1.price
+        )
         ord2 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=12,
             user=usr1.id
+        )
+        OrderItem.create(
+            order=ord2.id,
+            item=itm1.id,
+            quantity=1,
+            subtotal=itm1.price
         )
 
         resp = self.app.delete('/orders/{}'.format(ord1.order_id))
@@ -310,6 +329,9 @@ class TestOrders:
         orders = Order.select()
         assert len(orders) == 1
         assert Order.get(Order.order_id == ord2.order_id)
+
+        order_items = OrderItem.select().where(OrderItem.order_id == ord1.id)
+        assert len(order_items) == 0
 
     def test_delete_order__failure_non_existing(self):
         usr1 = User.create(
