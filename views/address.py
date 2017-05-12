@@ -45,7 +45,7 @@ class AddressResource(Resource):
             obj = Address.get(address_id=address_id)
         except Address.DoesNotExist:
             return None, NOT_FOUND
-        
+
         return obj.json(), OK
 
     def put(self, address_id):
@@ -82,7 +82,6 @@ class AddressResource(Resource):
         obj.save()
 
         return obj.json(), CREATED
-
 
     def delete(self, address_id):
         try:

@@ -166,7 +166,7 @@ class Testaddress:
             'city': '',
             'postal_code': '',
             'local_address': '',
-            'phone':''
+            'phone': ''
         }
 
         resp = self.app.put('/addresses/{}'.format(address.address_id), data=data)
