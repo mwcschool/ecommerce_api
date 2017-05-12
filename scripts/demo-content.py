@@ -26,9 +26,9 @@ def main():
         users_list.append(user)
 
     for user in users_list:
-        for x in range(randint(1,3)):
-            temp_address = Address.create(
-                user=user, nation=fake.country(), city=fake.city(), postal_code=fake.postcode(), 
+        for x in range(randint(1, 3)):
+            Address.create(
+                user=user, nation=fake.country(), city=fake.city(), postal_code=fake.postcode(),
                 local_address=fake.address(), phone=fake.phone_number())
 
     for user in users_list:
