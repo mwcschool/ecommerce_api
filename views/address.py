@@ -1,6 +1,6 @@
 import uuid
 from models import User, Address
-from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST
+from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, OK
 from flask_restful import Resource, reqparse
 import re
 
@@ -40,6 +40,8 @@ class AddressResource(Resource):
             obj = Address.get(address_id=address_id)
         except Address.DoesNotExist:
             return None, NOT_FOUND
+
+        return obj.json(), OK
 
     def put(self, address_id):
         try:
