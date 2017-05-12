@@ -30,6 +30,15 @@ class User(BaseModel):
         }
 
 
+class Address(BaseModel):
+    user = ForeignKeyField(User, related_name="address")
+    nation = CharField()
+    city = CharField()
+    postal_code = CharField()
+    local_address = CharField()
+    phone = CharField()
+
+
 class Order(BaseModel):
     order_id = UUIDField(unique=True)
     total_price = DecimalField()
