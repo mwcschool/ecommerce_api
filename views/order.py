@@ -1,6 +1,7 @@
 from flask_restful import reqparse, Resource
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 import uuid
+import json
 
 from models import Order, OrderItem, Item, User, database
 
@@ -9,11 +10,15 @@ def is_valid_uuid(user_id):
     return uuid.UUID(user_id, version=4)
 
 
+def is_valid_item_list(json_item_list):
+    return json.loads(json_item_list)
+
+
 class OrdersResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user', type=is_valid_uuid, required=True)
-        parser.add_argument('items', type=list, required=True)
+        parser.add_argument('items', type=is_valid_item_list, required=True)
         args = parser.parse_args(strict=True)
 
         try:
@@ -41,7 +46,7 @@ class OrdersResource(Resource):
             )
 
             for item in items_query:
-                item_qty = [x[1] for x in items if x[0] == item.item_id][0]
+                item_qty = [x[1] for x in items if x[0] == str(item.item_id)][0]
                 OrderItem.create(
                     order=order.id,
                     item=item.id,
@@ -85,7 +90,7 @@ class OrderResource(Resource):
 
         with database.transaction():
             order_items = OrderItem.select().where(
-                    OrderItem.order_id == order.id)
+                OrderItem.order_id == order.id)
 
             for order_item in order_items:
                 order_item.delete_instance()
