@@ -64,6 +64,16 @@ class AddressResource(Resource):
         parser.add_argument('phone', type=non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
+        if len(args['nation'] < 3):
+            return '', BAD_REQUEST
+        elif len(args['city'] < 3):
+            return '', BAD_REQUEST
+        elif len(args['postal_code'] < 3):
+            return '', BAD_REQUEST
+        elif len(args['local_address'] < 3):
+            return '', BAD_REQUEST
+        elif len(args['phone'] < 3):
+            return '', BAD_REQUEST
 
         obj.nation=args['nation']
         obj.city=args['city']
