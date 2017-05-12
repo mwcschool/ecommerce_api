@@ -10,9 +10,6 @@ from app import app
 import uuid
 
 
-<< << << < HEAD
-
-
 def create_user(id_user, number):
     return User.create(
         user_id=id_user,
