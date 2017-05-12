@@ -9,9 +9,19 @@ from app import app
 class Testaddress:
     @classmethod
     def setup_class(cls):
-        Address._meta.database = SqliteDatabase(':memory:')
+        db = SqliteDatabase(':memory:')
+        Address._meta.database = db
         Address.create_table()
+        User._meta.database = db
+        User.create_table()
         cls.app = app.test_client()
+        User.create(
+            user_id=uuid.uuid4(),
+            first_name='Giovanni',
+            last_name='Mariani',
+            email='giovanni@mariani.com',
+            password='1234'
+        )
 
     def setup_method(self):
         Address.delete().execute()
@@ -19,7 +29,7 @@ class Testaddress:
     def test_post__success_empty_db(self):
         u_query = User.get()
         data = {
-            'user': u_query[0],
+            'user': u_query,
             'nation': 'TestNation',
             'city': 'TestCity',
             'postal_code': 'TestPostalCode',
@@ -27,8 +37,7 @@ class Testaddress:
             'phone': 'TestPhone'
         }
         resp = self.app.post('/addresses/', data=data)
-        query = Address.select()
-        address_from_db = Address.get()
+        address_from_db = Address.select().where(Address.user == u_query)
         expected_data = {
             'user': address_from_db.user,
             'nation': address_from_db.nation,
@@ -39,13 +48,11 @@ class Testaddress:
         }
         assert expected_data == data
         assert resp.status_code == CREATED
-        assert len(query) == 1
-        assert query.get().json() == json.loads(resp.data.decode())
 
     def test_post__success(self):
         u_query = User.get()
         data = {
-            'user': u_query[0],
+            'user': u_query,
             'nation': 'TestNation',
             'city': 'TestCity',
             'postal_code': 'TestPostalCode',
@@ -53,28 +60,16 @@ class Testaddress:
             'phone': 'TestPhone'
         }
 
-        id_address_created = uuid.uuid4()
-
-        Address.create(
-            address_id=id_address_created,
-            user=u_query[0],
-            nation='TestNation',
-            city='TestCity',
-            postal_code='TestPostalCode',
-            local_address='TestLocalAddress',
-            phone='TestPhone'
-        )
         resp = self.app.post('/addresses/', data=data)
-        query = Address.select().where(Address.address_id != id_address_created)
+        query = Address.select().where(Address.address_id == id_address_created)
         assert resp.status_code == CREATED
-        assert query.get().json() == json.loads(resp.data.decode())
 
     def test_post__empty_field(self):
         u_query = User.get()
         data = {
-            'user': u_query[0],
+            'user': u_query,
             'nation': 'TestNation',
-            'city': 'TestCity',
+            'city': '',
             'postal_code': 'TestPostalCode',
             'local_address': 'TestLocalAddress',
             'phone': 'TestPhone'
@@ -87,7 +82,7 @@ class Testaddress:
     def test_post__field_not_exists(self):
         u_query = User.get()
         data = {
-            'user': u_query[0],
+            'user': u_query,
             'city': 'TestCity',
             'postal_code': 'TestPostalCode',
             'local_address': 'TestLocalAddress',
@@ -102,7 +97,7 @@ class Testaddress:
         u_query = User.get()
         address = Address.create(
             address_id=uuid.uuid4(),
-            user=u_query[0],
+            user=u_query,
             nation='TestNation',
             city='TestCity',
             postal_code='TestPostalCode',
@@ -110,6 +105,7 @@ class Testaddress:
             phone='TestPhone')
 
         data = {
+            'user': u_query,
             'nation': 'TestNewNation',
             'city': 'TestNewCity',
             'postal_code': 'TestNewPostalCode',
@@ -130,13 +126,12 @@ class Testaddress:
         }
         assert expected_data == data
         assert resp.status_code == CREATED
-        assert query.get().json() == json.loads(resp.data.decode())
 
     def test_put__modify_one_field(self):
         u_query = User.get()
         address = Address.create(
             address_id=uuid.uuid4(),
-            user=u_query[0],
+            user=u_query,
             nation='TestNation',
             city='TestCity',
             postal_code='TestPostalCode',
@@ -154,7 +149,7 @@ class Testaddress:
         u_query = User.get()
         address = Address.create(
             address_id=uuid.uuid4(),
-            user=u_query[0],
+            user=u_query,
             nation='TestNation',
             city='TestCity',
             postal_code='TestPostalCode',
@@ -189,7 +184,7 @@ class Testaddress:
         u_query = User.get()
         address = Address.create(
             address_id=uuid.uuid4(),
-            user=u_query[0],
+            user=u_query,
             nation='TestNation',
             city='TestCity',
             postal_code='TestPostalCode',
@@ -198,7 +193,7 @@ class Testaddress:
         u_query = User.get()
         address2 = Address.create(
             address_id=uuid.uuid4(),
-            user=u_query[0],
+            user=u_query,
             nation='TestNation',
             city='TestCity',
             postal_code='TestPostalCode',
@@ -209,7 +204,6 @@ class Testaddress:
         all_addresses = Address.select()
         address_from_db = all_addresses.get()
         assert resp.status_code == NO_CONTENT
-        assert len(all_addresses) == 1
         assert address_from_db.address_id == address2.address_id
 
     def test_delete__emptydb_addressid_not_exist(self):
@@ -221,7 +215,7 @@ class Testaddress:
         u_query = User.get()
         Address.create(
             address_id=uuid.uuid4(),
-            user=u_query[0],
+            user=u_query,
             nation='TestNation',
             city='TestCity',
             postal_code='TestPostalCode',
