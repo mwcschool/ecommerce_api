@@ -4,6 +4,7 @@ import uuid
 from peewee import SqliteDatabase
 from models import User
 from app import app
+from passlib.hash import pbkdf2_sha256
 
 
 class Testuser:
@@ -30,7 +31,7 @@ class Testuser:
             'first_name': user_from_db.first_name,
             'last_name': user_from_db.last_name,
             'email': user_from_db.email,
-            'password': user_from_db.password
+            'password': data['password']
         }
         assert expected_data == data
         assert resp.status_code == CREATED
@@ -105,7 +106,7 @@ class Testuser:
             'first_name': user_from_db.first_name,
             'last_name': user_from_db.last_name,
             'email': user_from_db.email,
-            'password': user_from_db.password
+            'password': data['password']
         }
         assert expected_data == data
         assert resp.status_code == CREATED
