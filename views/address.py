@@ -32,11 +32,9 @@ class AddressesResource(Resource):
         elif len(args['phone']) < 3:
             return '', BAD_REQUEST
 
-        check_user = User.select().where(User.user_id == user_id)
-
-        if check_user.exists():
+        if User.select().where(User.user_id == args['user_id']).exists():
             obj = Address.create(
-                address_id=uuid.uuid4(), user=user_id, nation=args['nation'],
+                address_id=uuid.uuid4(), user=args['user_id'], nation=args['nation'],
                 city=args['city'], postal_code=args['postal_code'],
                 local_address=args['local_address'], phone=args['phone'])
 
@@ -73,6 +71,7 @@ class AddressResource(Resource):
             return None, NOT_FOUND
 
         parser = reqparse.RequestParser()
+        parser.add_argument('user_id', type=non_empty_str, required=True)
         parser.add_argument('nation', type=non_empty_str, required=True)
         parser.add_argument('city', type=non_empty_str, required=True)
         parser.add_argument('postal_code', type=non_empty_str, required=True)
@@ -91,14 +90,17 @@ class AddressResource(Resource):
         elif len(args['phone']) < 3:
             return '', BAD_REQUEST
 
-        obj.nation = args['nation']
-        obj.city = args['city']
-        obj.postal_code = args['postal_code']
-        obj.local_address = args['local_address']
-        obj.phone = args['phone']
-        obj.save()
+        if Address.user_id == args['user_id']:
+            obj.nation = args['nation']
+            obj.city = args['city']
+            obj.postal_code = args['postal_code']
+            obj.local_address = args['local_address']
+            obj.phone = args['phone']
+            obj.save()
 
-        return obj.json(), CREATED
+            return obj.json(), CREATED
+        else:
+            return '', BAD_REQUEST
 
     def delete(self, address_id):
         try:
