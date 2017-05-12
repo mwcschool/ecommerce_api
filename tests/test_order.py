@@ -167,14 +167,29 @@ class TestOrders:
             total_price=10,
             user=self.user1.id
         )
+        OrderItem.create(
+            order=order1.id,
+            item=self.item1.id,
+            quantity=1,
+            subtotal=self.item1.price
+        )
+
         order2 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=12,
             user=self.user1.id
         )
+        OrderItem.create(
+            order=order2.id,
+            item=self.item1.id,
+            quantity=1,
+            subtotal=self.item1.price
+        )
 
         updates = {
-            'total_price': 7
+            'items':json.dumps([
+                    [self.item2.item_id, 2]
+                ])
         }
 
         resp = self.app.put(
@@ -184,10 +199,15 @@ class TestOrders:
         assert resp.status_code == OK
 
         order1_upd = Order.get(Order.order_id == order1.order_id).json()
-        assert order1_upd['total_price'] == updates['total_price']
+        total_price = self.item2.price*2
+        assert order1_upd['total_price'] == total_price
 
         order2_db = Order.get(Order.order_id == order2.order_id).json()
         assert order2_db == order2.json()
+
+        order1_items = OrderItem.select().where(OrderItem.order_id==order1.id)
+        assert len(order1_items) == 1
+        assert order1_items[0].item_id == self.item2.id
 
     def test_modify_order__failure_non_existing(self):
         Order.create(
