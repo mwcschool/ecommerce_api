@@ -227,7 +227,7 @@ class Testaddress:
             postal_code='TestPostalCode',
             local_address='TestLocalAddress',
             phone='TestPhone')
-        
+
         resp = self.app.delete('/addresses/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 1

@@ -56,7 +56,6 @@ class Order(BaseModel):
     total_price = DecimalField()
     user = ForeignKeyField(User, related_name="orders")
 
-
 class OrderItem(BaseModel):
     order = ForeignKeyField(Order)
     item = ForeignKeyField(Item)
