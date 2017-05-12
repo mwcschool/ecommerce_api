@@ -23,3 +23,6 @@ def database_disconnect(response):
 
 api.add_resource(UsersResource, '/users/')
 api.add_resource(UserResource, '/users/<uuid:user_id>')
+
+api.add_resource(AddressesResource, '/addresses/')
+api.add_resource(AddressResource, '/addresses/<uuid:address_id>')
