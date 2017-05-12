@@ -16,6 +16,14 @@ class Item(BaseModel):
     price = DecimalField()
     description = TextField()
 
+    def json(self):
+        return {
+            'item_id': str(self.item_id),
+            'name': self.name,
+            'price': int(self.price),
+            'description': self.description
+        }
+
 
 class User(BaseModel):
     user_id = UUIDField(unique=True)
