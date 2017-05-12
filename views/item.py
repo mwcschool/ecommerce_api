@@ -6,14 +6,10 @@ from http.client import OK
 from http.client import BAD_REQUEST
 import uuid
 from models import Item
+import utils
 
 
-def string_not_empty(string_test):
-    if string_test.strip() == '':
-        raise ValueError("La stringa non può essere vuota")
-
-
-class Items_Resource(Resource):
+class ItemsResource(Resource):
     def get(self):
         return [obj.json() for obj in Item.select()], OK
 
@@ -24,7 +20,7 @@ class Items_Resource(Resource):
         parser.add_argument('description', type=str, required=True)
         args = parser.parse_args(strict=True)
         try:
-            string_not_empty(args['name'])
+            utils.non_empty_str(args['name'], 'name')
         except ValueError:
             return None, BAD_REQUEST
 
@@ -38,7 +34,7 @@ class Items_Resource(Resource):
         return obj.json(), CREATED
 
 
-class Item_Resource(Resource):
+class ItemResource(Resource):
 
     def get(self, item_id):
         try:
@@ -67,7 +63,7 @@ class Item_Resource(Resource):
         parser.add_argument('description', type=str, required=True)
         args = parser.parse_args(strict=True)
         try:
-            string_not_empty(args['name'])
+            utils.non_empty_str(args['name'], 'name')
         except ValueError:
             return None, BAD_REQUEST
 
