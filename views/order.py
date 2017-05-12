@@ -75,11 +75,36 @@ class OrderResource(Resource):
             return None, NOT_FOUND
 
         parser = reqparse.RequestParser()
-        parser.add_argument('total_price', type=float, required=True)
+        parser.add_argument('items', type=is_valid_item_list, required=True)
         args = parser.parse_args(strict=True)
 
-        order.total_price = args['total_price']
-        order.save()
+        total_price = 0
+
+        items = args['items']
+        items_id = [i[0] for i in items]
+        items_query = Item.select().where(Item.item_id << items_id)
+
+        if items_query.count() != len(items) or len(items) == 0:
+            return None, BAD_REQUEST
+
+        for item in items_query:
+            item_qty = [x[1] for x in items if x[0] == str(item.item_id)][0]
+            total_price += float(item.price * item_qty)
+
+        with database.transaction():
+            OrderItem.delete().where(OrderItem.order_id == order.id).execute()
+
+            for item in items_query:
+                item_qty = [x[1] for x in items if x[0] == str(item.item_id)][0]
+                OrderItem.create(
+                    order=order.id,
+                    item=item.id,
+                    quantity=item_qty,
+                    subtotal=float(item.price * item_qty)
+                )
+
+            order.total_price = total_price
+            order.save()
 
         return order.json(), OK
 
