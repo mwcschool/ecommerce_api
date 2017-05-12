@@ -283,7 +283,7 @@ class TestOrders:
         )
 
         updates = {
-            'total_price': None
+            'items':json.dumps('')
         }
 
         resp = self.app.put(
