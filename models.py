@@ -112,3 +112,27 @@ class Picture(BaseModel):
             'title': self.title,
             'extension': self.extension,
         }
+
+
+class Favorites(BaseModel):
+    user = ForeignKeyField(User)
+    item = ForeignKeyField(Item)
+
+    def json(self):
+        return {
+            'user': str(self.user),
+            'item': str(self.item)
+        }
+
+    def getUser(self):
+        return {
+            'user_id': str(self.user.user_id)
+        }
+
+    def getItem(self):
+        return {
+            'item_id': str(self.item.item_id),
+            'name': self.item.name,
+            'price': int(self.item.price),
+            'description': self.item.description
+        }
