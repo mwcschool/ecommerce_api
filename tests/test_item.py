@@ -10,6 +10,10 @@ from app import app
 import uuid
 
 
+def number_of_rows_in_DB():
+    return len(Item.select())
+
+
 class TestItems:
     def setup_class(cls):
         Item._meta.database = SqliteDatabase(':memory:')
@@ -19,12 +23,12 @@ class TestItems:
     def setup_method(self):
         Item.delete().execute()
 
-    def test_get_items__empty(self):
+    def test_get__database_empty(self):
         resp = self.app.get('/items/')
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == []
 
-    def test_get_items__not_empty(self):
+    def test_get__database_not_empty(self):
         obj1 = Item.create(
             item_id=uuid.uuid4(),
             name='cubo',
@@ -43,7 +47,7 @@ class TestItems:
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == [obj1.json(), obj2.json()]
 
-    def test_post_create_item__success(self):
+    def test_post__create_item_success(self):
         source_item = {
             'name': 'cubo',
             'price': 15,
@@ -52,33 +56,44 @@ class TestItems:
 
         resp = self.app.post('/items/', data=source_item)
         assert resp.status_code == CREATED
-        resp2 = self.app.get('/items/')
 
-        db_data = {
-            'name': json.loads(resp2.data.decode())[0]['name'],
-            'price': json.loads(resp2.data.decode())[0]['price'],
-            'description': json.loads(resp2.data.decode())[0]['description']
-        }
+        select_query_db = Item.select()
 
-        assert source_item == db_data
+        assert len(select_query_db) == 1
 
-    def test_post__malformed_input_type(self):
+        item_from_db = select_query_db[0].json()
+        assert item_from_db == json.loads(resp.data.decode())
+
+    def test_post__name_with_only_spaces(self):
         source_item = {
-            'name': 'cubo',
-            'price': 'banana',
+            'name': '    ',
+            'price': 123,
             'description': 'desc1'
         }
+        resp = self.app.post('/items/', data=source_item)
+        assert resp.status_code == BAD_REQUEST
+        assert number_of_rows_in_DB() == 0
 
-        source_item_2 = {
+    def test_post__item_without_an_argument_given(self):
+        source_item = {
             'name': 'rombo',
             'description': 'desc2'
         }
         resp = self.app.post('/items/', data=source_item)
         assert resp.status_code == BAD_REQUEST
-        resp = self.app.post('/items/', data=source_item_2)
-        assert resp.status_code == BAD_REQUEST
+        assert number_of_rows_in_DB() == 0
 
-    def test_get_item__has_found(self):
+    def test_post__price_value_as_a_string(self):
+        source_item = {
+            'name': 'ciao',
+            'price': 'stringa',
+            'description': 'desc3'
+        }
+        resp = self.app.post('/items/', data=source_item)
+        assert resp.status_code == BAD_REQUEST
+        assert number_of_rows_in_DB() == 0
+
+    def test_get__item_found(self):
         obj1 = Item.create(
             item_id=uuid.uuid4(),
             name='cubo',
@@ -92,12 +107,12 @@ class TestItems:
         item = json.loads(resp.data.decode())
         assert item == obj1.json()
 
-    def test_get_item__not_found(self):
+    def test_get__item_not_found(self):
 
         resp = self.app.get('/item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
-    def test_item__deleted_successfully(self):
+    def test_delete__item_removed_successfully(self):
         obj1 = Item.create(
             item_id=uuid.uuid4(),
             name='cubo',
@@ -105,20 +120,13 @@ class TestItems:
             description='dhfsdjòfgjasdògj'
         )
 
-        obj2 = Item.create(
-            item_id=uuid.uuid4(),
-            name='triangolo',
-            price=10,
-            description='Roba a caso, totally random'
-        )
         resp = self.app.delete('item/{}'.format(obj1.item_id))
         assert resp.status_code == NO_CONTENT
-        assert len(Item.select()) == 1
+        assert number_of_rows_in_DB() == 0
         resp = self.app.get('item/{}'.format(obj1.item_id))
         assert resp.status_code == NOT_FOUND
-        assert Item.get(item_id=obj2.item_id)
 
-    def test_item__delete_not_found(self):
+    def test_delete__item_not_found(self):
         Item.create(
             item_id=uuid.uuid4(),
             name='cubo',
@@ -129,15 +137,15 @@ class TestItems:
         resp = self.app.delete('item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
-    def test_item__delete_without_any_existing_item(self):
+    def test_delete__database_is_empty(self):
         resp = self.app.delete('item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
-    def test_item__modified_successfully(self):
-        id = uuid.uuid4()
+    def test_post__item_modified_successfully(self):
+        static_id = uuid.uuid4()
 
         Item.create(
-            item_id=id,
+            item_id=static_id,
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj'
@@ -149,9 +157,9 @@ class TestItems:
             'description': 'Descrizione sensata'
         }
 
-        resp = self.app.put('item/{}'.format(id), data=obj2)
+        resp = self.app.put('item/{}'.format(static_id), data=obj2)
         assert resp.status_code == OK
-        resp = self.app.get('item/{}'.format(id))
+        resp = self.app.get('item/{}'.format(static_id))
 
         db_data = {
             'name': json.loads(resp.data.decode())['name'],
@@ -161,11 +169,32 @@ class TestItems:
 
         assert obj2 == db_data
 
-    def test_put_item__malformed(self):
-        id = uuid.uuid4()
+    def test_put__item_name_with_only_spaces(self):
+        static_id = uuid.uuid4()
 
-        Item.create(
-            item_id=id,
+        obj = Item.create(
+            item_id=static_id,
+            name='cubo',
+            price=5,
+            description='dhfsdjòfgjasdògj'
+        )
+
+        modified_content = {
+            'name': '      ',
+            'price': '123',
+            'description': 'desc2'
+        }
+
+        resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
+        output_from_DB = Item.get(item_id=obj.item_id).json()
+        assert obj.json() == output_from_DB
+        assert resp.status_code == BAD_REQUEST
+
+    def test_put__item_without_an_argument_given(self):
+        static_id = uuid.uuid4()
+
+        obj = Item.create(
+            item_id=static_id,
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj'
@@ -175,13 +204,28 @@ class TestItems:
             'name': 'rombo',
             'description': 'desc2'
         }
-        resp = self.app.put('/item/{}'.format(id), data=modified_content)
+
+        resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
+        output_from_DB = Item.get(item_id=obj.item_id).json()
+        assert obj.json() == output_from_DB
         assert resp.status_code == BAD_REQUEST
+
+    def test_put__item_price_value_as_a_string(self):
+        static_id = uuid.uuid4()
+
+        obj = Item.create(
+            item_id=static_id,
+            name='cubo',
+            price=5,
+            description='dhfsdjòfgjasdògj'
+        )
 
         modified_content = {
             'name': 'rombo',
             'price': 'asdasd',
             'description': 'Ciaociao'
         }
-        resp = self.app.put('/item/{}'.format(id), data=modified_content)
+        resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
         assert resp.status_code == BAD_REQUEST
+        output_from_DB = Item.get(item_id=obj.item_id).json()
+        assert obj.json() == output_from_DB

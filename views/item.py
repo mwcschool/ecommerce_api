@@ -5,24 +5,30 @@ from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
 import uuid
-import models
+from models import Item
 
 
-class Items(Resource):
+def string_not_empty(string_test):
+    if string_test.strip() == '':
+        raise ValueError("La stringa non può essere vuota")
+
+
+class Items_Resource(Resource):
     def get(self):
-        return [obj.json() for obj in models.Item.select()], OK
+        return [obj.json() for obj in Item.select()], OK
 
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
         parser.add_argument('price', type=int, required=True)
         parser.add_argument('description', type=str, required=True)
+        args = parser.parse_args(strict=True)
         try:
-            args = parser.parse_args()
+            string_not_empty(args['name'])
         except ValueError:
             return None, BAD_REQUEST
 
-        obj = models.Item.create(
+        obj = Item.create(
             item_id=uuid.uuid4(),
             name=args["name"],
             price=args["price"],
@@ -32,18 +38,18 @@ class Items(Resource):
         return obj.json(), CREATED
 
 
-class Item(Resource):
+class Item_Resource(Resource):
 
     def get(self, item_id):
         try:
-            return models.Item.get(models.Item.item_id == item_id).json(), OK
-        except models.Item.DoesNotExist:
+            return Item.get(Item.item_id == item_id).json(), OK
+        except Item.DoesNotExist:
             return None, NOT_FOUND
 
     def delete(self, item_id):
         try:
-            item = models.Item.get(models.Item.item_id == item_id)
-        except models.Item.DoesNotExist:
+            item = Item.get(Item.item_id == item_id)
+        except Item.DoesNotExist:
             return None, NOT_FOUND
 
         item.delete_instance()
@@ -51,17 +57,17 @@ class Item(Resource):
 
     def put(self, item_id):
         try:
-            obj = models.Item.get(item_id=item_id)
-        except models.Item.DoesNotExist:
+            obj = Item.get(item_id=item_id)
+        except Item.DoesNotExist:
             return None, NOT_FOUND
 
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
         parser.add_argument('price', type=int, required=True)
         parser.add_argument('description', type=str, required=True)
-
+        args = parser.parse_args(strict=True)
         try:
-            args = parser.parse_args()
+            string_not_empty(args['name'])
         except ValueError:
             return None, BAD_REQUEST
 

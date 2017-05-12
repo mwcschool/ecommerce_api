@@ -1,10 +1,7 @@
 from flask import Flask
 from flask_restful import Api
-
 from models import database
-
-import views.item as vi
-
+from views import item
 
 app = Flask(__name__)
 api = Api(app)
@@ -23,5 +20,5 @@ def database_disconnect(response):
     return response
 
 
-api.add_resource(vi.Items, '/items/')
-api.add_resource(vi.Item, '/item/<uuid:item_id>')
+api.add_resource(item.Items_Resource, '/items/')
+api.add_resource(item.Item_Resource, '/item/<uuid:item_id>')
