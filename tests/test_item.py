@@ -33,14 +33,16 @@ class TestItems:
             item_id=uuid.uuid4(),
             name='cubo',
             price=5,
-            description='dhfsdjòfgjasdògj'
+            description='dhfsdjòfgjasdògj',
+            category='poligoni'
         )
 
         obj2 = Item.create(
             item_id=uuid.uuid4(),
-            name='cubo',
+            name='iphone',
             price=15,
-            description='desc2'
+            description='desc2',
+            category='smartphone'
         )
 
         resp = self.app.get('/items/')
@@ -51,7 +53,8 @@ class TestItems:
         source_item = {
             'name': 'cubo',
             'price': 15,
-            'description': 'desc1'
+            'description': 'desc1',
+            'category': 'poligoni'
         }
 
         resp = self.app.post('/items/', data=source_item)
@@ -68,13 +71,14 @@ class TestItems:
         source_item = {
             'name': '    ',
             'price': 123,
-            'description': 'desc1'
+            'description': 'desc1',
+            'category': 'varie'
         }
         resp = self.app.post('/items/', data=source_item)
         assert resp.status_code == BAD_REQUEST
         assert number_of_rows_in_DB() == 0
 
-    def test_post__item_without_an_argument_given(self):
+    def test_post__item_without_arguments_given(self):
         source_item = {
             'name': 'rombo',
             'description': 'desc2'
@@ -87,7 +91,8 @@ class TestItems:
         source_item = {
             'name': 'ciao',
             'price': 'stringa',
-            'description': 'desc3'
+            'description': 'desc3',
+            'category': 'varie'
         }
         resp = self.app.post('/items/', data=source_item)
         assert resp.status_code == BAD_REQUEST
@@ -98,7 +103,8 @@ class TestItems:
             item_id=uuid.uuid4(),
             name='cubo',
             price=5,
-            description='dhfsdjofgjasdogj'
+            description='dhfsdjofgjasdogj',
+            category='poligoni'
         )
 
         resp = self.app.get('/item/{}'.format(obj1.item_id))
@@ -117,7 +123,8 @@ class TestItems:
             item_id=uuid.uuid4(),
             name='cubo',
             price=5,
-            description='dhfsdjòfgjasdògj'
+            description='dhfsdjòfgjasdògj',
+            category='poligoni'
         )
 
         resp = self.app.delete('item/{}'.format(obj1.item_id))
@@ -131,7 +138,8 @@ class TestItems:
             item_id=uuid.uuid4(),
             name='cubo',
             price=5,
-            description='dhfsdjòfgjasdògj'
+            description='dhfsdjòfgjasdògj',
+            category='poligoni'
         )
 
         resp = self.app.delete('item/{}'.format(uuid.uuid4()))
@@ -148,13 +156,15 @@ class TestItems:
             item_id=static_id,
             name='cubo',
             price=5,
-            description='dhfsdjòfgjasdògj'
+            description='dhfsdjòfgjasdògj',
+            category='poligoni'
         )
 
         obj2 = {
             'name': 'triangolo',
             'price': 10,
-            'description': 'Descrizione sensata'
+            'description': 'Descrizione sensata',
+            'category': 'Poligoni'
         }
 
         resp = self.app.put('item/{}'.format(static_id), data=obj2)
@@ -164,7 +174,8 @@ class TestItems:
         db_data = {
             'name': json.loads(resp.data.decode())['name'],
             'price': json.loads(resp.data.decode())['price'],
-            'description': json.loads(resp.data.decode())['description']
+            'description': json.loads(resp.data.decode())['description'],
+            'category': json.loads(resp.data.decode())['category']
         }
 
         assert obj2 == db_data
@@ -176,13 +187,15 @@ class TestItems:
             item_id=static_id,
             name='cubo',
             price=5,
-            description='dhfsdjòfgjasdògj'
+            description='dhfsdjòfgjasdògj',
+            category='poligoni'
         )
 
         modified_content = {
             'name': '      ',
             'price': '123',
-            'description': 'desc2'
+            'description': 'desc2',
+            'category': '    '
         }
 
         resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
@@ -197,7 +210,8 @@ class TestItems:
             item_id=static_id,
             name='cubo',
             price=5,
-            description='dhfsdjòfgjasdògj'
+            description='dhfsdjòfgjasdògj',
+            category='poligoni'
         )
 
         modified_content = {
@@ -217,13 +231,15 @@ class TestItems:
             item_id=static_id,
             name='cubo',
             price=5,
-            description='dhfsdjòfgjasdògj'
+            description='dhfsdjòfgjasdògj',
+            category='poligoni'
         )
 
         modified_content = {
             'name': 'rombo',
             'price': 'asdasd',
-            'description': 'Ciaociao'
+            'description': 'Ciaociao',
+            'category': 'asdfdafdf'
         }
         resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
         assert resp.status_code == BAD_REQUEST
