@@ -26,8 +26,8 @@ class AddressesResource(Resource):
         if check_user.exists():
             obj = Address.create(
                 address_id=uuid.uuid4(), user=user_id, nation=args['nation'],
-                city = args['city'], postal_code = args['postal_code'],
-                local_address = args['local_address'], phone = args['phone'])
+                city=args['city'], postal_code=args['postal_code'],
+                local_address=args['local_address'], phone=args['phone'])
 
             return obj.json(), CREATED
         else:
