@@ -230,7 +230,9 @@ class TestOrders:
 
     def test_modify_order__failure_non_existing_empty_orders(self):
         updates = {
-            'total_price': 7
+            'items':json.dumps([
+                    [self.item1.item_id, 1]
+                ])
         }
 
         resp = self.app.put(
