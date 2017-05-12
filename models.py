@@ -30,6 +30,10 @@ class User(BaseModel):
         }
 
 
+    def verify_email(self):
+        pbkdf2_sha256.verify(origin_password, self.password)
+
+
 class Order(BaseModel):
     order_id = UUIDField(unique=True)
     total_price = DecimalField()
