@@ -28,8 +28,9 @@ def main():
     for user in users_list:
         for x in range(randint(1, 3)):
             Address.create(
-                user=user, nation=fake.country(), city=fake.city(), postal_code=fake.postcode(),
-                local_address=fake.address(), phone=fake.phone_number())
+                address_id=fake.uuid4(), user=user, nation=fake.country(),
+                city=fake.city(), postal_code=fake.postcode(), local_address=fake.address(),
+                phone=fake.phone_number())
 
     for user in users_list:
         # User has three chance on four to make an order
