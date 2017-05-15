@@ -21,8 +21,6 @@ class AddressesResource(Resource):
         parser.add_argument('phone', type=non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
-
-
         if len(args['nation']) < 3:
             return '', BAD_REQUEST
         elif len(args['city']) < 3:
@@ -34,14 +32,17 @@ class AddressesResource(Resource):
         elif len(args['phone']) < 3:
             return '', BAD_REQUEST
 
+        check_user = User.select().where(User.user_id == args['user_id']).get()
 
-        obj = Address.create(
-            address_id=uuid.uuid4(), user=args['user_id'], nation=args['nation'],
-            city=args['city'], postal_code=args['postal_code'],
-            local_address=args['local_address'], phone=args['phone'])
+        if check_user:
+            obj = Address.create(
+                address_id=uuid.uuid4(), user=check_user, nation=args['nation'],
+                city=args['city'], postal_code=args['postal_code'],
+                local_address=args['local_address'], phone=args['phone'])
 
-        return obj.json(), CREATED
-
+            return obj.json(), CREATED
+        else:
+            return '', BAD_REQUEST
 
 
 class AddressResource(Resource):
