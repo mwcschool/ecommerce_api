@@ -3,6 +3,7 @@ from flask_restful import Api
 from models import database
 from views import item
 from views.user import UserResource, UsersResource
+from views.address import AddressResource, AddressesResource
 
 app = Flask(__name__)
 api = Api(app)
@@ -25,3 +26,5 @@ api.add_resource(item.ItemsResource, '/items/')
 api.add_resource(item.ItemResource, '/item/<uuid:item_id>')
 api.add_resource(UsersResource, '/users/')
 api.add_resource(UserResource, '/users/<uuid:user_id>')
+api.add_resource(AddressesResource, '/addresses/')
+api.add_resource(AddressResource, '/addresses/<uuid:address_id>')
