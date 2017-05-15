@@ -22,6 +22,7 @@ def database_disconnect(response):
         database.close()
     return response
 
+
 api.add_resource(item.ItemsResource, '/items/')
 api.add_resource(item.ItemResource, '/item/<uuid:item_id>')
 api.add_resource(UsersResource, '/users/')
