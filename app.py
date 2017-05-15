@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import Api
 from models import database
+import views.order
 from views import item
 from views.user import UserResource, UsersResource
 
@@ -21,6 +22,8 @@ def database_disconnect(response):
     return response
 
 
+api.add_resource(views.order.OrdersResource, '/orders/')
+api.add_resource(views.order.OrderResource, '/orders/<uuid:order_id>')
 api.add_resource(item.ItemsResource, '/items/')
 api.add_resource(item.ItemResource, '/item/<uuid:item_id>')
 api.add_resource(UsersResource, '/users/')
