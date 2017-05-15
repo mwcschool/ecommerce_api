@@ -21,21 +21,27 @@ class AddressesResource(Resource):
         parser.add_argument('phone', type=non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
-        query = User.select().where(User.user_id == args['user_id'])
 
-        if query.exists():
-            obj = Address.create(
-                user=query[0],
-                address_id=uuid.uuid4(),
-                nation=args['nation'],
-                city=args['city'],
-                postal_code=args['postal_code'],
-                local_address=args['local_address'],
-                phone=args['phone'])
 
-            return obj.json(), CREATED
-        else:
+        if len(args['nation']) < 3:
             return '', BAD_REQUEST
+        elif len(args['city']) < 3:
+            return '', BAD_REQUEST
+        elif len(args['postal_code']) < 3:
+            return '', BAD_REQUEST
+        elif len(args['local_address']) < 3:
+            return '', BAD_REQUEST
+        elif len(args['phone']) < 3:
+            return '', BAD_REQUEST
+
+
+        obj = Address.create(
+            address_id=uuid.uuid4(), user=args['user_id'], nation=args['nation'],
+            city=args['city'], postal_code=args['postal_code'],
+            local_address=args['local_address'], phone=args['phone'])
+
+        return obj.json(), CREATED
+
 
 
 class AddressResource(Resource):
@@ -54,6 +60,7 @@ class AddressResource(Resource):
             return None, NOT_FOUND
 
         parser = reqparse.RequestParser()
+        parser.add_argument('user_id', type=non_empty_str, required=True)
         parser.add_argument('nation', type=non_empty_str, required=True)
         parser.add_argument('city', type=non_empty_str, required=True)
         parser.add_argument('postal_code', type=non_empty_str, required=True)
@@ -61,26 +68,28 @@ class AddressResource(Resource):
         parser.add_argument('phone', type=non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
-        if len(args['nation'] < 3):
+        if len(args['nation']) < 3:
             return '', BAD_REQUEST
-        elif len(args['city'] < 3):
+        elif len(args['city']) < 3:
             return '', BAD_REQUEST
-        elif len(args['postal_code'] < 3):
+        elif len(args['postal_code']) < 3:
             return '', BAD_REQUEST
-        elif len(args['local_address'] < 3):
+        elif len(args['local_address']) < 3:
             return '', BAD_REQUEST
-        elif len(args['phone'] < 3):
+        elif len(args['phone']) < 3:
             return '', BAD_REQUEST
 
-        obj.nation = args['nation']
-        obj.city = args['city']
-        obj.postal_code = args['postal_code']
-        obj.local_address = args['local_address']
-        obj.phone = args['phone']
+        if Address.user_id == args['user_id']:
+            obj.nation = args['nation']
+            obj.city = args['city']
+            obj.postal_code = args['postal_code']
+            obj.local_address = args['local_address']
+            obj.phone = args['phone']
+            obj.save()
 
-        obj.save()
-
-        return obj.json(), CREATED
+            return obj.json(), CREATED
+        else:
+            return '', BAD_REQUEST
 
     def delete(self, address_id):
         try:
