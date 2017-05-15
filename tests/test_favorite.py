@@ -64,5 +64,9 @@ class TestFavorites:
         )
 
         resp = self.app.get('/favorites/')
+        import pdb
+        pdb.set_trace()
         assert resp.status_code == OK
-        assert resp.data
+        assert Item.number_of_rows() == 1
+        assert User.number_of_rows() == 1
+        assert Favorites.number_of_rows() == 1
