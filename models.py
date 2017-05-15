@@ -16,13 +16,15 @@ class Item(BaseModel):
     name = CharField()
     price = DecimalField()
     description = TextField()
+    category = CharField()
 
     def json(self):
         return {
             'item_id': str(self.item_id),
             'name': self.name,
             'price': int(self.price),
-            'description': self.description
+            'description': self.description,
+            'category': self.category
         }
 
 
