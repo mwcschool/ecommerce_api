@@ -3,6 +3,7 @@ from flask_restful import Api
 
 from models import database
 from views.user import UserResource, UsersResource
+from views.address import AddressResource, AddressesResource
 
 app = Flask(__name__)
 api = Api(app)
