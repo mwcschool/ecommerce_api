@@ -30,7 +30,7 @@ class TestItems:
 
     def test_get__database_not_empty(self):
         obj1 = Item.create(
-            item_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
@@ -38,7 +38,7 @@ class TestItems:
         )
 
         obj2 = Item.create(
-            item_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             name='iphone',
             price=15,
             description='desc2',
@@ -120,17 +120,17 @@ class TestItems:
 
     def test_delete__item_removed_successfully(self):
         obj1 = Item.create(
-            item_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
             category='poligoni'
         )
 
-        resp = self.app.delete('item/{}'.format(obj1.item_id))
+        resp = self.app.delete('item/{}'.format(obj1.uuid))
         assert resp.status_code == NO_CONTENT
         assert number_of_rows_in_DB() == 0
-        resp = self.app.get('item/{}'.format(obj1.item_id))
+        resp = self.app.get('item/{}'.format(obj1.uuid))
         assert resp.status_code == NOT_FOUND
 
     def test_delete__item_not_found(self):
