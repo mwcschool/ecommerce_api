@@ -52,6 +52,9 @@ class User(BaseModel):
     def verify_password(self, origin_password):
         return pbkdf2_sha256.verify(origin_password, self.password)
 
+    def get_favorite_items(self):
+        return [favorite.item.json() for favorite in self.favorites]
+
 
 class Address(BaseModel):
     uuid = UUIDField(unique=True)
@@ -115,24 +118,11 @@ class Picture(BaseModel):
 
 
 class Favorites(BaseModel):
-    user = ForeignKeyField(User)
-    item = ForeignKeyField(Item)
+    user = ForeignKeyField(User, related_name="favorites")
+    item = ForeignKeyField(Item, related_name="favorites")
 
     def json(self):
         return {
             'user': str(self.user),
             'item': str(self.item)
-        }
-
-    def getUser(self):
-        return {
-            'user_id': str(self.user.user_id)
-        }
-
-    def getItem(self):
-        return {
-            'item_id': str(self.item.item_id),
-            'name': self.item.name,
-            'price': int(self.item.price),
-            'description': self.item.description
         }
