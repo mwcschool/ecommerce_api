@@ -1,6 +1,7 @@
 from peewee import Model, SqliteDatabase
 from peewee import DecimalField, TextField, CharField
 from peewee import UUIDField, ForeignKeyField, IntegerField
+from passlib.hash import pbkdf2_sha256
 
 database = SqliteDatabase('database.db')
 
@@ -29,6 +30,18 @@ class User(BaseModel):
             'user_id': str(self.user_id)
         }
 
+    def verify_password(self, origin_password):
+        return pbkdf2_sha256.verify(origin_password, self.password)
+
+
+class Address(BaseModel):
+    user = ForeignKeyField(User, related_name="address")
+    nation = CharField()
+    city = CharField()
+    postal_code = CharField()
+    local_address = CharField()
+    phone = CharField()
+
 
 class Order(BaseModel):
     order_id = UUIDField(unique=True)
@@ -41,9 +54,3 @@ class OrderItem(BaseModel):
     item = ForeignKeyField(Item)
     quantity = IntegerField()
     subtotal = DecimalField()
-
-
-User.create_table(fail_silently=True)
-Item.create_table(fail_silently=True)
-Order.create_table(fail_silently=True)
-OrderItem.create_table(fail_silently=True)

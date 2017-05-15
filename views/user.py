@@ -3,6 +3,7 @@ from models import User
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST
 from flask_restful import Resource, reqparse
 import re
+from passlib.hash import pbkdf2_sha256
 
 
 def non_empty_str(val, name):
@@ -12,12 +13,13 @@ def non_empty_str(val, name):
 
 
 def valid_email(email):
-    regex = re.compile('[a-z]{3,}(?P<at>@)[a-z]{3,}(?P<point>\.)[a-z]{2,}')
+    return re.match('[a-z]{3,}(?P<at>@)[a-z]{3,}(?P<point>\.)[a-z]{2,}', email)
 
-    if regex.match(email) is None:
-        return False
-    else:
-        return True
+
+def crypt_password(password):
+    crypt = pbkdf2_sha256.hash(password)
+
+    return crypt
 
 
 class UsersResource(Resource):
@@ -35,7 +37,7 @@ class UsersResource(Resource):
                 first_name=args['first_name'],
                 last_name=args['last_name'],
                 email=args['email'],
-                password=args['password']
+                password=crypt_password(args['password'])
             )
 
             return obj.json(), CREATED
@@ -61,7 +63,7 @@ class UserResource(Resource):
             obj.first_name = args['first_name']
             obj.last_name = args['last_name']
             obj.email = args['email']
-            obj.password = args['password']
+            obj.password = crypt_password(args['password'])
             obj.save()
 
             return obj.json(), CREATED
