@@ -29,7 +29,7 @@ class Testaddress:
     def test_post__success_empty_db(self):
         u_query = User.get()
         data = {
-            'user_id': u_query,
+            'user_id': u_query.user_id,
             'nation': 'TestNation',
             'city': 'TestCity',
             'postal_code': 'TestPostalCode',
@@ -37,13 +37,28 @@ class Testaddress:
             'phone': 'TestPhone'
         }
         resp = self.app.post('/addresses/', data=data)
+        print(Address.user)
+        print(u_query.user_id)
+
+
+        checked_address = Address.get(Address.user == u_query.user_id)
+        checked_address_dict = {
+            'user_id': u_query.user_id,
+            'nation': checked_address.nation,
+            'city': checked_address.city,
+            'postal_code': checked_address.postal_code,
+            'local_address': checked_address.local_address,
+            'phone': checked_address.phone
+        }
+
+        assert data == checked_address_dict
 
         assert resp.status_code == CREATED
 
     def test_post__success(self):
         u_query = User.get()
         data = {
-            'user_id': u_query,
+            'user_id': u_query.user_id,
             'nation': 'TestNation',
             'city': 'TestCity',
             'postal_code': 'TestPostalCode',
@@ -57,7 +72,7 @@ class Testaddress:
     def test_post__empty_field(self):
         u_query = User.get()
         data = {
-            'user_id': u_query,
+            'user_id': u_query.user_id,
             'nation': 'TestNation',
             'city': '',
             'postal_code': 'TestPostalCode',
@@ -72,7 +87,7 @@ class Testaddress:
     def test_post__field_not_exists(self):
         u_query = User.get()
         data = {
-            'user_id': u_query,
+            'user_id': u_query.user_id,
             'city': 'TestCity',
             'postal_code': 'TestPostalCode',
             'local_address': 'TestLocalAddress',
@@ -95,7 +110,7 @@ class Testaddress:
             phone='TestPhone')
 
         data = {
-            'user_id': u_query,
+            'user_id': u_query.user_id,
             'nation': 'TestNewNation',
             'city': 'TestNewCity',
             'postal_code': 'TestNewPostalCode',
