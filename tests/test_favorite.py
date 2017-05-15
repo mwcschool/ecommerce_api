@@ -1,5 +1,6 @@
 import json
 from http.client import OK
+from http.client import NOT_FOUND
 from peewee import SqliteDatabase
 from models import Item, User, Favorites
 from app import app
@@ -65,7 +66,10 @@ class TestFavorites:
 
         resp = self.app.get('/favorites/')
         assert resp.status_code == OK
-        assert Item.row_count() == 1
-        assert User.row_count() == 1
-        assert Favorites.row_count() == 1
-        assert user_db.get_favorite_items() == [Item.get().json()]
+        assert len(json.loads(resp.data.decode())) == 1
+        assert user_db.get_favorite_items() == json.loads(resp.data.decode())
+
+    def test_get__favorites_empty(self):
+        resp = self.app.get('/favorites/')
+        assert json.loads(resp.data.decode()) == None
+        assert resp.status_code == NOT_FOUND
