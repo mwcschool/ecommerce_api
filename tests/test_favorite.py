@@ -1,4 +1,5 @@
 import json
+from http.client import OK
 from peewee import SqliteDatabase
 from models import Item, User, Favorites
 from app import app
@@ -25,15 +26,13 @@ def create_an_item(id_item, name, price, description):
 
 
 class TestFavorites:
+    @classmethod
     def setup_class(cls):
-        Favorites._meta.database = SqliteDatabase(':memory:')
-        Favorites.create_table()
-
-        Item._meta.database = SqliteDatabase(':memory:')
-        Item.create_table()
-
-        User._meta.database = SqliteDatabase(':memory:')
-        User.create_table()
+        db = SqliteDatabase(':memory:')
+        tables = [Favorites, Item, User]
+        for table in tables:
+            table._meta.database = db
+            table.create_table()
 
         cls.app = app.test_client()
 
@@ -47,14 +46,14 @@ class TestFavorites:
         id_item = uuid.uuid4()
 
         user_db = create_an_user(
-            uuid.uuid4(),
+            id_user,
             'fname',
             'lname',
             'e@e.com',
             'psw')
 
         item_db = create_an_item(
-            uuid.uuid4(),
+            id_item,
             'name',
             '5',
             'desc')
@@ -64,4 +63,6 @@ class TestFavorites:
             item=item_db
         )
 
-        True
+        resp = self.app.get('/favorites/')
+        assert resp.status_code == OK
+        assert resp.data
