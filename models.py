@@ -23,6 +23,9 @@ class BaseModel(Model):
         schema = self.get_schema()
         return schema.dump(self).data
 
+    def number_of_rows(self):
+        return len(self.select())
+
 
 class Item(BaseModel):
     uuid = UUIDField(unique=True)
