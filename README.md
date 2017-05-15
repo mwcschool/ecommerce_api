@@ -4,7 +4,7 @@
 Before you start, it's recommended to create a new virtualenv for the application
 ### Linux Ubuntu
 ```
-mkvirtualenv -p python3 ecommerce
+mkvirtualenv ecommerce -p /usr/bin/python3
 ```
 
 ### macOS
