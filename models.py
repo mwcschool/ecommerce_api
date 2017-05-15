@@ -68,7 +68,7 @@ class Order(BaseModel):
 
     def _get_order_items(self):
         data = []
-        for order_item in self.items:
+        for order_item in self.order_items:
             item = order_item.item
             data.append({
                 'item_id': str(item.item_id),
