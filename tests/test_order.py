@@ -90,12 +90,12 @@ class TestOrders:
         assert resp.status_code == CREATED
 
         order_from_server = json.loads(resp.data.decode())
-        order_from_db = Order.get(Order.order_id == order_from_server['order_id']).json()
+        order_from_db = Order.get(Order.order_id == order_from_server['uuid']).json()
 
         assert len(Order.select()) == 1
         assert order_from_db == order_from_server
 
-        order_from_server.pop('order_id')
+        order_from_server.pop('uuid')
         assert order_from_server['user'] == new_order_data['user']
         assert len(order_from_server['items']) == 2
 
