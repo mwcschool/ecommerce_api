@@ -36,8 +36,8 @@ class OrdersResource(Resource):
             return None, BAD_REQUEST
 
         for item in items_query:
-            item_qty = [x[1] for x in items if x[0] == str(item.item_id)][0]
-            total_price += float(item.price * item_qty)
+            item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
+            total_price += float(item.price * item_quantity)
 
         with database.transaction():
             order = Order.create(
@@ -47,12 +47,12 @@ class OrdersResource(Resource):
             )
 
             for item in items_query:
-                item_qty = [x[1] for x in items if x[0] == str(item.item_id)][0]
+                item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
                 OrderItem.create(
                     order=order.id,
                     item=item.id,
-                    quantity=item_qty,
-                    subtotal=float(item.price * item_qty)
+                    quantity=item_quantity,
+                    subtotal=float(item.price * item_quantity)
                 )
 
         return order.json(), CREATED
@@ -88,19 +88,19 @@ class OrderResource(Resource):
             return None, BAD_REQUEST
 
         for item in items_query:
-            item_qty = [x[1] for x in items if x[0] == str(item.item_id)][0]
-            total_price += float(item.price * item_qty)
+            item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
+            total_price += float(item.price * item_quantity)
 
         with database.transaction():
             OrderItem.delete().where(OrderItem.order_id == order.id).execute()
 
             for item in items_query:
-                item_qty = [x[1] for x in items if x[0] == str(item.item_id)][0]
+                item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
                 OrderItem.create(
                     order=order.id,
                     item=item.id,
-                    quantity=item_qty,
-                    subtotal=float(item.price * item_qty)
+                    quantity=item_quantity,
+                    subtotal=float(item.price * item_quantity)
                 )
 
             order.total_price = total_price

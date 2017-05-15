@@ -6,10 +6,6 @@ from views import item
 from views.order import OrderResource, OrdersResource
 from views.user import UserResource, UsersResource
 
-import views.order
-from views import item
-from views.user import UserResource, UsersResource
-
 app = Flask(__name__)
 api = Api(app)
 

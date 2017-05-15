@@ -12,15 +12,10 @@ class TestOrders:
     def setup_class(cls):
         database = SqliteDatabase(':memory:')
 
-        OrderItem._meta.database = database
-        Order._meta.database = database
-        Item._meta.database = database
-        User._meta.database = database
-
-        OrderItem.create_table()
-        Order.create_table()
-        Item.create_table()
-        User.create_table()
+        tables = [OrderItem, Order, Item, User]
+        for table in tables:
+            table._meta.database = database
+            table.create_table()
 
         cls.user1 = User.create(
             user_id=str(uuid.uuid4()),
