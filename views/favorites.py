@@ -13,8 +13,6 @@ class FavoritesResource(Resource):
     def get(self):
         # TODO: we will have a user from auth here.
         user = User.select().get()
-        import pdb
-        pdb.set_trace()
         return user.get_favorite_items(), OK
 
 
