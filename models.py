@@ -80,7 +80,7 @@ class Order(BaseModel):
 
 
 class OrderItem(BaseModel):
-    order = ForeignKeyField(Order, related_name="items")
+    order = ForeignKeyField(Order, related_name="order_items")
     item = ForeignKeyField(Item)
     quantity = IntegerField()
     subtotal = DecimalField()
