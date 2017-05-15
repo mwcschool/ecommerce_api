@@ -32,9 +32,11 @@ class AddressesResource(Resource):
         elif len(args['phone']) < 3:
             return '', BAD_REQUEST
 
-        if User.select().where(User.user_id == args['user_id']).exists():
+        check_user = User.select().where(User.user_id == args['user_id']).get()
+
+        if check_user:
             obj = Address.create(
-                address_id=uuid.uuid4(), user=args['user_id'], nation=args['nation'],
+                address_id=uuid.uuid4(), user=check_user, nation=args['nation'],
                 city=args['city'], postal_code=args['postal_code'],
                 local_address=args['local_address'], phone=args['phone'])
 
