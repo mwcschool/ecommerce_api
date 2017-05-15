@@ -149,15 +149,6 @@ class TestOrders:
         assert resp.status_code == BAD_REQUEST
         assert len(Order.select()) == 0
 
-    def test_create_order__failure_empty_field(self):
-        new_order_data = {
-            'total_price': None,
-            'user': self.user1.user_id
-        }
-
-        resp = self.app.post('/orders/', data=new_order_data)
-        assert resp.status_code == BAD_REQUEST
-
     def test_modify_order__success(self):
         order1 = Order.create(
             order_id=str(uuid.uuid4()),
