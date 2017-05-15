@@ -26,7 +26,7 @@ class ItemsResource(Resource):
             return None, BAD_REQUEST
 
         obj = Item.create(
-            item_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             name=args["name"],
             price=args["price"],
             description=args["description"],
@@ -38,15 +38,15 @@ class ItemsResource(Resource):
 
 class ItemResource(Resource):
 
-    def get(self, item_id):
+    def get(self, uuid):
         try:
-            return Item.get(Item.item_id == item_id).json(), OK
+            return Item.get(Item.uuid == item_id).json(), OK
         except Item.DoesNotExist:
             return None, NOT_FOUND
 
-    def delete(self, item_id):
+    def delete(self, uuid):
         try:
-            item = Item.get(Item.item_id == item_id)
+            item = Item.get(Item.uuid == item_id)
         except Item.DoesNotExist:
             return None, NOT_FOUND
 
