@@ -12,7 +12,7 @@ class BaseModel(Model):
 
 
 class Item(BaseModel):
-    item_id = UUIDField(unique=True)
+    uuid = UUIDField(unique=True)
     name = CharField()
     price = DecimalField()
     description = TextField()
@@ -20,7 +20,7 @@ class Item(BaseModel):
 
     def json(self):
         return {
-            'item_id': str(self.item_id),
+            'item_id': str(self.uuid),
             'name': self.name,
             'price': int(self.price),
             'description': self.description,
