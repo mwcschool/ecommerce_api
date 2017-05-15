@@ -40,38 +40,9 @@ class AddressesResource(Resource):
                 city=args['city'], postal_code=args['postal_code'],
                 local_address=args['local_address'], phone=args['phone'])
 
-        query = User.select().where(User.user_id == args['user_id'])
-
-        if query.exists():
-            obj = Address.create(
-                user=query[0],
-                address_id=uuid.uuid4(),
-                nation=args['nation'],
-                city=args['city'],
-                postal_code=args['postal_code'],
-                local_address=args['local_address'],
-                phone=args['phone'])
-
-
-        if len(args['nation']) < 3:
+            return obj.json(), CREATED
+        else:
             return '', BAD_REQUEST
-        elif len(args['city']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['postal_code']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['local_address']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['phone']) < 3:
-            return '', BAD_REQUEST
-
-
-        obj = Address.create(
-            address_id=uuid.uuid4(), user=args['user_id'], nation=args['nation'],
-            city=args['city'], postal_code=args['postal_code'],
-            local_address=args['local_address'], phone=args['phone'])
-
-        return obj.json(), CREATED
-
 
 
 class AddressResource(Resource):
