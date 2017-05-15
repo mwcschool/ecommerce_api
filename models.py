@@ -23,8 +23,9 @@ class BaseModel(Model):
         schema = self.get_schema()
         return schema.dump(self).data
 
-    def number_of_rows(self):
-        return len(self.select())
+    @classmethod
+    def row_count(cls):
+        return len(cls.select())
 
 
 class Item(BaseModel):
