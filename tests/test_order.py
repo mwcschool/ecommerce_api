@@ -28,13 +28,15 @@ class TestOrders:
             item_id=str(uuid.uuid4()),
             name='Item one',
             price=10,
-            description='Item one description'
+            description='Item one description',
+            category='Category one'
         )
         cls.item2 = Item.create(
             item_id=str(uuid.uuid4()),
             name='Item two',
             price=10,
-            description='Item two description'
+            description='Item two description',
+            category='Category one'
         )
 
         app.config['TESTING'] = True
