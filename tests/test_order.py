@@ -139,8 +139,10 @@ class TestOrders:
 
     def test_create_order__failure_non_existing_user(self):
         new_order_data = {
-            'total_price': 10,
-            'user': str(uuid.uuid4())
+            'user': str(uuid.uuid4()),
+            'items': json.dumps([
+                [self.item1.item_id, 1]
+            ])
         }
 
         resp = self.app.post('/orders/', data=new_order_data)
