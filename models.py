@@ -41,8 +41,8 @@ class Address(BaseModel):
 
     def json(self):
         return {
-            'address_id': self.address_id,
-            'user': self.user,
+            'address_id': str(self.address_id),
+            'user': str(self.user.user_id),
             'nation': self.nation,
             'city': self.city,
             'postal_code': self.postal_code,
