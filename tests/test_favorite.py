@@ -1,6 +1,8 @@
 import json
 from http.client import OK
 from http.client import NOT_FOUND
+from http.client import CREATED
+from http.client import BAD_REQUEST
 from peewee import SqliteDatabase
 from models import Item, User, Favorites
 from app import app
@@ -43,6 +45,7 @@ class TestFavorites:
         User.delete().execute()
 
     def test_get__favorites(self):
+        import pdb; pdb.set_trace()
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
@@ -73,3 +76,45 @@ class TestFavorites:
         resp = self.app.get('/favorites/')
         assert json.loads(resp.data.decode()) == None
         assert resp.status_code == NOT_FOUND
+
+    # def test_post__create_favorite_success(self):
+    #     import pdb; pdb.set_trace()
+    #     assert 0
+
+    def test_post__failed_uuid_not_valid(self):
+        sample_favorite = {
+            'id_user':  "Stringa di prova",
+            'id_item': 123123
+        }
+        resp = self.app.post('/favorites/', data=sample_favorite)
+        assert resp.status_code == BAD_REQUEST
+        assert Favorites.row_count() == 0
+
+    def test_post__failed_uuid_does_not_exists(self):
+        id_user = uuid.uuid4()
+        id_item = uuid.uuid4()
+
+        user = create_an_user(
+            id_user,
+            'first_name',
+            'last_name',
+            'email@email.com',
+            'password'
+        )
+
+        item = create_an_item(
+            id_item,
+            'item_name',
+            100,
+            'description'
+        )
+
+        sample_favorite = {
+            'id_user' : uuid.uuid4(),
+            'id_item' : uuid.uuid4()
+        }
+
+        resp = self.app.post('/favorites/', data=sample_favorite )
+
+        assert resp.status_code == NOT_FOUND
+        assert Favorites.row_count() == 0
