@@ -47,6 +47,8 @@ class TestFavorites:
         User.delete().execute()
 
     def test_get__favorites(self):
+        import pdb
+        pdb.set_trace()
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
