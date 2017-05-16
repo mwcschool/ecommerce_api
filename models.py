@@ -40,6 +40,11 @@ class Item(BaseModel):
     def get_schema(cls):
         return ItemSchema()
 
+    def exists_uuid(self, check_uuid):
+        if Item.select().where(Item.item_id == check_uuid).exists():
+            return True
+        else:
+            return False
 
 class User(BaseModel):
     uuid = UUIDField(unique=True)
@@ -58,6 +63,12 @@ class User(BaseModel):
 
     def get_favorite_items(self):
         return [favorite.item.json() for favorite in self.favorites]
+
+    def exists_uuid(self, check_uuid):
+        if User.select().where(User.user_id == check_uuid).exists():
+            return True
+        else:
+            return False
 
 
 class Address(BaseModel):
