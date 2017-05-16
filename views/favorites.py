@@ -6,6 +6,10 @@ from http.client import CREATED
 from models import Item, User, Favorites
 import uuid
 
+def check_uuid_is_in_(id_check):
+    #if id_check not
+    pass
+
 
 class FavoritesResource(Resource):
     def get(self):
@@ -30,6 +34,18 @@ class FavoritesResource(Resource):
             return None, NOT_FOUND
 
         return user.add_favorite(item).json(), CREATED
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('id_user', type=type(uuid.uuid4), required=True)
+        parser.add_argument('id_item', type=type(uuid.uuid4), required=True)
+        args = parser.parse_args(strict=True)
+
+        obj = Favorites.create(
+            item=args['id_item'],
+            user=args['id_user']
+        )
+        return obj.json(), CREATED
 
 
 class FavoriteResource(Resource):
