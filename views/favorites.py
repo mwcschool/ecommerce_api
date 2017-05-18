@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse
+from http.client import CREATED
 from http.client import NOT_FOUND
 from http.client import OK
 from http.client import NO_CONTENT
@@ -6,8 +7,9 @@ from http.client import CREATED
 from models import Item, User, Favorites
 import uuid
 
+
 def check_uuid_is_in_(id_check):
-    #if id_check not
+    # if id_check not
     pass
 
 
@@ -43,10 +45,9 @@ class FavoritesResource(Resource):
         if not User.exists_uuid(args['id_user']) and not Item.exists_uuid(args['id_item']):
             return None, NOT_FOUND
 
-
         obj = Favorites.create(
-            item=args['id_item'],
-            user=args['id_user']
+            item=Item.get(Item.item_id == args['id_item']),
+            user=User.get(User.user_id == args['id_user']),
         )
         return obj.json(), CREATED
 
