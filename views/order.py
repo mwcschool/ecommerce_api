@@ -39,6 +39,11 @@ class OrdersResource(Resource):
             item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
             total_price += float(item.price * item_quantity)
 
+        for item in items_query:
+            item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
+            if item.quantity < item_quantity or item.availability == False:
+                return None, BAD_REQUEST
+
         with database.transaction():
             order = Order.create(
                 uuid=uuid.uuid4(),
@@ -54,6 +59,11 @@ class OrdersResource(Resource):
                     quantity=item_quantity,
                     subtotal=float(item.price * item_quantity)
                 )
+                item.quantity = item.quantity - item_quantity
+                if item.quantity == 0:
+                    item.availability = False
+                item.save()
+
 
         return order.json(), CREATED
 
