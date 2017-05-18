@@ -48,14 +48,14 @@ class Testuser:
         id_user_created = uuid.uuid4()
 
         User.create(
-            user_id=id_user_created,
+            uuid=id_user_created,
             first_name='Giovanni',
             last_name='Mariani',
             email='giovanni@mariani.com',
             password='1234'
         )
         resp = self.app.post('/users/', data=data)
-        query = User.select().where(User.user_id != id_user_created)
+        query = User.select().where(User.uuid != id_user_created)
         assert resp.status_code == CREATED
         assert query.get().json() == json.loads(resp.data.decode())
 
@@ -84,7 +84,7 @@ class Testuser:
 
     def test_put__success(self):
         user = User.create(
-            user_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             first_name='Giovanni',
             last_name='Mariani',
             email='giovanni@mariani.com',
@@ -98,7 +98,7 @@ class Testuser:
             'password': '1234567'
         }
 
-        resp = self.app.put('/users/{}'.format(user.user_id), data=data)
+        resp = self.app.put('/users/{}'.format(user.uuid), data=data)
         query = User.select()
         user_from_db = query.get()
         expected_data = {
@@ -113,7 +113,7 @@ class Testuser:
 
     def test_put__modify_one_field(self):
         user = User.create(
-            user_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             first_name='Giovanni',
             last_name='Mariani',
             email='giovanni@mariani.com',
@@ -124,12 +124,12 @@ class Testuser:
             'first_name': 'Anna',
         }
 
-        resp = self.app.put('/users/{}'.format(user.user_id), data=data)
+        resp = self.app.put('/users/{}'.format(user.uuid), data=data)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__empty_fields(self):
         user = User.create(
-            user_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             first_name='Giovanni',
             last_name='Mariani',
             email='giovanni@mariani.com',
@@ -143,7 +143,7 @@ class Testuser:
             'password': ''
         }
 
-        resp = self.app.put('/users/{}'.format(user.user_id), data=data)
+        resp = self.app.put('/users/{}'.format(user.uuid), data=data)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__userid_not_exist(self):
@@ -160,25 +160,25 @@ class Testuser:
 
     def test_delete_user__success(self):
         user = User.create(
-            user_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             first_name='Alessandro',
             last_name='Cappellini',
             email='prova@pippo.com',
             password='1234'
             )
         user2 = User.create(
-            user_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             first_name='Jonh',
             last_name='Smith',
             email='jonh@smith.com',
             password='1234'
             )
-        resp = self.app.delete('/users/{}'.format(user.user_id))
+        resp = self.app.delete('/users/{}'.format(user.uuid))
         all_users = User.select()
         user_from_db = all_users.get()
         assert resp.status_code == NO_CONTENT
         assert len(all_users) == 1
-        assert user_from_db.user_id == user2.user_id
+        assert user_from_db.uuid == user2.uuid
 
     def test_delete__emptydb_userid_not_exist(self):
         resp = self.app.delete('/user/{}'.format(uuid.uuid4()))
@@ -187,7 +187,7 @@ class Testuser:
 
     def test_delete__userid_not_exist(self):
         User.create(
-            user_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             first_name='Alessandro',
             last_name='Rossi',
             email='a@b.it',
