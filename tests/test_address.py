@@ -27,9 +27,9 @@ class Testaddress:
         Address.delete().execute()
 
     def test_post__success_empty_db(self):
-        u_query = User.get()
+        user = User.get()
         data = {
-            'user_id': u_query.user_id,
+            'user_id': user.user_id,
             'nation': 'TestNation',
             'city': 'TestCity',
             'postal_code': 'TestPostalCode',
@@ -37,13 +37,12 @@ class Testaddress:
             'phone': 'TestPhone'
         }
         resp = self.app.post('/addresses/', data=data)
-        print(Address.user)
-        print(u_query.user_id)
 
 
-        checked_address = Address.get(Address.user == u_query.user_id)
+        checked_address = user.address.get()
+        
         checked_address_dict = {
-            'user_id': u_query.user_id,
+            'user_id': user.user_id,
             'nation': checked_address.nation,
             'city': checked_address.city,
             'postal_code': checked_address.postal_code,
