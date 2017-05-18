@@ -22,4 +22,4 @@ def database_disconnect(response):
 
 
 api.add_resource(UsersResource, '/users/')
-api.add_resource(UserResource, '/users/<uuid:user_id>')
+api.add_resource(UserResource, '/users/<uuid:user_id>', methods=['put', 'delete'])
