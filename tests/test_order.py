@@ -1,21 +1,16 @@
 import uuid
 import json
-from peewee import SqliteDatabase
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 
-from app import app
 from models import Order, OrderItem, Item, User
 
+from .base_test import BaseTest
 
-class TestOrders:
+
+class TestOrders(BaseTest):
     @classmethod
     def setup_class(cls):
-        database = SqliteDatabase(':memory:')
-
-        tables = [OrderItem, Order, Item, User]
-        for table in tables:
-            table._meta.database = database
-            table.create_table()
+        super(TestOrders, cls).setup_class()
 
         cls.user1 = User.create(
             uuid=str(uuid.uuid4()),
@@ -38,9 +33,6 @@ class TestOrders:
             description='Item two description',
             category='Category one',
         )
-
-        app.config['TESTING'] = True
-        cls.app = app.test_client()
 
     def setup_method(self):
         OrderItem.delete().execute()
