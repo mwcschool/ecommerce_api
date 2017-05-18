@@ -32,23 +32,23 @@ class AddressesResource(Resource):
         elif len(args['phone']) < 3:
             return '', BAD_REQUEST
 
-        check_user = User.select().where(User.user_id == args['user_id']).get()
-
-        if check_user:
-            obj = Address.create(
-                address_id=uuid.uuid4(), user=check_user, nation=args['nation'],
-                city=args['city'], postal_code=args['postal_code'],
-                local_address=args['local_address'], phone=args['phone'])
-
-            return obj.json(), CREATED
-        else:
+        try:
+            check_user = User.get(User.user_id == args['user_id'])
+        except User.DoesNotExist:
             return '', BAD_REQUEST
+
+        obj = Address.create(
+            address_id=uuid.uuid4(), user=check_user, nation=args['nation'],
+            city=args['city'], postal_code=args['postal_code'],
+            local_address=args['local_address'], phone=args['phone'])
+
+        return obj.json(), CREATED
 
 
 class AddressResource(Resource):
     def get(self, address_id):
         try:
-            obj = Address.get(address_id=address_id)
+            obj = Address.get(Address.address_id == address_id)
         except Address.DoesNotExist:
             return None, NOT_FOUND
 
@@ -56,7 +56,7 @@ class AddressResource(Resource):
 
     def put(self, address_id):
         try:
-            obj = Address.get(address_id=address_id)
+            obj = Address.get(Address.address_id == address_id)
         except Address.DoesNotExist:
             return None, NOT_FOUND
 
@@ -80,7 +80,7 @@ class AddressResource(Resource):
         elif len(args['phone']) < 3:
             return '', BAD_REQUEST
 
-        if Address.user_id == args['user_id']:
+        if obj.user.user_id == args['user_id']:
             obj.nation = args['nation']
             obj.city = args['city']
             obj.postal_code = args['postal_code']
@@ -94,7 +94,7 @@ class AddressResource(Resource):
 
     def delete(self, address_id):
         try:
-            obj = Address.get(address_id=address_id)
+            obj = Address.get(Address.address_id == address_id)
         except Address.DoesNotExist:
             return None, NOT_FOUND
 
