@@ -29,7 +29,7 @@ class Item(BaseModel):
 
 
 class User(BaseModel):
-    user_id = UUIDField(unique=True)
+    uuid = UUIDField(unique=True)
     first_name = CharField()
     last_name = CharField()
     email = CharField(unique=True)
@@ -37,7 +37,7 @@ class User(BaseModel):
 
     def json(self):
         return {
-            'user_id': str(self.user_id)
+            'user_id': str(self.uuid)
         }
 
     def verify_password(self, origin_password):
