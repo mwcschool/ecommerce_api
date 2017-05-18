@@ -80,7 +80,7 @@ class AddressResource(Resource):
         elif len(args['phone']) < 3:
             return '', BAD_REQUEST
 
-        if obj.user.user_id == args['user_id']:
+        if str(obj.user.user_id) == str(args['user_id']):
             obj.nation = args['nation']
             obj.city = args['city']
             obj.postal_code = args['postal_code']
