@@ -8,10 +8,14 @@ class BaseTest:
     def setup_class(cls):
         database = SqliteDatabase(':memory:')
 
-        tables = [Item, User, Address, Order, OrderItem]
-        for table in tables:
+        cls.tables = [Item, User, Address, Order, OrderItem]
+        for table in cls.tables:
             table._meta.database = database
             table.create_table()
 
         app.config['TESTING'] = True
         cls.app = app.test_client()
+
+    def setup_method(self):
+        for table in self.tables:
+            table.delete().execute()
