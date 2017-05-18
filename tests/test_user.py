@@ -2,19 +2,13 @@ from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, UNAUTHORIZE
 import json
 import uuid
 from views.user import crypt_password
-from peewee import SqliteDatabase
-from models import User
-from app import app
 import base64
+from models import User
+
+from .base_test import BaseTest
 
 
-class Testuser:
-    @classmethod
-    def setup_class(cls):
-        User._meta.database = SqliteDatabase(':memory:')
-        User.create_table()
-        cls.app = app.test_client()
-
+class Testuser(BaseTest):
     def setup_method(self):
         User.delete().execute()
 
