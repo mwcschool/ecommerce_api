@@ -214,17 +214,19 @@ class Testuser:
             last_name='Cappellini',
             email='prova@pippo.com',
             password=crypt_password('1234567')
-            )
+        )
+
         user2 = User.create(
             uuid=uuid.uuid4(),
             first_name='Jonh',
             last_name='Smith',
             email='jonh@smith.com',
             password=crypt_password('1234567')
-            )
+        )
 
         resp = self.open_with_auth(
             '/users/{}'.format(user.uuid), 'delete', user.email, '1234567', data='')
+
         all_users = User.select()
         user_from_db = all_users.get()
         assert resp.status_code == NO_CONTENT
