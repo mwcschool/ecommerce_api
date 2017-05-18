@@ -1,22 +1,20 @@
 import json
-from peewee import SqliteDatabase
 from http.client import CREATED
 from http.client import NO_CONTENT
 from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
 from models import Item
-from app import app
 import uuid
 
+from .base_test import BaseTest
 
-class TestItems:
-    @classmethod
-    def setup_class(cls):
-        Item._meta.database = SqliteDatabase(':memory:')
-        Item.create_table()
-        cls.app = app.test_client()
 
+def number_of_rows_in_DB():
+    return len(Item.select())
+
+
+class TestItems(BaseTest):
     def setup_method(self):
         Item.delete().execute()
 
