@@ -178,8 +178,8 @@ class TestOrders:
 
         updates = {
             'items': json.dumps([
-                    [self.item2.uuid, 2]
-                ])
+                [self.item2.uuid, 2]
+            ])
         }
 
         resp = self.app.put(
@@ -189,7 +189,7 @@ class TestOrders:
         assert resp.status_code == OK
 
         order1_upd = Order.get(Order.uuid == order1.uuid).json()
-        total_price = self.item2.price*2
+        total_price = self.item2.price * 2
         assert order1_upd['total_price'] == total_price
 
         order2_db = Order.get(Order.uuid == order2.uuid).json()
@@ -208,8 +208,8 @@ class TestOrders:
 
         updates = {
             'items': json.dumps([
-                    [self.item1.uuid, 1]
-                ])
+                [self.item1.uuid, 1]
+            ])
         }
 
         resp = self.app.put(
@@ -221,8 +221,8 @@ class TestOrders:
     def test_modify_order__failure_non_existing_empty_orders(self):
         updates = {
             'items': json.dumps([
-                    [self.item1.uuid, 1]
-                ])
+                [self.item1.uuid, 1]
+            ])
         }
 
         resp = self.app.put(
