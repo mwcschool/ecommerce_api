@@ -96,11 +96,12 @@ class TestFavorites:
         )
 
         sample_favorite = {
-            'id_user' : id_user,
-            'id_item' : id_item
+            'id_user': id_user,
+            'id_item': id_item
         }
 
-        resp = self.app.post('/favorites/', data=sample_favorite )
+        resp = self.app.post('/favorites/', data=sample_favorite)
+        assert resp.status_code == CREATED
         assert Favorites.row_count() == 1
 
     def test_post__failed_uuid_not_valid(self):
@@ -132,11 +133,11 @@ class TestFavorites:
         )
 
         sample_favorite = {
-            'id_user' : uuid.uuid4(),
-            'id_item' : uuid.uuid4()
+            'id_user': uuid.uuid4(),
+            'id_item': uuid.uuid4()
         }
 
-        resp = self.app.post('/favorites/', data=sample_favorite )
+        resp = self.app.post('/favorites/', data=sample_favorite)
         assert resp.status_code == NOT_FOUND
         assert json.loads(resp.data.decode()) == None
         assert Favorites.row_count() == 0
