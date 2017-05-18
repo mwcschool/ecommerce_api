@@ -98,7 +98,6 @@ class TestItems:
         assert resp.status_code == BAD_REQUEST
         assert number_of_rows_in_DB() == 0
 
-
     def test_get__item_found(self):
         obj1 = Item.create(
             uuid=uuid.uuid4(),
