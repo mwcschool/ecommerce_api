@@ -30,3 +30,12 @@ class BaseTest:
             email=email,
             password=password,
         )
+
+    def create_item(name="Item name", price=7, description="Item description", category="Category"):
+        return Item.create(
+            item_id=str(uuid.uuid4()),
+            name=name,
+            price=price,
+            description=description,
+            category=category,
+        )
