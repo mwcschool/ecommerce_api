@@ -1,5 +1,5 @@
-from peewee import Model, SqliteDatabase
-from peewee import DecimalField, TextField, CharField
+from peewee import Model, SqliteDatabase, Check
+from peewee import DecimalField, TextField, CharField, BooleanField
 from peewee import UUIDField, ForeignKeyField, IntegerField
 from passlib.hash import pbkdf2_sha256
 
@@ -17,6 +17,8 @@ class Item(BaseModel):
     price = DecimalField()
     description = TextField()
     category = CharField()
+    quantity = IntegerField(constraints=[Check('quantity <= 0')])
+    availability = BooleanField()
 
     def json(self):
         return {
