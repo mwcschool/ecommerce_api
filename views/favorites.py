@@ -42,7 +42,7 @@ class FavoritesResource(Resource):
         parser.add_argument('id_user', type=type(uuid.uuid4()), required=True)
         parser.add_argument('id_item', type=type(uuid.uuid4()), required=True)
         args = parser.parse_args(strict=True)
-        if not User.exists_uuid(args['id_user']) and not Item.exists_uuid(args['id_item']):
+        if not User.exists_uuid(args['id_user']) or not Item.exists_uuid(args['id_item']):
             return None, NOT_FOUND
 
         obj = Favorites.create(
