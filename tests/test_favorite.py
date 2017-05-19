@@ -9,22 +9,22 @@ from app import app
 import uuid
 
 
-def create_an_user(id_user, first_name, last_name, email, password):
+def create_an_user(id_user, number):
     return User.create(
         user_id=id_user,
-        first_name=first_name,
-        last_name=last_name,
-        email=email,
-        password=password
+        first_name='{}{}'.format('first_name_', number),
+        last_name='{}{}'.format('last_name_', number),
+        email='{}{}'.format('email_', number),
+        password='{}{}'.format('password_', number),
     )
 
 
-def create_an_item(id_item, name, price, description):
+def create_an_item(id_item, number):
     return Item.create(
         item_id=id_item,
-        name=name,
-        price=price,
-        description=description
+        name='{}{}'.format('name_', number),
+        price=number,
+        description='{}{}'.format('description_', number),
     )
 
 
@@ -50,16 +50,11 @@ class TestFavorites:
 
         user_db = create_an_user(
             id_user,
-            'fname',
-            'lname',
-            'e@e.com',
-            'psw')
+            1)
 
         item_db = create_an_item(
             id_item,
-            'name',
-            '5',
-            'desc')
+            1)
 
         fav_db = Favorites.create(
             user=user_db,
@@ -80,20 +75,9 @@ class TestFavorites:
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
-        user = create_an_user(
-            id_user,
-            'first_name',
-            'last_name',
-            'email@email.com',
-            'password'
-        )
+        user = create_an_user(id_user, 1)
 
-        item = create_an_item(
-            id_item,
-            'item_name',
-            100,
-            'description'
-        )
+        item = create_an_item(id_item, 1)
 
         sample_favorite = {
             'id_user': id_user,
@@ -107,20 +91,9 @@ class TestFavorites:
     def test_post__failed_item_do_not_exist(self):
         id_user = uuid.uuid4()
 
-        user = create_an_user(
-            id_user,
-            'first_name',
-            'last_name',
-            'email@email.com',
-            'password'
-        )
+        user = create_an_user(id_user, 1)
 
-        item = create_an_item(
-            uuid.uuid4(),
-            'item_name',
-            100,
-            'description'
-        )
+        item = create_an_item(uuid.uuid4(), 1)
 
         sample_favorite = {
             'id_user': id_user,
@@ -145,20 +118,9 @@ class TestFavorites:
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
-        user = create_an_user(
-            id_user,
-            'first_name',
-            'last_name',
-            'email@email.com',
-            'password'
-        )
+        user = create_an_user(id_user, 1)
 
-        item = create_an_item(
-            id_item,
-            'item_name',
-            100,
-            'description'
-        )
+        item = create_an_item(id_item, 1)
 
         sample_favorite = {
             'id_user': id_user,
@@ -174,20 +136,9 @@ class TestFavorites:
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
-        user = create_an_user(
-            id_user,
-            'first_name',
-            'last_name',
-            'email@email.com',
-            'password'
-        )
+        user = create_an_user(id_user, 1)
 
-        item = create_an_item(
-            id_item,
-            'item_name',
-            100,
-            'description'
-        )
+        item = create_an_item(id_item, 1)
 
         sample_favorite = {
             'id_user': uuid.uuid4(),
