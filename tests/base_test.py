@@ -41,7 +41,7 @@ class BaseTest:
             category=category,
         )
 
-    def create_order(self, items=None, user=None):
+    def create_order(self, user=None, items=None):
         '''Parameter format:
 
         items = [
