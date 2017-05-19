@@ -15,30 +15,14 @@ def number_of_rows_in_DB():
 
 
 class TestItems(BaseTest):
-    def setup_method(self):
-        Item.delete().execute()
-
     def test_get_items__empty(self):
         resp = self.app.get('/items/')
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == []
 
     def test_get_items(self):
-        item1 = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one'
-        )
-
-        item2 = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item two',
-            price=15,
-            description='Description two',
-            category='Category two'
-        )
+        item1 = self.create_item()
+        item2 = self.create_item()
 
         resp = self.app.get('/items/')
         assert resp.status_code == OK
@@ -107,13 +91,7 @@ class TestItems(BaseTest):
         assert len(Item.select()) == 0
 
     def test_get__item(self):
-        item1 = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one'
-        )
+        item1 = self.create_item()
 
         resp = self.app.get('/item/{}'.format(item1.uuid))
         assert resp.status_code == OK
@@ -124,6 +102,9 @@ class TestItems(BaseTest):
     def test_get_item__empty(self):
         resp = self.app.get('/item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
+
+        item = json.loads(resp.data.decode())
+        assert item == item1.json()
 
     def test_get_item__failure_non_existing_item(self):
         Item.create(
@@ -138,28 +119,16 @@ class TestItems(BaseTest):
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__success(self):
-        item1 = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Descripion one',
-            category='Category one'
-        )
+        item1 = self.create_item()
 
         resp = self.app.delete('item/{}'.format(item1.uuid))
         assert resp.status_code == NO_CONTENT
-        assert len(Item.select()) == 0
+        assert number_of_rows_in_DB() == 0
         resp = self.app.get('item/{}'.format(item1.uuid))
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__failure_not_found(self):
-        Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one'
-        )
+        self.create_item()
 
         resp = self.app.delete('item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
