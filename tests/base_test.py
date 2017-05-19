@@ -31,7 +31,8 @@ class BaseTest:
             password=password,
         )
 
-    def create_item(self, name="Item name", price=7, description="Item description", category="Category"):
+    def create_item(self, name="Item name", price=7,
+                    description="Item description", category="Category"):
         return Item.create(
             item_id=str(uuid.uuid4()),
             name=name,
