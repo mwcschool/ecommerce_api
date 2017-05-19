@@ -24,8 +24,8 @@ class TestOrders(BaseTest):
         assert json.loads(resp.data.decode()) == []
 
     def test_get_orders(self):
-        order1 = self.create_order(self.order_items, self.user1)
-        order2 = self.create_order(self.order_items, self.user1)
+        order1 = self.create_order(self.user1)
+        order2 = self.create_order(self.user1)
 
         resp = self.app.get('/orders/')
         assert resp.status_code == OK
@@ -103,8 +103,8 @@ class TestOrders(BaseTest):
         assert len(Order.select()) == 0
 
     def test_modify_order__success(self):
-        order1 = self.create_order(user=self.user1)
-        order2 = self.create_order(user=self.user1)
+        order1 = self.create_order(self.user1)
+        order2 = self.create_order(self.user1)
 
         updates = {
             'items': json.dumps([
@@ -130,7 +130,7 @@ class TestOrders(BaseTest):
         assert str(order1_items[0].item.uuid) == self.item2.uuid
 
     def test_modify_order__failure_non_existing(self):
-        self.create_order(user=self.user1)
+        self.create_order(self.user1)
 
         updates = {
             'items': json.dumps([
@@ -158,7 +158,7 @@ class TestOrders(BaseTest):
         assert resp.status_code == NOT_FOUND
 
     def test_modify_order__failure_changed_order_id(self):
-        order1 = self.create_order(user=self.user1)
+        order1 = self.create_order(self.user1)
 
         updates = {
             'uuid': str(uuid.uuid4())
@@ -171,7 +171,7 @@ class TestOrders(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_changed_user(self):
-        order1 = self.create_order(user=self.user1)
+        order1 = self.create_order(self.user1)
 
         updates = {
             'user': str(uuid.uuid4())
@@ -184,7 +184,7 @@ class TestOrders(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_empty_field(self):
-        order1 = self.create_order(user=self.user1)
+        order1 = self.create_order(self.user1)
 
         updates = {
             'items': json.dumps('')
@@ -197,8 +197,8 @@ class TestOrders(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_delete_order__success(self):
-        order1 = self.create_order(user=self.user1)
-        order2 = self.create_order(user=self.user1)
+        order1 = self.create_order(self.user1)
+        order2 = self.create_order(self.user1)
 
         resp = self.app.delete('/orders/{}'.format(order1.uuid))
         assert resp.status_code == NO_CONTENT
@@ -211,8 +211,8 @@ class TestOrders(BaseTest):
         assert len(order_items) == 0
 
     def test_delete_order__failure_non_existing(self):
-        self.create_order(user=self.user1)
-        self.create_order(user=self.user1)
+        self.create_order(self.user1)
+        self.create_order(self.user1)
 
         resp = self.app.delete('/orders/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
