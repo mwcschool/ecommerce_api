@@ -26,7 +26,9 @@ class Item(BaseModel):
             'name': self.name,
             'price': int(self.price),
             'description': self.description,
-            'category': self.category
+            'category': self.category,
+            'quantity': self.quantity,
+            'availability': self.availability
         }
 
 
