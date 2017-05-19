@@ -40,3 +40,47 @@ class BaseTest:
             description=description,
             category=category,
         )
+
+    def create_order(self, items=None, user=None):
+        '''Parameter format:
+
+        items = [
+            [Instance of Item, quantity],
+            ...
+            [instance of item, quantity]
+        ]
+
+        user = Instance of User
+        '''
+        if not user:
+            user = self.create_user()
+
+        if not items:
+            items = []
+            for i in range(2):
+                item = self.create_item()
+                items.append([item, i + 1])
+
+        total_price = 0
+
+        for item in items:
+            total_price = float(item[0].price * item[1])
+
+        order = Order.create(
+            order_id=uuid.uuid4(),
+            total_price=total_price,
+            user=user.id
+        )
+
+        for item in items:
+            item_quantity = item[1]
+            item = item[0]
+
+            OrderItem.create(
+                order=order.id,
+                item=item.id,
+                quantity=item_quantity,
+                subtotal=float(item.price * item_quantity)
+            )
+
+        return order
