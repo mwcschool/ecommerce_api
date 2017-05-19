@@ -104,6 +104,34 @@ class TestFavorites:
         assert resp.status_code == CREATED
         assert Favorites.row_count() == 1
 
+    def test_post__failed_item_do_not_exist(self):
+        id_user = uuid.uuid4()
+
+        user = create_an_user(
+            id_user,
+            'first_name',
+            'last_name',
+            'email@email.com',
+            'password'
+        )
+
+        item = create_an_item(
+            uuid.uuid4(),
+            'item_name',
+            100,
+            'description'
+        )
+
+        sample_favorite = {
+            'id_user': id_user,
+            'id_item': uuid.uuid4()
+        }
+
+        resp = self.app.post('/favorites/', data=sample_favorite)
+
+        assert resp.status_code == NOT_FOUND
+        assert Favorites.row_count() == 0
+
     def test_post__failed_uuid_not_valid(self):
         sample_favorite = {
             'id_user':  "Stringa di prova",
@@ -113,7 +141,36 @@ class TestFavorites:
         assert resp.status_code == BAD_REQUEST
         assert Favorites.row_count() == 0
 
-    def test_post__failed_uuids_does_not_exists(self):
+    def test_post__failed_item_uuid_does_not_exists(self):
+        id_user = uuid.uuid4()
+        id_item = uuid.uuid4()
+
+        user = create_an_user(
+            id_user,
+            'first_name',
+            'last_name',
+            'email@email.com',
+            'password'
+        )
+
+        item = create_an_item(
+            id_item,
+            'item_name',
+            100,
+            'description'
+        )
+
+        sample_favorite = {
+            'id_user': id_user,
+            'id_item': uuid.uuid4()
+        }
+
+        resp = self.app.post('/favorites/', data=sample_favorite)
+        assert resp.status_code == NOT_FOUND
+        assert json.loads(resp.data.decode()) == None
+        assert Favorites.row_count() == 0
+
+    def test_post__failed_user_uuid_does_not_exists(self):
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
@@ -134,7 +191,7 @@ class TestFavorites:
 
         sample_favorite = {
             'id_user': uuid.uuid4(),
-            'id_item': uuid.uuid4()
+            'id_item': id_item
         }
 
         resp = self.app.post('/favorites/', data=sample_favorite)
