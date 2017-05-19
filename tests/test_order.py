@@ -198,7 +198,6 @@ class TestOrders(BaseTest):
 
     def test_delete_order__success(self):
         order1 = self.create_order(self.order_items, self.user1)
-
         order2 = self.create_order(self.order_items, self.user1)
 
         resp = self.app.delete('/orders/{}'.format(order1.uuid))
