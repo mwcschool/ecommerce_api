@@ -149,3 +149,22 @@ class TestFavorites:
         assert resp.status_code == NOT_FOUND
         assert json.loads(resp.data.decode()) == None
         assert Favorites.row_count() == 0
+
+    def test_delete__favorite_success(self):
+        id_user = uuid.uuid4()
+        id_item = uuid.uuid4()
+
+        user = create_an_user(id_user, 1)
+
+        item = create_an_item(id_item, 1)
+
+        Favorites.create(
+            user=User.get(User.user_id == id_user),
+            item=Item.get(Item.item_id == id_item),
+        )
+
+        resp = self.app.delete('/favorites/{}'.format(id_item))
+        import pdb
+        pdb.set_trace()
+
+        assert 0
