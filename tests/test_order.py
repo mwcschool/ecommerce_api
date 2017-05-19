@@ -2,41 +2,21 @@ import uuid
 import json
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 
-from models import Order, OrderItem, Item, User
+from models import Order, OrderItem
 
 from .base_test import BaseTest
 
 
 class TestOrders(BaseTest):
-    @classmethod
-    def setup_class(cls):
-        super(TestOrders, cls).setup_class()
-
-        cls.user1 = User.create(
-            uuid=str(uuid.uuid4()),
-            first_name='Name',
-            last_name='Surname',
-            email='email@domain.com',
-            password='password',
-        )
-        cls.item1 = Item.create(
-            uuid=str(uuid.uuid4()),
-            name='Item one',
-            price=10,
-            description='Item one description',
-            category='Category one',
-        )
-        cls.item2 = Item.create(
-            uuid=str(uuid.uuid4()),
-            name='Item two',
-            price=10,
-            description='Item two description',
-            category='Category one',
-        )
-
     def setup_method(self):
-        OrderItem.delete().execute()
-        Order.delete().execute()
+        super(TestOrders, self).setup_method()
+        self.user1 = self.create_user()
+        self.item1 = self.create_item()
+        self.item2 = self.create_item()
+
+        self.order_items = [
+            [self.item1, 1], [self.item2, 2]
+        ]
 
     def test_get_orders__empty(self):
         resp = self.app.get('/orders/')
@@ -44,29 +24,8 @@ class TestOrders(BaseTest):
         assert json.loads(resp.data.decode()) == []
 
     def test_get_orders(self):
-        order1 = Order.create(
-            uuid=uuid.uuid4(),
-            total_price=10,
-            user=self.user1.id,
-        )
-        OrderItem.create(
-            order=order1.id,
-            item=self.item1.id,
-            quantity=1,
-            subtotal=self.item1.price,
-        )
-
-        order2 = Order.create(
-            uuid=uuid.uuid4(),
-            total_price=7,
-            user=self.user1.id,
-        )
-        OrderItem.create(
-            order=order2.id,
-            item=self.item1.id,
-            quantity=1,
-            subtotal=self.item1.price,
-        )
+        order1 = self.create_order(self.order_items, self.user1)
+        order2 = self.create_order(self.order_items, self.user1)
 
         resp = self.app.get('/orders/')
         assert resp.status_code == OK
@@ -144,29 +103,8 @@ class TestOrders(BaseTest):
         assert len(Order.select()) == 0
 
     def test_modify_order__success(self):
-        order1 = Order.create(
-            uuid=uuid.uuid4(),
-            total_price=10,
-            user=self.user1.id,
-        )
-        OrderItem.create(
-            order=order1.id,
-            item=self.item1.id,
-            quantity=1,
-            subtotal=self.item1.price,
-        )
-
-        order2 = Order.create(
-            uuid=uuid.uuid4(),
-            total_price=12,
-            user=self.user1.id,
-        )
-        OrderItem.create(
-            order=order2.id,
-            item=self.item1.id,
-            quantity=1,
-            subtotal=self.item1.price,
-        )
+        order1 = self.create_order(self.order_items, self.user1)
+        order2 = self.create_order(self.order_items, self.user1)
 
         updates = {
             'items': json.dumps([
@@ -192,11 +130,7 @@ class TestOrders(BaseTest):
         assert str(order1_items[0].item.uuid) == self.item2.uuid
 
     def test_modify_order__failure_non_existing(self):
-        Order.create(
-            uuid=str(uuid.uuid4()),
-            total_price=10,
-            user=self.user1.id,
-        )
+        self.create_order(self.order_items, self.user1)
 
         updates = {
             'items': json.dumps([
@@ -223,12 +157,8 @@ class TestOrders(BaseTest):
         )
         assert resp.status_code == NOT_FOUND
 
-    def test_modify_order__failure_changed_uuid(self):
-        order1 = Order.create(
-            uuid=str(uuid.uuid4()),
-            total_price=10,
-            user=self.user1.id,
-        )
+    def test_modify_order__failure_changed_order_id(self):
+        order1 = self.create_order(self.order_items, self.user1)
 
         updates = {
             'uuid': str(uuid.uuid4())
@@ -241,11 +171,7 @@ class TestOrders(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_changed_user(self):
-        order1 = Order.create(
-            uuid=str(uuid.uuid4()),
-            total_price=10,
-            user=self.user1.id,
-        )
+        order1 = self.create_order(self.order_items, self.user1)
 
         updates = {
             'user': str(uuid.uuid4())
@@ -258,11 +184,7 @@ class TestOrders(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_empty_field(self):
-        order1 = Order.create(
-            uuid=str(uuid.uuid4()),
-            total_price=10,
-            user=self.user1.id,
-        )
+        order1 = self.create_order(self.order_items, self.user1)
 
         updates = {
             'items': json.dumps('')
@@ -275,29 +197,9 @@ class TestOrders(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_delete_order__success(self):
-        order1 = Order.create(
-            uuid=uuid.uuid4(),
-            total_price=10,
-            user=self.user1,
-        )
-        OrderItem.create(
-            order=order1.id,
-            item=self.item1.id,
-            quantity=1,
-            subtotal=self.item1.price,
-        )
+        order1 = self.create_order(self.order_items, self.user1)
 
-        order2 = Order.create(
-            uuid=uuid.uuid4(),
-            total_price=12,
-            user=self.user1,
-        )
-        OrderItem.create(
-            order=order2.id,
-            item=self.item1.id,
-            quantity=1,
-            subtotal=self.item1.price,
-        )
+        order2 = self.create_order(self.order_items, self.user1)
 
         resp = self.app.delete('/orders/{}'.format(order1.uuid))
         assert resp.status_code == NO_CONTENT
@@ -310,16 +212,8 @@ class TestOrders(BaseTest):
         assert len(order_items) == 0
 
     def test_delete_order__failure_non_existing(self):
-        Order.create(
-            uuid=str(uuid.uuid4()),
-            total_price=10,
-            user=self.user1.id
-        )
-        Order.create(
-            uuid=str(uuid.uuid4()),
-            total_price=12,
-            user=self.user1.id
-        )
+        self.create_order(self.order_items, self.user1)
+        self.create_order(self.order_items, self.user1)
 
         resp = self.app.delete('/orders/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
