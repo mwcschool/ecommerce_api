@@ -90,8 +90,8 @@ class TestItems:
 
     def test_create_item__failure_missing_field(self):
         new_item_data = {
-            'name': 'rombo',
-            'description': 'desc2'
+            'name': 'Item one',
+            'description': 'Description one'
         }
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
