@@ -78,33 +78,33 @@ class TestItems:
         assert len(Item.select()) == 0
 
     def test_create_item__failure_empty_field_only_spaces(self):
-        source_item = {
+        new_item_data = {
             'name': '    ',
             'price': 10,
             'description': 'Description one',
             'category': 'Category one'
         }
-        resp = self.app.post('/items/', data=source_item)
+        resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
         assert len(Item.select()) == 0
 
     def test_post__item_without_arguments_given(self):
-        source_item = {
+        new_item_data = {
             'name': 'rombo',
             'description': 'desc2'
         }
-        resp = self.app.post('/items/', data=source_item)
+        resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
         assert len(Item.select()) == 0
 
     def test_post__price_value_as_a_string(self):
-        source_item = {
+        new_item_data = {
             'name': 'ciao',
             'price': 'stringa',
             'description': 'desc3',
             'category': 'varie'
         }
-        resp = self.app.post('/items/', data=source_item)
+        resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
         assert len(Item.select()) == 0
 
