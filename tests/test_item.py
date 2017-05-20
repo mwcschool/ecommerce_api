@@ -50,7 +50,7 @@ class TestItems:
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == [item1.json(), item2.json()]
 
-    def test_post__create_item_success(self):
+    def test_create_item__success(self):
         source_item = {
             'name': 'cubo',
             'price': 15,
