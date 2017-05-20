@@ -120,8 +120,8 @@ class TestItems:
         resp = self.app.get('/item/{}'.format(item1.uuid))
         assert resp.status_code == OK
 
-        item = json.loads(resp.data.decode())
-        assert item == item1.json()
+        item_from_server = json.loads(resp.data.decode())
+        assert item_from_server == item1.json()
 
     def test_get__item_not_found(self):
 
