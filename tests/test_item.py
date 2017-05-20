@@ -51,14 +51,14 @@ class TestItems:
         assert json.loads(resp.data.decode()) == [item1.json(), item2.json()]
 
     def test_create_item__success(self):
-        source_item = {
+        new_item_data = {
             'name': 'cubo',
             'price': 15,
             'description': 'desc1',
             'category': 'poligoni'
         }
 
-        resp = self.app.post('/items/', data=source_item)
+        resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == CREATED
 
         select_query_db = Item.select()
