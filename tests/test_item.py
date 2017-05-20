@@ -124,7 +124,6 @@ class TestItems:
         assert item_from_server == item1.json()
 
     def test_get_item__empty(self):
-
         resp = self.app.get('/item/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
 
