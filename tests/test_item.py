@@ -84,9 +84,9 @@ class TestItems:
     def test_create_item__failure_empty_field_only_spaces(self):
         source_item = {
             'name': '    ',
-            'price': 123,
-            'description': 'desc1',
-            'category': 'varie'
+            'price': 10,
+            'description': 'Description one',
+            'category': 'Category one'
         }
         resp = self.app.post('/items/', data=source_item)
         assert resp.status_code == BAD_REQUEST
