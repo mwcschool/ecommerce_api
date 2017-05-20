@@ -24,7 +24,7 @@ class TestItems:
     def setup_method(self):
         Item.delete().execute()
 
-    def test_get__database_empty(self):
+    def test_get_items__empty(self):
         resp = self.app.get('/items/')
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == []
