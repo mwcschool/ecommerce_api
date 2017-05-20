@@ -10,10 +10,6 @@ from app import app
 import uuid
 
 
-def number_of_rows_in_DB():
-    return len(Item.select())
-
-
 class TestItems:
     @classmethod
     def setup_class(cls):
@@ -90,7 +86,7 @@ class TestItems:
         }
         resp = self.app.post('/items/', data=source_item)
         assert resp.status_code == BAD_REQUEST
-        assert number_of_rows_in_DB() == 0
+        assert len(Item.select()) == 0
 
     def test_post__item_without_arguments_given(self):
         source_item = {
@@ -99,7 +95,7 @@ class TestItems:
         }
         resp = self.app.post('/items/', data=source_item)
         assert resp.status_code == BAD_REQUEST
-        assert number_of_rows_in_DB() == 0
+        assert len(Item.select()) == 0
 
     def test_post__price_value_as_a_string(self):
         source_item = {
@@ -110,7 +106,7 @@ class TestItems:
         }
         resp = self.app.post('/items/', data=source_item)
         assert resp.status_code == BAD_REQUEST
-        assert number_of_rows_in_DB() == 0
+        assert len(Item.select()) == 0
 
     def test_get__item_found(self):
         item1 = Item.create(
@@ -143,7 +139,7 @@ class TestItems:
 
         resp = self.app.delete('item/{}'.format(item1.uuid))
         assert resp.status_code == NO_CONTENT
-        assert number_of_rows_in_DB() == 0
+        assert len(Item.select()) == 0
         resp = self.app.get('item/{}'.format(item1.uuid))
         assert resp.status_code == NOT_FOUND
 
