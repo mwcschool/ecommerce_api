@@ -29,21 +29,21 @@ class TestItems:
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == []
 
-    def test_get__database_not_empty(self):
+    def test_get_items(self):
         item1 = Item.create(
             uuid=str(uuid.uuid4()),
-            name='cubo',
+            name='Item one',
             price=5,
-            description='dhfsdjòfgjasdògj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
         item2 = Item.create(
             uuid=str(uuid.uuid4()),
-            name='iphone',
+            name='Item two',
             price=15,
-            description='desc2',
-            category='smartphone'
+            description='Description two',
+            category='Category two'
         )
 
         resp = self.app.get('/items/')
