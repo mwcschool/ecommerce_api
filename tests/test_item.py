@@ -52,10 +52,10 @@ class TestItems:
 
     def test_create_item__success(self):
         new_item_data = {
-            'name': 'cubo',
+            'name': 'Item one',
             'price': 15,
-            'description': 'desc1',
-            'category': 'poligoni'
+            'description': 'Description one',
+            'category': 'Category one'
         }
 
         resp = self.app.post('/items/', data=new_item_data)
