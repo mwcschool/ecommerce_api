@@ -99,10 +99,10 @@ class TestItems:
 
     def test_create_item__failure_field_wrong_type(self):
         new_item_data = {
-            'name': 'ciao',
-            'price': 'stringa',
-            'description': 'desc3',
-            'category': 'varie'
+            'name': 'Item one',
+            'price': 'Ten',
+            'description': 'Description one',
+            'category': 'Category one'
         }
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
