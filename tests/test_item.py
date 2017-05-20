@@ -61,12 +61,11 @@ class TestItems:
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == CREATED
 
-        select_query_db = Item.select()
+        item_from_server = json.loads(resp.data.decode())
+        item_from_db = Item.get(Item.item_id == item_from_server['item_id']).json()
 
-        assert len(select_query_db) == 1
-
-        item_from_db = select_query_db[0].json()
-        assert item_from_db == json.loads(resp.data.decode())
+        assert len(Item.select()) == 1
+        assert item_from_db == item_from_server
 
     def test_post__name_with_only_spaces(self):
         source_item = {
