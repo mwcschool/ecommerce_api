@@ -127,6 +127,18 @@ class TestItems:
         resp = self.app.get('/item/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
 
+    def test_get_item__failure_non_existing_item(self):
+        item1 = Item.create(
+            item_id=str(uuid.uuid4()),
+            name='Item one',
+            price=5,
+            description='Description one',
+            category='Category one'
+        )
+
+        resp = self.app.get('/item/{}'.format(str(uuid.uuid4())))
+        assert resp.status_code == NOT_FOUND
+
     def test_delete__item_removed_successfully(self):
         item1 = Item.create(
             uuid=str(uuid.uuid4()),
