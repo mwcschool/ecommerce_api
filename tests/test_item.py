@@ -15,6 +15,7 @@ def number_of_rows_in_DB():
 
 
 class TestItems:
+    @classmethod
     def setup_class(cls):
         Item._meta.database = SqliteDatabase(':memory:')
         Item.create_table()
