@@ -30,7 +30,7 @@ class TestItems:
 
     def test_get__database_not_empty(self):
         item1 = Item.create(
-            uuid=uuid.uuid4(),
+            uuid=str(uuid.uuid4()),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
@@ -38,7 +38,7 @@ class TestItems:
         )
 
         item2 = Item.create(
-            uuid=uuid.uuid4(),
+            uuid=str(uuid.uuid4()),
             name='iphone',
             price=15,
             description='desc2',
@@ -100,7 +100,7 @@ class TestItems:
 
     def test_get__item_found(self):
         item1 = Item.create(
-            uuid=uuid.uuid4(),
+            uuid=str(uuid.uuid4()),
             name='cubo',
             price=5,
             description='dhfsdjofgjasdogj',
@@ -115,12 +115,12 @@ class TestItems:
 
     def test_get__item_not_found(self):
 
-        resp = self.app.get('/item/{}'.format(uuid.uuid4()))
+        resp = self.app.get('/item/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
 
     def test_delete__item_removed_successfully(self):
         item1 = Item.create(
-            uuid=uuid.uuid4(),
+            uuid=str(uuid.uuid4()),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
@@ -135,22 +135,22 @@ class TestItems:
 
     def test_delete__item_not_found(self):
         Item.create(
-            uuid=uuid.uuid4(),
+            uuid=str(uuid.uuid4()),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
             category='poligoni'
         )
 
-        resp = self.app.delete('item/{}'.format(uuid.uuid4()))
+        resp = self.app.delete('item/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
 
     def test_delete__database_is_empty(self):
-        resp = self.app.delete('item/{}'.format(uuid.uuid4()))
+        resp = self.app.delete('item/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
 
     def test_post__item_modified_successfully(self):
-        static_id = uuid.uuid4()
+        static_id = str(uuid.uuid4())
 
         Item.create(
             uuid=static_id,
@@ -181,7 +181,7 @@ class TestItems:
         assert item2 == db_data
 
     def test_put__item_name_with_only_spaces(self):
-        static_id = uuid.uuid4()
+        static_id = str(uuid.uuid4())
 
         item = Item.create(
             uuid=uuid.uuid4(),
@@ -204,7 +204,7 @@ class TestItems:
         assert resp.status_code == BAD_REQUEST
 
     def test_put__item_without_an_argument_given(self):
-        static_id = uuid.uuid4()
+        static_id = str(uuid.uuid4())
 
         item = Item.create(
             uuid=uuid.uuid4(),
@@ -226,7 +226,7 @@ class TestItems:
         assert resp.status_code == BAD_REQUEST
 
     def test_put__item_price_value_as_a_string(self):
-        static_id = uuid.uuid4()
+        static_id = str(uuid.uuid4())
 
         item = Item.create(
             uuid=uuid.uuid4(),
