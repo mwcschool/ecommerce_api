@@ -108,7 +108,7 @@ class TestItems:
         assert resp.status_code == BAD_REQUEST
         assert len(Item.select()) == 0
 
-    def test_get__item_found(self):
+    def test_get__item(self):
         item1 = Item.create(
             uuid=str(uuid.uuid4()),
             name='cubo',
