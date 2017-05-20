@@ -29,7 +29,7 @@ class TestItems:
         assert json.loads(resp.data.decode()) == []
 
     def test_get__database_not_empty(self):
-        obj1 = Item.create(
+        item1 = Item.create(
             uuid=uuid.uuid4(),
             name='cubo',
             price=5,
@@ -37,7 +37,7 @@ class TestItems:
             category='poligoni'
         )
 
-        obj2 = Item.create(
+        item2 = Item.create(
             uuid=uuid.uuid4(),
             name='iphone',
             price=15,
@@ -47,7 +47,7 @@ class TestItems:
 
         resp = self.app.get('/items/')
         assert resp.status_code == OK
-        assert json.loads(resp.data.decode()) == [obj1.json(), obj2.json()]
+        assert json.loads(resp.data.decode()) == [item1.json(), item2.json()]
 
     def test_post__create_item_success(self):
         source_item = {
@@ -99,7 +99,7 @@ class TestItems:
         assert number_of_rows_in_DB() == 0
 
     def test_get__item_found(self):
-        obj1 = Item.create(
+        item1 = Item.create(
             uuid=uuid.uuid4(),
             name='cubo',
             price=5,
@@ -107,11 +107,11 @@ class TestItems:
             category='poligoni'
         )
 
-        resp = self.app.get('/item/{}'.format(obj1.uuid))
+        resp = self.app.get('/item/{}'.format(item1.uuid))
         assert resp.status_code == OK
 
         item = json.loads(resp.data.decode())
-        assert item == obj1.json()
+        assert item == item1.json()
 
     def test_get__item_not_found(self):
 
@@ -119,7 +119,7 @@ class TestItems:
         assert resp.status_code == NOT_FOUND
 
     def test_delete__item_removed_successfully(self):
-        obj1 = Item.create(
+        item1 = Item.create(
             uuid=uuid.uuid4(),
             name='cubo',
             price=5,
@@ -127,10 +127,10 @@ class TestItems:
             category='poligoni'
         )
 
-        resp = self.app.delete('item/{}'.format(obj1.uuid))
+        resp = self.app.delete('item/{}'.format(item1.uuid))
         assert resp.status_code == NO_CONTENT
         assert number_of_rows_in_DB() == 0
-        resp = self.app.get('item/{}'.format(obj1.uuid))
+        resp = self.app.get('item/{}'.format(item1.uuid))
         assert resp.status_code == NOT_FOUND
 
     def test_delete__item_not_found(self):
@@ -160,14 +160,14 @@ class TestItems:
             category='poligoni'
         )
 
-        obj2 = {
+        item2 = {
             'name': 'triangolo',
             'price': 10,
             'description': 'Descrizione sensata',
             'category': 'Poligoni'
         }
 
-        resp = self.app.put('item/{}'.format(static_id), data=obj2)
+        resp = self.app.put('item/{}'.format(static_id), data=item2)
         assert resp.status_code == OK
         resp = self.app.get('item/{}'.format(static_id))
 
@@ -178,13 +178,13 @@ class TestItems:
             'category': json.loads(resp.data.decode())['category']
         }
 
-        assert obj2 == db_data
+        assert item2 == db_data
 
     def test_put__item_name_with_only_spaces(self):
         static_id = uuid.uuid4()
 
-        obj = Item.create(
-            uuid=static_id,
+        item = Item.create(
+            uuid=uuid.uuid4(),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
@@ -199,15 +199,15 @@ class TestItems:
         }
 
         resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
-        output_from_DB = Item.get(uuid=obj.uuid).json()
-        assert obj.json() == output_from_DB
+        output_from_DB = Item.get(uuid=item.uuid).json()
+        assert item.json() == output_from_DB
         assert resp.status_code == BAD_REQUEST
 
     def test_put__item_without_an_argument_given(self):
         static_id = uuid.uuid4()
 
-        obj = Item.create(
-            uuid=static_id,
+        item = Item.create(
+            uuid=uuid.uuid4(),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
@@ -220,15 +220,16 @@ class TestItems:
         }
 
         resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
-        output_from_DB = Item.get(uuid=obj.uuid).json()
-        assert obj.json() == output_from_DB
+
+        output_from_DB = Item.get(uuid=item.uuid).json()
+        assert item.json() == output_from_DB
         assert resp.status_code == BAD_REQUEST
 
     def test_put__item_price_value_as_a_string(self):
         static_id = uuid.uuid4()
 
-        obj = Item.create(
-            uuid=static_id,
+        item = Item.create(
+            uuid=uuid.uuid4(),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
@@ -243,5 +244,6 @@ class TestItems:
         }
         resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
         assert resp.status_code == BAD_REQUEST
-        output_from_DB = Item.get(uuid=obj.uuid).json()
-        assert obj.json() == output_from_DB
+
+        output_from_DB = Item.get(uuid=item.uuid).json()
+        assert item.json() == output_from_DB
