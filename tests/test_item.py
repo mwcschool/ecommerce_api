@@ -70,6 +70,17 @@ class TestItems:
         item_from_server.pop('item_id')
         assert item_from_server == new_item_data
 
+    def test_create_item__failure_empty_field(self):
+        new_item_data = {
+            'name': '',
+            'price': 10,
+            'description': 'Description one',
+            'category': 'Category one'
+        }
+        resp = self.app.post('/items/', data=new_item_data)
+        assert resp.status_code == BAD_REQUEST
+        assert len(Item.select()) == 0
+
     def test_post__name_with_only_spaces(self):
         source_item = {
             'name': '    ',
