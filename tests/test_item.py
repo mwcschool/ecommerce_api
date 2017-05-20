@@ -88,7 +88,7 @@ class TestItems:
         assert resp.status_code == BAD_REQUEST
         assert len(Item.select()) == 0
 
-    def test_post__item_without_arguments_given(self):
+    def test_create_item__failure_missing_field(self):
         new_item_data = {
             'name': 'rombo',
             'description': 'desc2'
