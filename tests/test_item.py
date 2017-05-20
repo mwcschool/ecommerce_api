@@ -81,7 +81,7 @@ class TestItems:
         assert resp.status_code == BAD_REQUEST
         assert len(Item.select()) == 0
 
-    def test_post__name_with_only_spaces(self):
+    def test_create_item__failure_empty_field_only_spaces(self):
         source_item = {
             'name': '    ',
             'price': 123,
