@@ -111,10 +111,10 @@ class TestItems:
     def test_get__item(self):
         item1 = Item.create(
             uuid=str(uuid.uuid4()),
-            name='cubo',
+            name='Item one',
             price=5,
-            description='dhfsdjofgjasdogj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
         resp = self.app.get('/item/{}'.format(item1.uuid))
