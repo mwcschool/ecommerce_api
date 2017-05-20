@@ -67,6 +67,9 @@ class TestItems:
         assert len(Item.select()) == 1
         assert item_from_db == item_from_server
 
+        item_from_server.pop('item_id')
+        assert item_from_server == new_item_data
+
     def test_post__name_with_only_spaces(self):
         source_item = {
             'name': '    ',
