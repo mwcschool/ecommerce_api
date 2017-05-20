@@ -97,7 +97,7 @@ class TestItems:
         assert resp.status_code == BAD_REQUEST
         assert len(Item.select()) == 0
 
-    def test_post__price_value_as_a_string(self):
+    def test_create_item__failure_field_wrong_type(self):
         new_item_data = {
             'name': 'ciao',
             'price': 'stringa',
