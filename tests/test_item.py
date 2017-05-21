@@ -242,10 +242,8 @@ class TestItems:
         assert resp.status_code == BAD_REQUEST
 
     def test_modufy_item__failure_field_wrong_type(self):
-        static_id = str(uuid.uuid4())
-
         item = Item.create(
-            uuid=uuid.uuid4(),
+            uuid=str(uuid.uuid4()),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
@@ -258,7 +256,7 @@ class TestItems:
             'description': 'Ciaociao',
             'category': 'asdfdafdf'
         }
-        resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
+        resp = self.app.put('/item/{}'.format(item.item_id), data=modified_content)
         assert resp.status_code == BAD_REQUEST
 
         output_from_DB = Item.get(uuid=item.uuid).json()
