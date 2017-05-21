@@ -201,10 +201,8 @@ class TestItems:
         assert new_item_data == item_from_server
 
     def test_modify_item__failure_empty_field_only_spaces(self):
-        static_id = str(uuid.uuid4())
-
         item = Item.create(
-            uuid=uuid.uuid4(),
+            uuid=str(uuid.uuid4()),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
@@ -218,8 +216,8 @@ class TestItems:
             'category': '    '
         }
 
-        resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
-        output_from_DB = Item.get(uuid=item.uuid).json()
+        resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
+        output_from_DB = Item.get(item_id=item.item_id).json()
         assert item.json() == output_from_DB
         assert resp.status_code == BAD_REQUEST
 
