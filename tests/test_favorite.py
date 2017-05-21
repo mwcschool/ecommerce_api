@@ -26,6 +26,7 @@ def create_an_item(id_item, number):
         name='{}{}'.format('name_', number),
         price=number,
         description='{}{}'.format('description_', number),
+        category='{}{}'.format('category_',number),
     )
 
 
