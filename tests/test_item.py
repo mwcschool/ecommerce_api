@@ -191,16 +191,10 @@ class TestItems:
 
         resp = self.app.put('item/{}'.format(static_id), data=new_item_data)
         assert resp.status_code == OK
-        resp = self.app.get('item/{}'.format(static_id))
+        item_from_server = json.loads(resp.data.decode())
 
-        db_data = {
-            'name': json.loads(resp.data.decode())['name'],
-            'price': json.loads(resp.data.decode())['price'],
-            'description': json.loads(resp.data.decode())['description'],
-            'category': json.loads(resp.data.decode())['category']
-        }
-
-        assert new_item_data == db_data
+        item_from_server.pop('item_id')
+        assert new_item_data == item_from_server
 
     def test_put__item_name_with_only_spaces(self):
         static_id = str(uuid.uuid4())
