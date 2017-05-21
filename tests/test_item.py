@@ -182,14 +182,14 @@ class TestItems:
             category='Category one'
         )
 
-        item2 = {
+        new_item_data = {
             'name': 'Item one',
             'price': 10,
             'description': 'Description two',
             'category': 'Category two'
         }
 
-        resp = self.app.put('item/{}'.format(static_id), data=item2)
+        resp = self.app.put('item/{}'.format(static_id), data=new_item_data)
         assert resp.status_code == OK
         resp = self.app.get('item/{}'.format(static_id))
 
@@ -200,7 +200,7 @@ class TestItems:
             'category': json.loads(resp.data.decode())['category']
         }
 
-        assert item2 == db_data
+        assert new_item_data == db_data
 
     def test_put__item_name_with_only_spaces(self):
         static_id = str(uuid.uuid4())
