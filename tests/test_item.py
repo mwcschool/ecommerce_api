@@ -217,8 +217,8 @@ class TestItems:
         }
 
         resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
-        output_from_DB = Item.get(item_id=item.item_id).json()
-        assert item.json() == output_from_DB
+        item_from_db = Item.get(item_id=item.uuid).json()
+        assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
     def test_put__item_without_an_argument_given(self):
