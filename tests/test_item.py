@@ -222,10 +222,8 @@ class TestItems:
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_item__failure_missing_argument(self):
-        static_id = str(uuid.uuid4())
-
         item = Item.create(
-            uuid=uuid.uuid4(),
+            uuid=str(uuid.uuid4()),
             name='cubo',
             price=5,
             description='dhfsdjòfgjasdògj',
@@ -237,9 +235,8 @@ class TestItems:
             'description': 'desc2'
         }
 
-        resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
-
-        output_from_DB = Item.get(uuid=item.uuid).json()
+        resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
+        output_from_DB = Item.get(item_id=item.uuid).json()
         assert item.json() == output_from_DB
         assert resp.status_code == BAD_REQUEST
 
