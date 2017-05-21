@@ -171,7 +171,7 @@ class TestItems:
         resp = self.app.delete('item/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
 
-    def test_post__item_modified_successfully(self):
+    def test_modify_item__success(self):
         static_id = str(uuid.uuid4())
 
         Item.create(
