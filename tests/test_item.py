@@ -224,15 +224,16 @@ class TestItems:
     def test_modify_item__failure_missing_argument(self):
         item = Item.create(
             uuid=str(uuid.uuid4()),
-            name='cubo',
+            name='Item one',
             price=5,
-            description='dhfsdjòfgjasdògj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
         modified_content = {
-            'name': 'rombo',
-            'description': 'desc2'
+            'name': 'Item two',
+            'price': 10,
+            'description': 'Description two'
         }
 
         resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
