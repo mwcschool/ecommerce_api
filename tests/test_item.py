@@ -221,7 +221,7 @@ class TestItems:
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
-    def test_put__item_without_an_argument_given(self):
+    def test_modify_item__failure_missing_argument(self):
         static_id = str(uuid.uuid4())
 
         item = Item.create(
