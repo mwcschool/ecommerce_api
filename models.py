@@ -5,7 +5,6 @@ from schemas import ItemSchema, UserSchema, AddressSchema
 from passlib.hash import pbkdf2_sha256
 
 from http.client import NO_CONTENT
-from http.client import NOT_FOUND
 from http.client import CREATED
 
 database = SqliteDatabase('database.db')
