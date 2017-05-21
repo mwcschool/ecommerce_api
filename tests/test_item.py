@@ -176,17 +176,17 @@ class TestItems:
 
         Item.create(
             uuid=static_id,
-            name='cubo',
+            name='Item one',
             price=5,
-            description='dhfsdjòfgjasdògj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
         item2 = {
-            'name': 'triangolo',
+            'name': 'Item one',
             'price': 10,
-            'description': 'Descrizione sensata',
-            'category': 'Poligoni'
+            'description': 'Description two',
+            'category': 'Category two'
         }
 
         resp = self.app.put('item/{}'.format(static_id), data=item2)
