@@ -166,7 +166,7 @@ class TestItems:
         resp = self.app.delete('item/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
 
-    def test_delete__database_is_empty(self):
+    def test_delete_item__failure_non_existing_empty_items(self):
         resp = self.app.delete('item/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
 
