@@ -153,17 +153,17 @@ class TestFavorites:
 
     def test_delete__favorite_success(self):
         id_user = uuid.uuid4()
-        id_item = uuid.uuid4()
+        id_item_1 = uuid.uuid4()
         id_item_2 = uuid.uuid4()
 
         user = create_an_user(id_user, 1)
 
-        item = create_an_item(id_item, 1)
-        item = create_an_item(id_item_2, 1)
+        item_1 = create_an_item(id_item_1, 1)
+        item_2 = create_an_item(id_item_2, 1)
 
         Favorites.create(
             user=User.get(User.user_id == id_user),
-            item=Item.get(Item.item_id == id_item),
+            item=Item.get(Item.item_id == id_item_1),
         )
 
         Favorites.create(
@@ -171,7 +171,61 @@ class TestFavorites:
             item=Item.get(Item.item_id == id_item_2),
         )
 
-        resp = self.app.delete('/favorites/{}'.format(id_item))
+        resp = self.app.delete('/favorites/{}'.format(id_item_1))
 
         assert Favorites.row_count() == 1
+        assert Favorites.item == item_2
         assert resp.status_code == NO_CONTENT
+
+    def test_delete__failed_item_not_found(self):
+        id_user = uuid.uuid4()
+        id_item_1 = uuid.uuid4()
+
+        user = create_an_user(id_user, 1)
+        item_1 = create_an_item(id_item_1, 1)
+
+        Favorites.create(
+            user=User.get(User.user_id == id_user),
+            item=Item.get(Item.item_id == id_item_1),
+        )
+
+        resp = self.app.delete('/favorites/{}'.format(uuid.uuid4()))
+
+        assert Favorites.row_count() == 1
+        assert Favorites.item == item_1
+        assert resp.status_code == NOT_FOUND
+        assert json.loads(resp.data.decode()) == None
+
+    def test_delete__failed_user_has_no_favorite_items(self):
+        id_user_1 = uuid.uuid4()
+        id_user_2 = uuid.uuid4()
+        id_item_1 = uuid.uuid4()
+
+        user_1 = create_an_user(id_user_1, 1)
+        user_2 = create_an_user(id_user_2, 2)
+        item_1 = create_an_item(id_item_1, 1)
+
+        Favorites.create(
+            user=User.get(User.user_id == id_user_2),
+            item=Item.get(Item.item_id == id_item_1),
+        )
+
+        resp = self.app.delete('/favorites/{}'.format(id_item_1))
+
+        assert Favorites.row_count() == 1
+        assert Favorites.item == item_1
+        assert resp.status_code == NOT_FOUND
+        assert json.loads(resp.data.decode()) == None
+
+    def test_delete__database_has_no_favorites(self):
+        id_user = uuid.uuid4()
+        id_item = uuid.uuid4()
+
+        user = create_an_user(id_user, 1)
+        item = create_an_item(id_item, 1)
+
+        resp = self.app.delete('/favorites/{}'.format(id_item))
+
+        assert Favorites.row_count() == 0
+        assert resp.status_code == NOT_FOUND
+        assert json.loads(resp.data.decode()) == None
