@@ -241,7 +241,7 @@ class TestItems:
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
-    def test_modufy_item__failure_field_wrong_type(self):
+    def test_modify_item__failure_field_wrong_type(self):
         item = Item.create(
             uuid=str(uuid.uuid4()),
             name='Item one',
