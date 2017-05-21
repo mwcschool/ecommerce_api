@@ -93,7 +93,7 @@ class TestItems(BaseTest):
         resp = self.open_with_auth(
             '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
-        assert len(Item.select()) == 0
+        assert Item.row_count() == 0
 
     def test_create_item__failure_missing_field(self):
         user = self.create_user()
@@ -105,22 +105,19 @@ class TestItems(BaseTest):
         resp = self.open_with_auth(
             '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
-        assert len(Item.select()) == 0
+        assert Item.row_count() == 0
 
-    def test_create_item__failure_field_wrong_type(self):
-        user = self.create_user()
-
-        new_item_data = {
-            'name': 'Item one',
-            'price': 'Ten',
-            'description': 'Description one',
-            'category': 'Category one',
-            'availability': 11
+    def test_post__price_value_as_a_string(self):
+        source_item = {
+            'name': 'ciao',
+            'price': 'stringa',
+            'description': 'desc3',
+            'category': 'varie'
         }
         resp = self.open_with_auth(
             '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
-        assert len(Item.select()) == 0
+        assert Item.row_count() == 0
 
     def test_get__item(self):
         item1 = self.create_item()
@@ -155,8 +152,8 @@ class TestItems(BaseTest):
         resp = self.open_with_auth(
             'items/{}'.format(item1.uuid), 'delete', user.email, 'p4ssw0rd', data='')
         assert resp.status_code == NO_CONTENT
-        assert len(Item.select()) == 0
-        resp = self.app.get('/items/{}'.format(item1.uuid))
+        assert Item.row_count() == 0
+        resp = self.app.get('item/{}'.format(obj1.item_id))
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__failure_not_found(self):
