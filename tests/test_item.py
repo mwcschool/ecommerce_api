@@ -165,6 +165,7 @@ class TestItems:
 
         resp = self.app.delete('item/{}'.format(str(uuid.uuid4())))
         assert resp.status_code == NOT_FOUND
+        assert len(Item.select()) == 1
 
     def test_delete_item__failure_non_existing_empty_items(self):
         resp = self.app.delete('item/{}'.format(str(uuid.uuid4())))
