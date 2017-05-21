@@ -9,11 +9,6 @@ import uuid
 import utils
 
 
-def check_uuid_is_in_(id_check):
-    # if id_check not
-    pass
-
-
 class FavoritesResource(Resource):
     def get(self):
         # TODO: we will have a user from auth here.
@@ -31,11 +26,10 @@ class FavoritesResource(Resource):
         if not User.exists_uuid(args['id_user']) or not Item.exists_uuid(args['id_item']):
             return None, NOT_FOUND
 
-        obj = Favorites.create(
-            item=Item.get(Item.item_id == args['id_item']),
-            user=User.get(User.user_id == args['id_user']),
-        )
-        return obj.json(), CREATED
+        item=Item.get(Item.item_id == args['id_item'])
+        user=User.get(User.user_id == args['id_user'])
+
+        return user.add_favorite(item)
 
 
 class FavoriteResource(Resource):
@@ -55,7 +49,7 @@ class FavoriteResource(Resource):
                 .where(User.user_id == user.user_id)\
                 .exists()
 
-        if query_check_many_to_many_exists is False:
+        if not query_check_many_to_many_exists:
             return None, NOT_FOUND
 
         favorite_to_be_deleted = Favorites.select()\
@@ -65,6 +59,4 @@ class FavoriteResource(Resource):
                 .where(User.user_id == user.user_id)\
                 .where(Item.item_id == item_id)
 
-        Favorites.delete().where(Favorites.id == favorite_to_be_deleted).execute()
-
-        return None, NO_CONTENT
+        return user.remove_favorite(Item.get(Item.item_id == item_id))
