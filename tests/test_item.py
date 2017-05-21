@@ -259,5 +259,5 @@ class TestItems:
         resp = self.app.put('/item/{}'.format(item.item_id), data=modified_content)
         assert resp.status_code == BAD_REQUEST
 
-        output_from_DB = Item.get(uuid=item.uuid).json()
-        assert item.json() == output_from_DB
+        item_from_db = Item.get(uuid=item.uuid).json()
+        assert item.json() == item_from_db
