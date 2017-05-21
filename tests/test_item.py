@@ -237,7 +237,7 @@ class TestItems:
         }
 
         resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
-        item_from_db = Item.get(item_id=item.uuid).json()
+        item_from_db = Item.get(Item.item_id == item.uuid).json()
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
