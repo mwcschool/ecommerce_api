@@ -200,7 +200,7 @@ class TestItems:
         item_from_server.pop('item_id')
         assert new_item_data == item_from_server
 
-    def test_put__item_name_with_only_spaces(self):
+    def test_modify_item__failure_empty_field_only_spaces(self):
         static_id = str(uuid.uuid4())
 
         item = Item.create(
