@@ -128,7 +128,7 @@ class TestItems:
         assert resp.status_code == NOT_FOUND
 
     def test_get_item__failure_non_existing_item(self):
-         Item.create(
+        Item.create(
             item_id=str(uuid.uuid4()),
             name='Item one',
             price=5,
