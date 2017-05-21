@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 from http.client import CREATED
-# from http.client import NO_CONTENT
+from http.client import NO_CONTENT
 from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
@@ -49,4 +49,22 @@ class FavoriteResource(Resource):
         if not Item.exists_uuid(item_id):
             return None, NOT_FOUND
 
-        True
+        query_check_many_to_many_exists = Item.select()\
+                .join(Favorites, on=Favorites.item)\
+                .join(User, on=Favorites.user)\
+                .where(User.user_id == user.user_id)\
+                .exists()
+
+        if query_check_many_to_many_exists is False:
+            return None, NOT_FOUND
+
+        favorite_to_be_deleted = Favorites.select()\
+                .join(Item, on=Favorites.item)\
+                .switch(Favorites)\
+                .join(User, on=Favorites.user)\
+                .where(User.user_id == user.user_id)\
+                .where(Item.item_id == item_id)
+
+        Favorites.delete().where(Favorites.id == favorite_to_be_deleted).execute()
+
+        return None, NO_CONTENT
