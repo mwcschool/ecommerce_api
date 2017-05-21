@@ -4,6 +4,10 @@ from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField
 from schemas import ItemSchema, UserSchema, AddressSchema
 from passlib.hash import pbkdf2_sha256
 
+from http.client import NO_CONTENT
+from http.client import NOT_FOUND
+from http.client import CREATED
+
 database = SqliteDatabase('database.db')
 
 
@@ -73,6 +77,16 @@ class User(BaseModel):
         else:
             return False
 
+    def add_favorite(this, item):
+        favorite = Favorites.create(
+            user = this,
+            item = item,
+        )
+        return favorite.json(), CREATED
+
+    def remove_favorite(this, item):
+        Favorites.delete().where(Favorites.id == item).execute()
+        return None, NO_CONTENT
 
 class Address(BaseModel):
     uuid = UUIDField(unique=True)
