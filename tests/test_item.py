@@ -154,7 +154,7 @@ class TestItems:
         resp = self.app.get('item/{}'.format(item1.uuid))
         assert resp.status_code == NOT_FOUND
 
-    def test_delete__item_not_found(self):
+    def test_delete_item__failure_not_found(self):
         Item.create(
             uuid=str(uuid.uuid4()),
             name='cubo',
