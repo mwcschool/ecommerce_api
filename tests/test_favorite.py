@@ -173,7 +173,6 @@ class TestFavorites:
         )
 
         resp = self.app.delete('/favorites/{}'.format(id_item_1))
-
         assert Favorites.row_count() == 1
         assert Favorites.item == item_2
         assert resp.status_code == NO_CONTENT
