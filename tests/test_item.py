@@ -191,7 +191,11 @@ class TestItems:
 
         resp = self.app.put('item/{}'.format(static_id), data=new_item_data)
         assert resp.status_code == OK
+
         item_from_server = json.loads(resp.data.decode())
+        item_from_db = Item.get(Item.item_id == item_from_server['item_id']).json()
+
+        assert item_from_db == item_from_server
 
         item_from_server.pop('item_id')
         assert new_item_data == item_from_server
