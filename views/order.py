@@ -6,8 +6,8 @@ import json
 from models import Order, OrderItem, Item, User, database
 
 
-def is_valid_uuid(uuid):
-    return uuid.UUID(uuid, version=4)
+def is_valid_uuid(user_id):
+    return uuid.UUID(user_id, version=4)
 
 
 def is_valid_item_list(json_item_list):
