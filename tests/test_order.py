@@ -197,7 +197,7 @@ class TestOrders:
 
         order1_items = OrderItem.select().where(OrderItem.order_id == order1.id)
         assert len(order1_items) == 1
-        assert order1_items[0].item_id == self.item2.id
+        assert str(order1_items[0].item.uuid) == self.item2.uuid
 
     def test_modify_order__failure_non_existing(self):
         Order.create(
