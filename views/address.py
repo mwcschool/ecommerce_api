@@ -8,6 +8,7 @@ import utils
 class AddressesResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
+        # TODO Security issue, grab user_id from user authentication
         parser.add_argument('user_id', type=utils.non_empty_str, required=True)
         parser.add_argument('nation', type=utils.non_empty_str, required=True)
         parser.add_argument('city', type=utils.non_empty_str, required=True)
@@ -61,6 +62,7 @@ class AddressResource(Resource):
             return None, NOT_FOUND
 
         parser = reqparse.RequestParser()
+        # TODO Security issue, grab user_id from user authentication
         parser.add_argument('user_id', type=utils.non_empty_str, required=True)
         parser.add_argument('nation', type=utils.non_empty_str, required=True)
         parser.add_argument('city', type=utils.non_empty_str, required=True)
