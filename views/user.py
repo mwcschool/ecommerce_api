@@ -18,16 +18,6 @@ def crypt_password(password):
     return crypt
 
 
-def valid_email(email):
-    return re.match('[a-z]{3,}(?P<at>@)[a-z]{3,}(?P<point>\.)[a-z]{2,}', email)
-
-
-def crypt_password(password):
-    crypt = pbkdf2_sha256.hash(password)
-
-    return crypt
-
-
 class UsersResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
@@ -36,7 +26,6 @@ class UsersResource(Resource):
         parser.add_argument('email', type=utils.non_empty_str, required=True)
         parser.add_argument('password', type=utils.non_empty_str, required=True)
         args = parser.parse_args(strict=True)
-
 
         if valid_email(args['email']) and len(args['password']) > 6:
             obj = User.create(
