@@ -1,4 +1,4 @@
-from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, UNAUTHORIZED
+from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST
 import json
 import uuid
 from views.user import crypt_password
@@ -159,19 +159,6 @@ class Testuser:
             '/users/{}'.format(user.uuid), 'put', user.email, '1234567', data=data)
         assert resp.status_code == BAD_REQUEST
 
-    def test_put__userid_not_exist(self):
-        data = {
-            'first_name': 'Anna',
-            'last_name': 'Markis',
-            'email': 'anna@markis.com',
-            'password': '12345'
-        }
-
-        resp = self.open_with_auth(
-            '/users/{}'.format(uuid.uuid4()), 'put', data['email'], '1234567', data=data)
-        assert resp.status_code == UNAUTHORIZED
-        assert len(User.select()) == 0
-
     def test_delete_user__success(self):
         user = User.create(
             uuid=uuid.uuid4(),
@@ -195,12 +182,6 @@ class Testuser:
         assert resp.status_code == NO_CONTENT
         assert len(all_users) == 1
         assert user_from_db.uuid == user2.uuid
-
-    def test_delete__emptydb_userid_not_exist(self):
-        resp = self.open_with_auth(
-            '/users/{}'.format(uuid.uuid4()), 'delete', 'ciao@libero.it', '1234567', data='')
-        assert resp.status_code == UNAUTHORIZED
-        assert len(User.select()) == 0
 
     def test_delete__userid_not_exist(self):
         User.create(
