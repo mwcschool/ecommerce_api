@@ -17,16 +17,9 @@ class AddressesResource(Resource):
         parser.add_argument('phone', type=utils.non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
-        if len(args['nation']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['city']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['postal_code']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['local_address']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['phone']) < 3:
-            return '', BAD_REQUEST
+        for parm in ['nation', 'city', 'postal_code', 'local_address', 'phone']:
+            if len(args[parm]) < 3:
+                return '', BAD_REQUEST
 
         try:
             user = User.get(User.user_id == args['user_id'])
@@ -71,16 +64,9 @@ class AddressResource(Resource):
         parser.add_argument('phone', type=utils.non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
-        if len(args['nation']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['city']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['postal_code']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['local_address']) < 3:
-            return '', BAD_REQUEST
-        elif len(args['phone']) < 3:
-            return '', BAD_REQUEST
+        for parm in ['nation', 'city', 'postal_code', 'local_address', 'phone']:
+            if len(args[parm]) < 3:
+                return '', BAD_REQUEST
 
         if str(address.user.user_id) == args['user_id']:
             address.nation = args['nation']
