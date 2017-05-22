@@ -60,9 +60,9 @@ class Order(BaseModel):
 
     def json(self):
         return {
-            'uuid': str(self.order_id),
+            'uuid': str(self.uuid),
             'total_price': float(self.total_price),
-            'user': str(self.user.user_id),
+            'user': str(self.user.uuid),
             'items': self._get_order_items()
         }
 
