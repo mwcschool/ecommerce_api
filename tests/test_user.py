@@ -174,7 +174,7 @@ class Testuser(BaseTest):
 
     def test_delete_user__success(self):
         user = self.create_user()
-        user2 = self.create_user("email2@doamin.com")
+        user2 = self.create_user("email2@domain.com")
 
         resp = self.open_with_auth(
             '/users/{}'.format(user.uuid), 'delete', user.email, '1234567', data='')
