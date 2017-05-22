@@ -17,7 +17,7 @@ class Item(BaseModel):
     price = DecimalField()
     description = TextField()
     category = CharField()
-    quantity = IntegerField(constraints=[Check('quantity <= 0')])
+    quantity = IntegerField(constraints=[Check('quantity >= 0')])
     availability = BooleanField()
 
     def json(self):
