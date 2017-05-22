@@ -58,12 +58,12 @@ class TestItems:
         assert resp.status_code == CREATED
 
         item_from_server = json.loads(resp.data.decode())
-        item_from_db = Item.get(Item.item_id == item_from_server['item_id']).json()
+        item_from_db = Item.get(Item.uuid == item_from_server['uuid']).json()
 
         assert len(Item.select()) == 1
         assert item_from_db == item_from_server
 
-        item_from_server.pop('item_id')
+        item_from_server.pop('uuid')
         assert item_from_server == new_item_data
 
     def test_create_item__failure_empty_field(self):
@@ -129,7 +129,7 @@ class TestItems:
 
     def test_get_item__failure_non_existing_item(self):
         Item.create(
-            item_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             name='Item one',
             price=5,
             description='Description one',
@@ -193,11 +193,11 @@ class TestItems:
         assert resp.status_code == OK
 
         item_from_server = json.loads(resp.data.decode())
-        item_from_db = Item.get(Item.item_id == item_from_server['item_id']).json()
+        item_from_db = Item.get(Item.uuid == item_from_server['uuid']).json()
 
         assert item_from_db == item_from_server
 
-        item_from_server.pop('item_id')
+        item_from_server.pop('uuid')
         assert new_item_data == item_from_server
 
     def test_modify_item__failure_empty_field_only_spaces(self):
@@ -217,7 +217,7 @@ class TestItems:
         }
 
         resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
-        item_from_db = Item.get(Item.item_id == item.uuid).json()
+        item_from_db = Item.get(Item.uuid == item.uuid).json()
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
@@ -237,7 +237,7 @@ class TestItems:
         }
 
         resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
-        item_from_db = Item.get(Item.item_id == item.uuid).json()
+        item_from_db = Item.get(Item.uuid == item.uuid).json()
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
@@ -256,7 +256,7 @@ class TestItems:
             'description': 'Description two',
             'category': 'Category two'
         }
-        resp = self.app.put('/item/{}'.format(item.item_id), data=modified_content)
+        resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
         assert resp.status_code == BAD_REQUEST
 
         item_from_db = Item.get(uuid=item.uuid).json()
