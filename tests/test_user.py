@@ -110,13 +110,7 @@ class Testuser(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_put__empty_fields(self):
-        user = User.create(
-            uuid=uuid.uuid4(),
-            first_name='Giovanni',
-            last_name='Mariani',
-            email='giovanni@mariani.com',
-            password=crypt_password('1234567')
-        )
+        user = self.create_user()
 
         data = {
             'first_name': '',
