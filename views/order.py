@@ -92,7 +92,7 @@ class OrderResource(Resource):
             total_price += float(item.price * item_quantity)
 
         with database.transaction():
-            OrderItem.delete().where(OrderItem.uuid == order.id).execute()
+            OrderItem.delete().where(OrderItem.id == order.id).execute()
 
             for item in items_query:
                 item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
@@ -116,7 +116,7 @@ class OrderResource(Resource):
 
         with database.transaction():
             order_items = OrderItem.select().where(
-                OrderItem.uuid == order.id)
+                OrderItem.id == order.id)
 
             for order_item in order_items:
                 order_item.delete_instance()
