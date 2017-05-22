@@ -16,6 +16,16 @@ class Item(BaseModel):
     name = CharField()
     price = DecimalField()
     description = TextField()
+    category = CharField()
+
+    def json(self):
+        return {
+            'item_id': str(self.item_id),
+            'name': self.name,
+            'price': int(self.price),
+            'description': self.description,
+            'category': self.category
+        }
 
 
 class User(BaseModel):
@@ -48,9 +58,29 @@ class Order(BaseModel):
     total_price = DecimalField()
     user = ForeignKeyField(User, related_name="orders")
 
+    def json(self):
+        return {
+            'uuid': str(self.order_id),
+            'total_price': float(self.total_price),
+            'user': str(self.user.user_id),
+            'items': self._get_order_items()
+        }
+
+    def _get_order_items(self):
+        data = []
+        for order_item in self.order_items:
+            item = order_item.item
+            data.append({
+                'item_id': str(item.item_id),
+                'name': item.name,
+                'quantity': order_item.quantity,
+                'subtotal': float(order_item.subtotal)
+            })
+        return data
+
 
 class OrderItem(BaseModel):
-    order = ForeignKeyField(Order)
+    order = ForeignKeyField(Order, related_name="order_items")
     item = ForeignKeyField(Item)
     quantity = IntegerField()
     subtotal = DecimalField()

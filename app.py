@@ -1,7 +1,9 @@
 from flask import Flask
 from flask_restful import Api
-
 from models import database
+
+from views import item
+from views.order import OrderResource, OrdersResource
 from views.user import UserResource, UsersResource
 
 app = Flask(__name__)
@@ -21,5 +23,10 @@ def database_disconnect(response):
     return response
 
 
+api.add_resource(item.ItemsResource, '/items/')
+api.add_resource(item.ItemResource, '/item/<uuid:item_id>')
 api.add_resource(UsersResource, '/users/')
 api.add_resource(UserResource, '/users/<uuid:user_id>', methods=['put', 'delete'])
+api.add_resource(OrdersResource, '/orders/')
+api.add_resource(OrderResource, '/orders/<uuid:order_id>')
+
