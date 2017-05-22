@@ -45,7 +45,7 @@ class User(BaseModel):
 
 
 class Address(BaseModel):
-    address_id = UUIDField(unique=True)
+    uuid = UUIDField(unique=True)
     user = ForeignKeyField(User, related_name="address")
     nation = CharField()
     city = CharField()
@@ -55,7 +55,7 @@ class Address(BaseModel):
 
     def json(self):
         return {
-            'address_id': str(self.address_id),
+            'uuid': str(self.uuid),
             'user': str(self.user.user_id),
             'nation': self.nation,
             'city': self.city,

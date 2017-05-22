@@ -27,7 +27,7 @@ class AddressesResource(Resource):
             return '', BAD_REQUEST
 
         address = Address.create(
-            address_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             user=user,
             nation=args['nation'],
             city=args['city'],
@@ -42,7 +42,7 @@ class AddressesResource(Resource):
 class AddressResource(Resource):
     def get(self, address_id):
         try:
-            address = Address.get(Address.address_id == address_id)
+            address = Address.get(Address.uuid == address_id)
         except Address.DoesNotExist:
             return None, NOT_FOUND
 
@@ -50,7 +50,7 @@ class AddressResource(Resource):
 
     def put(self, address_id):
         try:
-            address = Address.get(Address.address_id == address_id)
+            address = Address.get(Address.uuid == address_id)
         except Address.DoesNotExist:
             return None, NOT_FOUND
 
@@ -82,7 +82,7 @@ class AddressResource(Resource):
 
     def delete(self, address_id):
         try:
-            address = Address.get(Address.address_id == address_id)
+            address = Address.get(Address.uuid == address_id)
         except Address.DoesNotExist:
             return None, NOT_FOUND
 
