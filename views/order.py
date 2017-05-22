@@ -6,8 +6,8 @@ import json
 from models import Order, OrderItem, Item, User, database
 
 
-def is_valid_uuid(user_id):
-    return uuid.UUID(user_id, version=4)
+def is_valid_uuid(uuid):
+    return uuid.UUID(uuid, version=4)
 
 
 def is_valid_item_list(json_item_list):
@@ -22,32 +22,32 @@ class OrdersResource(Resource):
         args = parser.parse_args(strict=True)
 
         try:
-            user = User.get(User.user_id == args['user'])
+            user = User.get(User.uuid == args['user'])
         except User.DoesNotExist:
             return None, BAD_REQUEST
 
         total_price = 0
 
         items = args['items']
-        items_id = [i[0] for i in items]
-        items_query = Item.select().where(Item.item_id << items_id)
+        uuid = [i[0] for i in items]
+        items_query = Item.select().where(Item.uuid << uuid)
 
         if items_query.count() != len(items) or len(items) == 0:
             return None, BAD_REQUEST
 
         for item in items_query:
-            item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
+            item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
             total_price += float(item.price * item_quantity)
 
         with database.transaction():
             order = Order.create(
-                order_id=uuid.uuid4(),
+                uuid=uuid.uuid4(),
                 total_price=total_price,
                 user=user.id
             )
 
             for item in items_query:
-                item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
+                item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
                 OrderItem.create(
                     order=order.id,
                     item=item.id,
@@ -62,15 +62,15 @@ class OrdersResource(Resource):
 
 
 class OrderResource(Resource):
-    def get(self, order_id):
+    def get(self, uuid):
         try:
-            return Order.get(order_id=order_id).json(), OK
+            return Order.get(uuid=uuid).json(), OK
         except Order.DoesNotExist:
             return None, NOT_FOUND
 
-    def put(self, order_id):
+    def put(self, uuid):
         try:
-            order = Order.get(order_id=order_id)
+            order = Order.get(uuid=uuid)
         except Order.DoesNotExist:
             return None, NOT_FOUND
 
@@ -81,21 +81,21 @@ class OrderResource(Resource):
         total_price = 0
 
         items = args['items']
-        items_id = [i[0] for i in items]
-        items_query = Item.select().where(Item.item_id << items_id)
+        uuid = [i[0] for i in items]
+        items_query = Item.select().where(Item.uuid << uuid)
 
         if items_query.count() != len(items) or len(items) == 0:
             return None, BAD_REQUEST
 
         for item in items_query:
-            item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
+            item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
             total_price += float(item.price * item_quantity)
 
         with database.transaction():
-            OrderItem.delete().where(OrderItem.order_id == order.id).execute()
+            OrderItem.delete().where(OrderItem.uuid == order.id).execute()
 
             for item in items_query:
-                item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
+                item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
                 OrderItem.create(
                     order=order.id,
                     item=item.id,
@@ -108,15 +108,15 @@ class OrderResource(Resource):
 
         return order.json(), OK
 
-    def delete(self, order_id):
+    def delete(self, uuid):
         try:
-            order = Order.get(Order.order_id == order_id)
+            order = Order.get(Order.uuid == uuid)
         except Order.DoesNotExist:
             return None, NOT_FOUND
 
         with database.transaction():
             order_items = OrderItem.select().where(
-                OrderItem.order_id == order.id)
+                OrderItem.uuid == order.id)
 
             for order_item in order_items:
                 order_item.delete_instance()
