@@ -1,9 +1,11 @@
 from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST
 import json
 import uuid
+from views.user import crypt_password
 from peewee import SqliteDatabase
 from models import User
 from app import app
+import base64
 
 
 class Testuser:
@@ -16,6 +18,11 @@ class Testuser:
     def setup_method(self):
         User.delete().execute()
 
+    def open_with_auth(self, url, method, email, password, data):
+        return self.app.open(
+            url, method=method, headers={'Authorization': 'Basic ' + base64.b64encode(
+                bytes(email + ":" + password, 'ascii')).decode('ascii')}, data=data)
+
     def test_post__success_empty_db(self):
         data = {
             'first_name': 'Alessandro',
@@ -25,7 +32,7 @@ class Testuser:
         }
         resp = self.app.post('/users/', data=data)
         query = User.select()
-        user_from_db = User.get()
+        user_from_db = query.get()
         expected_data = {
             'first_name': user_from_db.first_name,
             'last_name': user_from_db.last_name,
@@ -54,6 +61,7 @@ class Testuser:
             email='giovanni@mariani.com',
             password='1234'
         )
+
         resp = self.app.post('/users/', data=data)
         query = User.select().where(User.user_id != id_user_created)
         assert resp.status_code == CREATED
@@ -88,17 +96,17 @@ class Testuser:
             first_name='Giovanni',
             last_name='Mariani',
             email='giovanni@mariani.com',
-            password='1234567'
+            password=crypt_password('1234567')
         )
 
         data = {
-            'first_name': 'Anna',
-            'last_name': 'Markis',
-            'email': 'anna@markis.com',
+            'first_name': 'anna',
+            'last_name': 'Marini',
+            'email': 'giovanni@mariani.com',
             'password': '1234567'
         }
-
-        resp = self.app.put('/users/{}'.format(user.user_id), data=data)
+        resp = self.open_with_auth(
+            '/users/{}'.format(user.user_id), 'put', user.email, '1234567', data=data)
         query = User.select()
         user_from_db = query.get()
         expected_data = {
@@ -107,6 +115,7 @@ class Testuser:
             'email': user_from_db.email,
             'password': data['password']
         }
+
         assert expected_data == data
         assert resp.status_code == CREATED
         assert query.get().json() == json.loads(resp.data.decode())
@@ -117,14 +126,15 @@ class Testuser:
             first_name='Giovanni',
             last_name='Mariani',
             email='giovanni@mariani.com',
-            password='1234'
+            password=crypt_password('1234567')
         )
 
         data = {
             'first_name': 'Anna',
         }
 
-        resp = self.app.put('/users/{}'.format(user.user_id), data=data)
+        resp = self.open_with_auth(
+            '/users/{}'.format(user.user_id), 'put', user.email, '1234567', data=data)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__empty_fields(self):
@@ -133,7 +143,7 @@ class Testuser:
             first_name='Giovanni',
             last_name='Mariani',
             email='giovanni@mariani.com',
-            password='1234'
+            password=crypt_password('1234567')
         )
 
         data = {
@@ -143,20 +153,9 @@ class Testuser:
             'password': ''
         }
 
-        resp = self.app.put('/users/{}'.format(user.user_id), data=data)
+        resp = self.open_with_auth(
+            '/users/{}'.format(user.user_id), 'put', user.email, '1234567', data=data)
         assert resp.status_code == BAD_REQUEST
-
-    def test_put__userid_not_exist(self):
-        data = {
-            'first_name': 'Anna',
-            'last_name': 'Markis',
-            'email': 'anna@markis.com',
-            'password': '12345'
-        }
-
-        resp = self.app.put('/users/{}'.format(uuid.uuid4()), data=data)
-        assert resp.status_code == NOT_FOUND
-        assert len(User.select()) == 0
 
     def test_delete_user__success(self):
         user = User.create(
@@ -164,26 +163,22 @@ class Testuser:
             first_name='Alessandro',
             last_name='Cappellini',
             email='prova@pippo.com',
-            password='1234'
+            password=crypt_password('1234567')
             )
         user2 = User.create(
             user_id=uuid.uuid4(),
             first_name='Jonh',
             last_name='Smith',
             email='jonh@smith.com',
-            password='1234'
+            password=crypt_password('1234567')
             )
-        resp = self.app.delete('/users/{}'.format(user.user_id))
+        resp = self.open_with_auth(
+            '/users/{}'.format(user.user_id), 'delete', user.email, '1234567', data='')
         all_users = User.select()
         user_from_db = all_users.get()
         assert resp.status_code == NO_CONTENT
         assert len(all_users) == 1
         assert user_from_db.user_id == user2.user_id
-
-    def test_delete__emptydb_userid_not_exist(self):
-        resp = self.app.delete('/user/{}'.format(uuid.uuid4()))
-        assert resp.status_code == NOT_FOUND
-        assert len(User.select()) == 0
 
     def test_delete__userid_not_exist(self):
         User.create(
@@ -193,6 +188,19 @@ class Testuser:
             email='a@b.it',
             password='ciaociao'
         )
-        resp = self.app.delete('/users/{}'.format(uuid.uuid4()))
+        resp = self.open_with_auth(
+            '/users/{}'.format(uuid.uuid4), 'delete', 'ciao@libero.it', '1234567', data='')
         assert resp.status_code == NOT_FOUND
         assert len(User.select()) == 1
+
+    def test_post_regex__failure(self):
+        data = {
+            'first_name': 'Alessandro',
+            'last_name': 'Cappellini',
+            'email': 'testciao.it',
+            'password': 'testregex'
+        }
+        resp = self.app.post('/users/', data=data)
+        assert resp.status_code == BAD_REQUEST
+        assert json.loads(resp.data.decode()) == ''
+        assert len(User.select()) == 0
