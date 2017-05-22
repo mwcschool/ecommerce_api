@@ -35,7 +35,7 @@ class TestOrders(BaseTest):
         new_order_data = {
             'user': self.user1.uuid,
             'items': json.dumps([
-                [self.item1.uuid, 2], [self.item2.uuid, 1]
+                [str(self.item1.uuid), 2], [str(self.item2.uuid), 1]
             ])
         }
 
@@ -49,10 +49,10 @@ class TestOrders(BaseTest):
         assert order_from_db == order_from_server
 
         order_from_server.pop('uuid')
-        assert order_from_server['user'] == new_order_data['user']
+        assert order_from_server['user'] == str(new_order_data['user'])
         assert len(order_from_server['items']) == 2
 
-        order_items_ids = [self.item1.uuid, self.item2.uuid]
+        order_items_ids = [str(self.item1.uuid), str(self.item2.uuid)]
         assert order_from_server['items'][0]['uuid'] in order_items_ids
         assert order_from_server['items'][1]['uuid'] in order_items_ids
 
@@ -94,7 +94,7 @@ class TestOrders(BaseTest):
         new_order_data = {
             'user': str(uuid.uuid4()),
             'items': json.dumps([
-                [self.item1.uuid, 1]
+                [str(self.item1.uuid), 1]
             ])
         }
 
@@ -108,7 +108,7 @@ class TestOrders(BaseTest):
 
         updates = {
             'items': json.dumps([
-                [self.item2.uuid, 2]
+                [str(self.item2.uuid), 2]
             ])
         }
 
@@ -134,7 +134,7 @@ class TestOrders(BaseTest):
 
         updates = {
             'items': json.dumps([
-                [self.item1.uuid, 1]
+                [str(self.item1.uuid), 1]
             ])
         }
 
@@ -147,7 +147,7 @@ class TestOrders(BaseTest):
     def test_modify_order__failure_non_existing_empty_orders(self):
         updates = {
             'items': json.dumps([
-                [self.item1.uuid, 1]
+                [str(self.item1.uuid), 1]
             ])
         }
 
