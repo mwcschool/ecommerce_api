@@ -7,6 +7,43 @@ from models import Order, OrderItem
 from .base_test import BaseTest
 
 
+class TestOrders:
+    @classmethod
+    def setup_class(cls):
+        database = SqliteDatabase(':memory:')
+
+        tables = [OrderItem, Order, Item, User]
+        for table in tables:
+            table._meta.database = database
+            table.create_table()
+
+        cls.user1 = User.create(
+            uuid=str(uuid.uuid4()),
+            first_name='Name',
+            last_name='Surname',
+            email='email@domain.com',
+            password='password',
+        )
+        cls.item1 = Item.create(
+            uuid=str(uuid.uuid4()),
+            name='Item one',
+            price=15,
+            description='Item one description',
+            category='Category one',
+            availability=23
+        )
+        cls.item2 = Item.create(
+            uuid=str(uuid.uuid4()),
+            name='Item two',
+            price=10,
+            description='Item two description',
+            category='Category one',
+            availability=17
+        )
+
+        app.config['TESTING'] = True
+        cls.app = app.test_client()
+
 class TestOrders(BaseTest):
     def setup_method(self):
         super(TestOrders, self).setup_method()
