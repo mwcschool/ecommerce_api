@@ -173,21 +173,8 @@ class Testuser(BaseTest):
         assert resp.status_code == UNAUTHORIZED
 
     def test_delete_user__success(self):
-        user = User.create(
-            uuid=uuid.uuid4(),
-            first_name='Alessandro',
-            last_name='Cappellini',
-            email='prova@pippo.com',
-            password=crypt_password('1234567')
-        )
-
-        user2 = User.create(
-            uuid=uuid.uuid4(),
-            first_name='Jonh',
-            last_name='Smith',
-            email='jonh@smith.com',
-            password=crypt_password('1234567')
-        )
+        user = self.create_user()
+        user2 = self.create_user("email2@doamin.com")
 
         resp = self.open_with_auth(
             '/users/{}'.format(user.uuid), 'delete', user.email, '1234567', data='')
