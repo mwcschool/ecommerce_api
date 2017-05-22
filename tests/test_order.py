@@ -178,7 +178,7 @@ class TestOrders:
 
         updates = {
             'items': json.dumps([
-                    [self.item2.item_id, 2]
+                    [self.item2.uuid, 2]
                 ])
         }
 
