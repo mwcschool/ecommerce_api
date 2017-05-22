@@ -32,7 +32,6 @@ class OrdersResource(Resource):
         items_uuid = [i[0] for i in items]
         items_query = Item.select().where(Item.uuid << items_uuid)
 
-
         if items_query.count() != len(items) or len(items) == 0:
             return None, BAD_REQUEST
 
