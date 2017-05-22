@@ -12,7 +12,7 @@ class BaseModel(Model):
 
 
 class Item(BaseModel):
-    item_id = UUIDField(unique=True)
+    uuid = UUIDField(unique=True)
     name = CharField()
     price = DecimalField()
     description = TextField()
@@ -20,7 +20,7 @@ class Item(BaseModel):
 
     def json(self):
         return {
-            'item_id': str(self.item_id),
+            'uuid': str(self.uuid),
             'name': self.name,
             'price': int(self.price),
             'description': self.description,
@@ -29,7 +29,7 @@ class Item(BaseModel):
 
 
 class User(BaseModel):
-    user_id = UUIDField(unique=True)
+    uuid = UUIDField(unique=True)
     first_name = CharField()
     last_name = CharField()
     email = CharField(unique=True)
@@ -37,7 +37,7 @@ class User(BaseModel):
 
     def json(self):
         return {
-            'user_id': str(self.user_id)
+            'user_id': str(self.uuid)
         }
 
     def verify_password(self, origin_password):
@@ -54,15 +54,15 @@ class Address(BaseModel):
 
 
 class Order(BaseModel):
-    order_id = UUIDField(unique=True)
+    uuid = UUIDField(unique=True)
     total_price = DecimalField()
     user = ForeignKeyField(User, related_name="orders")
 
     def json(self):
         return {
-            'uuid': str(self.order_id),
+            'uuid': str(self.uuid),
             'total_price': float(self.total_price),
-            'user': str(self.user.user_id),
+            'user': str(self.user.uuid),
             'items': self._get_order_items()
         }
 
@@ -71,7 +71,7 @@ class Order(BaseModel):
         for order_item in self.order_items:
             item = order_item.item
             data.append({
-                'item_id': str(item.item_id),
+                'uuid': str(item.uuid),
                 'name': item.name,
                 'quantity': order_item.quantity,
                 'subtotal': float(order_item.subtotal)

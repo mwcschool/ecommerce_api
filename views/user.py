@@ -28,7 +28,7 @@ class UsersResource(Resource):
 
         if valid_email(args['email']) is not None and len(args['password']) > 6:
             obj = User.create(
-                user_id=uuid.uuid4(),
+                uuid=uuid.uuid4(),
                 first_name=args['first_name'],
                 last_name=args['last_name'],
                 email=args['email'],
@@ -41,9 +41,9 @@ class UsersResource(Resource):
 
 
 class UserResource(Resource):
-    def put(self, user_id):
+    def put(self, uuid):
         try:
-            obj = User.get(user_id=user_id)
+            obj = User.get(uuid=uuid)
         except User.DoesNotExist:
             return None, NOT_FOUND
 
@@ -65,9 +65,9 @@ class UserResource(Resource):
         else:
             return '', BAD_REQUEST
 
-    def delete(self, user_id):
+    def delete(self, uuid):
         try:
-            obj = User.get(user_id=user_id)
+            obj = User.get(uuid=uuid)
         except User.DoesNotExist:
             return None, NOT_FOUND
 
