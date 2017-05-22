@@ -28,8 +28,9 @@ class TestItems(BaseTest):
         new_item_data = {
             'name': 'Item one',
             'price': 15,
-            'description': 'Description one',
-            'category': 'Category one'
+            'description': 'desc1',
+            'category': 'poligoni',
+            'availability': 3
         }
 
         resp = self.app.post('/items/', data=new_item_data)
@@ -58,9 +59,10 @@ class TestItems(BaseTest):
     def test_create_item__failure_empty_field_only_spaces(self):
         new_item_data = {
             'name': '    ',
-            'price': 10,
-            'description': 'Description one',
-            'category': 'Category one'
+            'price': 123,
+            'description': 'desc1',
+            'category': 'varie',
+            'availability': 25
         }
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
@@ -80,7 +82,8 @@ class TestItems(BaseTest):
             'name': 'Item one',
             'price': 'Ten',
             'description': 'Description one',
-            'category': 'Category one'
+            'category': 'Category one',
+            'availability': 40
         }
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
@@ -139,14 +142,16 @@ class TestItems(BaseTest):
             name='Item one',
             price=5,
             description='Description one',
-            category='Category one'
+            category='Category one',
+            availability=22
         )
 
         new_item_data = {
             'name': 'Item one',
             'price': 10,
-            'description': 'Description two',
-            'category': 'Category two'
+            'description': 'Descrizione sensata',
+            'category': 'Poligoni',
+            'availability': 0
         }
 
         resp = self.app.put('/items/{}'.format(static_id), data=new_item_data)
@@ -166,14 +171,16 @@ class TestItems(BaseTest):
             name='Item one',
             price=5,
             description='Description one',
-            category='Category one'
+            category='Category one',
+            availability=12
         )
 
         modified_content = {
             'name': '      ',
             'price': 10,
             'description': 'Description two',
-            'category': 'Category two'
+            'category': 'Category two',
+            'availability': 12
         }
 
         resp = self.app.put('/items/{}'.format(item.uuid), data=modified_content)
@@ -187,7 +194,8 @@ class TestItems(BaseTest):
             name='Item one',
             price=5,
             description='Description one',
-            category='Category one'
+            category='Category one',
+            availability=37
         )
 
         modified_content = {
@@ -207,15 +215,18 @@ class TestItems(BaseTest):
             name='Item one',
             price=5,
             description='Description one',
-            category='Category one'
+            category='Category one',
+            availability=6
         )
 
         modified_content = {
             'name': 'Item one',
             'price': 'Ten',
             'description': 'Description two',
-            'category': 'Category two'
+            'category': 'Category two',
+            'availability': 6
         }
+
         resp = self.app.put('/items/{}'.format(item.uuid), data=modified_content)
         assert resp.status_code == BAD_REQUEST
 
