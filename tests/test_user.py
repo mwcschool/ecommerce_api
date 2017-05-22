@@ -43,18 +43,10 @@ class Testuser(BaseTest):
             'password': '1234567'
         }
 
-        id_user_created = uuid.uuid4()
-
-        User.create(
-            uuid=id_user_created,
-            first_name='Giovanni',
-            last_name='Mariani',
-            email='giovanni@mariani.com',
-            password='1234'
-        )
+        user1 = self.create_user()
 
         resp = self.app.post('/users/', data=data)
-        query = User.select().where(User.uuid != id_user_created)
+        query = User.select().where(User.uuid != user1.uuid)
         assert resp.status_code == CREATED
         assert query.get().json() == json.loads(resp.data.decode())
 
