@@ -59,7 +59,7 @@ class Testaddress:
         data_user = User.get()
         address_id_created = uuid.uuid4()
         Address.create(
-            address_id=address_id_created,
+            uuid=address_id_created,
             user=data_user,
             nation='Italia',
             city='Prato',
@@ -77,7 +77,7 @@ class Testaddress:
         }
 
         resp = self.app.post('/addresses/', data=data_address)
-        query = Address.select().where(Address.address_id != address_id_created)
+        query = Address.select().where(Address.uuid != address_id_created)
         assert resp.status_code == CREATED
         assert query.get().json() == json.loads(resp.data.decode())
 
@@ -128,7 +128,7 @@ class Testaddress:
         data_user = User.get()
         address_id_created = uuid.uuid4()
         Address.create(
-            address_id=address_id_created,
+            uuid=address_id_created,
             user=data_user,
             nation='Italia',
             city='Prato',
@@ -148,7 +148,7 @@ class Testaddress:
     def test_put__success(self):
         data_user = User.get()
         data_address = Address.create(
-            address_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             user=data_user,
             nation='Italia',
             city='Prato',
@@ -165,7 +165,7 @@ class Testaddress:
             'phone': '0550550550'
         }
 
-        resp = self.app.put('/addresses/{}'.format(data_address.address_id), data=new_data_address)
+        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
         address_from_db = Address.get()
         expected_data = {
             'user_id': address_from_db.user.user_id,
@@ -182,7 +182,7 @@ class Testaddress:
     def test_put__modify_one_field(self):
         data_user = User.get()
         data_address = Address.create(
-            address_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             user=data_user,
             nation='Italia',
             city='Prato',
@@ -194,13 +194,13 @@ class Testaddress:
             'nation': 'Albania',
         }
 
-        resp = self.app.put('/addresses/{}'.format(data_address.address_id), data=new_data_address)
+        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__modify_empty_fields(self):
         data_user = User.get()
         data_address = Address.create(
-            address_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             user=data_user,
             nation='Italia',
             city='Prato',
@@ -217,7 +217,7 @@ class Testaddress:
             'phone': ''
         }
 
-        resp = self.app.put('/addresses/{}'.format(data_address.address_id), data=new_data_address)
+        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__address_id_not_exists(self):
@@ -238,7 +238,7 @@ class Testaddress:
     def test_put__user_id_not_exists(self):
         data_user = User.get()
         data_address = Address.create(
-            address_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             user=data_user,
             nation='Italia',
             city='Prato',
@@ -254,7 +254,7 @@ class Testaddress:
             'phone': '0558778666'
         }
 
-        resp = self.app.put('/addresses/{}'.format(data_address.address_id), data=data)
+        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=data)
         assert resp.status_code == BAD_REQUEST
         assert len(Address.select()) == 1
         assert data_address == Address.get()
@@ -262,7 +262,7 @@ class Testaddress:
     def test_delete__success(self):
         data_user = User.get()
         data_address1 = Address.create(
-            address_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             user=data_user,
             nation='Italia',
             city='Prato',
@@ -270,7 +270,7 @@ class Testaddress:
             local_address='Via Roncioni 10',
             phone='0574100100')
         data_address2 = Address.create(
-            address_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             user=data_user,
             nation='Italia',
             city='Firenze',
@@ -278,12 +278,12 @@ class Testaddress:
             local_address='Via Baracca 10',
             phone='0558778666')
 
-        resp = self.app.delete('/addresses/{}'.format(data_address1.address_id))
+        resp = self.app.delete('/addresses/{}'.format(data_address1.uuid))
         all_addresses = Address.select()
         address_from_db = all_addresses.get()
         assert resp.status_code == NO_CONTENT
         assert len(all_addresses) == 1
-        assert address_from_db.address_id == data_address2.address_id
+        assert address_from_db.uuid == data_address2.uuid
 
     def test_delete__empty_db_address_id_not_exists(self):
         resp = self.app.delete('/addresses/{}'.format(uuid.uuid4()))
@@ -293,7 +293,7 @@ class Testaddress:
     def test_delete__address_id_not_exists(self):
         data_user = User.get()
         Address.create(
-            address_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             user=data_user,
             nation='Italia',
             city='Prato',
