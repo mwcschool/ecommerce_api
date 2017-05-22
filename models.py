@@ -17,8 +17,7 @@ class Item(BaseModel):
     price = DecimalField()
     description = TextField()
     category = CharField()
-    quantity = IntegerField(constraints=[Check('quantity >= 0')])
-    availability = BooleanField()
+    availability = IntegerField(constraints=[Check('availability >= 0')])
 
     def json(self):
         return {
@@ -27,7 +26,6 @@ class Item(BaseModel):
             'price': int(self.price),
             'description': self.description,
             'category': self.category,
-            'quantity': self.quantity,
             'availability': self.availability
         }
 
