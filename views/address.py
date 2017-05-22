@@ -22,7 +22,7 @@ class AddressesResource(Resource):
                 return '', BAD_REQUEST
 
         try:
-            user = User.get(User.user_id == args['user_id'])
+            user = User.get(User.uuid == args['user_id'])
         except User.DoesNotExist:
             return '', BAD_REQUEST
 
@@ -68,7 +68,7 @@ class AddressResource(Resource):
             if len(args[parm]) < 3:
                 return '', BAD_REQUEST
 
-        if str(address.user.user_id) == args['user_id']:
+        if str(address.user.uuid) == args['user_id']:
             address.nation = args['nation']
             address.city = args['city']
             address.postal_code = args['postal_code']

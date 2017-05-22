@@ -17,7 +17,7 @@ class Testaddress:
         cls.app = app.test_client()
 
         User.create(
-            user_id=uuid.uuid4(),
+            uuid=uuid.uuid4(),
             first_name='Mario',
             last_name='Rossi',
             email='email@email.it',
@@ -30,7 +30,7 @@ class Testaddress:
     def test_post__success_empty_db(self):
         data_user = User.get()
         data_address = {
-            'user_id': data_user.user_id,
+            'user_id': data_user.uuid,
             'nation': 'Italia',
             'city': 'Prato',
             'postal_code': '59100',
@@ -43,7 +43,7 @@ class Testaddress:
         query = Address.select()
         address_from_db = Address.get()
         expected_data = {
-            'user_id': address_from_db.user.user_id,
+            'user_id': address_from_db.user.uuid,
             'nation': address_from_db.nation,
             'city': address_from_db.city,
             'postal_code': address_from_db.postal_code,
@@ -68,7 +68,7 @@ class Testaddress:
             phone='0574100100')
 
         data_address = {
-            'user_id': data_user.user_id,
+            'user_id': data_user.uuid,
             'nation': 'Italia',
             'city': 'Prato',
             'postal_code': '59100',
@@ -84,7 +84,7 @@ class Testaddress:
     def test_post__empty_field(self):
         data_user = User.get()
         data_address = {
-            'user_id': data_user.user_id,
+            'user_id': data_user.uuid,
             'nation': '',
             'city': 'Prato',
             'postal_code': '59100',
@@ -99,7 +99,7 @@ class Testaddress:
     def test_post__field_not_exists(self):
         data_user = User.get()
         data_address = {
-            'user_id': data_user.user_id,
+            'user_id': data_user.uuid,
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
@@ -157,7 +157,7 @@ class Testaddress:
             phone='0574100100')
 
         new_data_address = {
-            'user_id': data_user.user_id,
+            'user_id': data_user.uuid,
             'nation': 'Italia',
             'city': 'Firenze',
             'postal_code': '505050',
@@ -168,7 +168,7 @@ class Testaddress:
         resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
         address_from_db = Address.get()
         expected_data = {
-            'user_id': address_from_db.user.user_id,
+            'user_id': address_from_db.user.uuid,
             'nation': address_from_db.nation,
             'city': address_from_db.city,
             'postal_code': address_from_db.postal_code,
@@ -209,7 +209,7 @@ class Testaddress:
             phone='0574100100')
 
         new_data_address = {
-            'user_id': data_user.user_id,
+            'user_id': data_user.uuid,
             'nation': '',
             'city': '',
             'postal_code': '',
@@ -223,7 +223,7 @@ class Testaddress:
     def test_put__address_id_not_exists(self):
         data_user = User.get()
         data = {
-            'user_id': data_user.user_id,
+            'user_id': data_user.uuid,
             'nation': 'Italia',
             'city': 'Prato',
             'postal_code': '59100',
