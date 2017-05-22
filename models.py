@@ -20,7 +20,7 @@ class Item(BaseModel):
 
     def json(self):
         return {
-            'item_id': str(self.uuid),
+            'uuid': str(self.uuid),
             'name': self.name,
             'price': int(self.price),
             'description': self.description,
@@ -71,7 +71,7 @@ class Order(BaseModel):
         for order_item in self.order_items:
             item = order_item.item
             data.append({
-                'item_id': str(item.item_id),
+                'uuid': str(item.uuid),
                 'name': item.name,
                 'quantity': order_item.quantity,
                 'subtotal': float(order_item.subtotal)
