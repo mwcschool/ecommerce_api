@@ -27,7 +27,7 @@ class UsersResource(Resource):
         parser.add_argument('password', type=utils.non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
-        if valid_email(args['email']) is not None and len(args['password']) > 6:
+        if valid_email(args['email']) and len(args['password']) > 6:
             obj = User.create(
                 uuid=uuid.uuid4(),
                 first_name=args['first_name'],
