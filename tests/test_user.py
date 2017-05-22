@@ -99,13 +99,7 @@ class Testuser(BaseTest):
         assert query.get().json() == json.loads(resp.data.decode())
 
     def test_put__modify_one_field(self):
-        user = User.create(
-            uuid=uuid.uuid4(),
-            first_name='Giovanni',
-            last_name='Mariani',
-            email='giovanni@mariani.com',
-            password=crypt_password('1234567')
-        )
+        user = self.create_user()
 
         data = {
             'first_name': 'Anna',
