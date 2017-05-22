@@ -27,7 +27,7 @@ class TestItems:
 
     def test_get_items(self):
         item1 = Item.create(
-            uuid=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             name='Item one',
             price=5,
             description='Description one',
@@ -35,7 +35,7 @@ class TestItems:
         )
 
         item2 = Item.create(
-            uuid=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             name='Item two',
             price=15,
             description='Description two',
@@ -110,7 +110,7 @@ class TestItems:
 
     def test_get__item(self):
         item1 = Item.create(
-            uuid=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             name='Item one',
             price=5,
             description='Description one',
@@ -124,24 +124,24 @@ class TestItems:
         assert item_from_server == item1.json()
 
     def test_get_item__empty(self):
-        resp = self.app.get('/item/{}'.format(str(uuid.uuid4())))
+        resp = self.app.get('/item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
     def test_get_item__failure_non_existing_item(self):
         Item.create(
-            item_id=str(uuid.uuid4()),
+            item_id=uuid.uuid4(),
             name='Item one',
             price=5,
             description='Description one',
             category='Category one'
         )
 
-        resp = self.app.get('/item/{}'.format(str(uuid.uuid4())))
+        resp = self.app.get('/item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__success(self):
         item1 = Item.create(
-            uuid=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             name='Item one',
             price=5,
             description='Descripion one',
@@ -156,23 +156,23 @@ class TestItems:
 
     def test_delete_item__failure_not_found(self):
         Item.create(
-            uuid=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             name='Item one',
             price=5,
             description='Description one',
             category='Category one'
         )
 
-        resp = self.app.delete('item/{}'.format(str(uuid.uuid4())))
+        resp = self.app.delete('item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
         assert len(Item.select()) == 1
 
     def test_delete_item__failure_non_existing_empty_items(self):
-        resp = self.app.delete('item/{}'.format(str(uuid.uuid4())))
+        resp = self.app.delete('item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
     def test_modify_item__success(self):
-        static_id = str(uuid.uuid4())
+        static_id = uuid.uuid4()
 
         Item.create(
             uuid=static_id,
@@ -202,7 +202,7 @@ class TestItems:
 
     def test_modify_item__failure_empty_field_only_spaces(self):
         item = Item.create(
-            uuid=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             name='Item one',
             price=5,
             description='Description one',
@@ -223,7 +223,7 @@ class TestItems:
 
     def test_modify_item__failure_missing_argument(self):
         item = Item.create(
-            uuid=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             name='Item one',
             price=5,
             description='Description one',
@@ -243,7 +243,7 @@ class TestItems:
 
     def test_modify_item__failure_field_wrong_type(self):
         item = Item.create(
-            uuid=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             name='Item one',
             price=5,
             description='Description one',
