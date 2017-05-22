@@ -37,13 +37,15 @@ class FavoritesResource(Resource):
         parser.add_argument('id_user', type=type(uuid.uuid4()), required=True)
         parser.add_argument('id_item', type=type(uuid.uuid4()), required=True)
         args = parser.parse_args(strict=True)
-        if not User.exists_uuid(args['id_user']) or not Item.exists_uuid(args['id_item']):
+
+        try:
+            user = User.get(User.user_id == args['id_user'])
+            item = Item.get(Item.item_id == args['id_item'])
+
+        except (User.DoesNotExist, Item.DoesNotExist):
             return None, NOT_FOUND
 
-        item = Item.get(Item.item_id == args['id_item'])
-        user = User.get(User.user_id == args['id_user'])
-
-        return user.add_favorite(item)
+        return user.add_favorite(item).json(), CREATED
 
 
 class FavoriteResource(Resource):
