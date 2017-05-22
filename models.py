@@ -66,7 +66,7 @@ class User(BaseModel):
     def verify_password(self, origin_password):
         return pbkdf2_sha256.verify(origin_password, self.password)
 
-    def get_favorite_items(self):
+    def favorite_items(self):
         return [favorite.item.json() for favorite in self.favorites]
 
     @classmethod
@@ -76,16 +76,16 @@ class User(BaseModel):
         else:
             return False
 
-    def add_favorite(this, item):
+    def add_favorite(self, item):
         favorite = Favorites.create(
-            user=this,
+            user=self,
             item=item,
         )
-        return favorite.json(), CREATED
+        return favorite
 
-    def remove_favorite(this, item):
-        Favorites.delete().where(Favorites.id == item).execute()
-        return None, NO_CONTENT
+    def remove_favorite(self, item):
+        Favorites.delete().where(Favorites.item == item).where(Favorites.user == self).execute()
+        return None
 
 
 class Address(BaseModel):
@@ -155,6 +155,6 @@ class Favorites(BaseModel):
 
     def json(self):
         return {
-            'user': str(self.user),
-            'item': str(self.item)
+            'user': str(self.user.user_id),
+            'item': str(self.item.item_id)
         }
