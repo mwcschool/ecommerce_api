@@ -186,7 +186,7 @@ class Testuser(BaseTest):
         assert user_from_db.uuid == user2.uuid
 
     def test_delete__userid_not_exist(self):
-        user = self.create_user()
+        self.create_user()
 
         resp = self.open_with_auth(
             '/users/{}'.format(uuid.uuid4), 'delete', 'ciao@libero.it', '1234567', data='')
