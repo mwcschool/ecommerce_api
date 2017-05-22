@@ -9,9 +9,6 @@ from .base_test import BaseTest
 
 
 class Testuser(BaseTest):
-    def setup_method(self):
-        User.delete().execute()
-
     def open_with_auth(self, url, method, email, password, data):
         return self.app.open(
             url, method=method, headers={'Authorization': 'Basic ' + base64.b64encode(
