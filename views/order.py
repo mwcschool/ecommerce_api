@@ -41,7 +41,7 @@ class OrdersResource(Resource):
 
         for item in items_query:
             item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
-            if item.quantity < item_quantity or item.availability == False:
+            if item_quantity > item.availability == True:
                 return None, BAD_REQUEST
 
         with database.transaction():
@@ -59,9 +59,7 @@ class OrdersResource(Resource):
                     quantity=item_quantity,
                     subtotal=float(item.price * item_quantity)
                 )
-                item.quantity = (item.quantity - item_quantity)
-                if item.quantity == 0:
-                    item.availability = False
+                item.availability = (item.availability - item_quantity)
                 item.save()
 
 
@@ -103,17 +101,15 @@ class OrderResource(Resource):
 
         for item in items_query:
             item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
-            if item.quantity < item_quantity or item.availability == False:
+            if item_quantity > item.availability == True:
                 return None, BAD_REQUEST
 
         with database.transaction():
             temp_query = OrderItem.select().where(OrderItem.order_id == order.id)
             for order_item in temp_query:
-                item_temp_query = Item.select().where(Item.item_id == OrderItem.item)
-                Item.quantity = (Item.quantity + OrderItem.quantity)
-                if item.quantity > 0:
-                    item.availability = True
-                item.save()
+                item_temp_query = Item.get(Item.id == order_item.item)
+                item_temp_query.availability = (item_temp_query.availability + order_item.quantity)
+                item_temp_query.save()
 
             OrderItem.delete().where(OrderItem.order_id == order.id).execute()
 
@@ -125,9 +121,7 @@ class OrderResource(Resource):
                     quantity=item_quantity,
                     subtotal=float(item.price * item_quantity)
                 )
-                item.quantity = (item.quantity - item_quantity)
-                if item.quantity == 0:
-                    item.availability = False
+                item.availability = (item.availability - item_quantity)
                 item.save()
 
             order.total_price = total_price
@@ -145,11 +139,9 @@ class OrderResource(Resource):
             order_items = OrderItem.select().where(OrderItem.order_id == order.id)
 
             for order_item in order_items:
-                temp_query = Item.select().where(Item.item_id == OrderItem.item)
-                Item.quantity = (Item.quantity + OrderItem.quantity)
-                if item.quantity > 0:
-                    item.availability = True
-                item.save()
+                temp_query = Item.get(Item.id == order_item.item)
+                temp_query.availability = temp_query.availability + order_item.quantity
+                temp_query.save()
 
             for order_item in order_items:
                 order_item.delete_instance()
