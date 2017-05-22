@@ -18,21 +18,21 @@ class TestOrders:
             table.create_table()
 
         cls.user1 = User.create(
-            user_id=str(uuid.uuid4()),
+            uuid=str(uuid.uuid4()),
             first_name='Name',
             last_name='Surname',
             email='email@domain.com',
             password='password',
         )
         cls.item1 = Item.create(
-            item_id=str(uuid.uuid4()),
+            uuid=str(uuid.uuid4()),
             name='Item one',
             price=10,
             description='Item one description',
             category='Category one',
         )
         cls.item2 = Item.create(
-            item_id=str(uuid.uuid4()),
+            uuid=str(uuid.uuid4()),
             name='Item two',
             price=10,
             description='Item two description',
@@ -53,7 +53,7 @@ class TestOrders:
 
     def test_get_orders(self):
         order1 = Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             total_price=10,
             user=self.user1.id,
         )
@@ -65,7 +65,7 @@ class TestOrders:
         )
 
         order2 = Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             total_price=7,
             user=self.user1.id,
         )
@@ -82,9 +82,9 @@ class TestOrders:
 
     def test_create_order__success(self):
         new_order_data = {
-            'user': self.user1.user_id,
+            'user': self.user1.uuid,
             'items': json.dumps([
-                [self.item1.item_id, 2], [self.item2.item_id, 1]
+                [self.item1.uuid, 2], [self.item2.uuid, 1]
             ])
         }
 
@@ -92,7 +92,7 @@ class TestOrders:
         assert resp.status_code == CREATED
 
         order_from_server = json.loads(resp.data.decode())
-        order_from_db = Order.get(Order.order_id == order_from_server['uuid']).json()
+        order_from_db = Order.get(Order.uuid == order_from_server['uuid']).json()
 
         assert len(Order.select()) == 1
         assert order_from_db == order_from_server
@@ -101,16 +101,16 @@ class TestOrders:
         assert order_from_server['user'] == new_order_data['user']
         assert len(order_from_server['items']) == 2
 
-        order_items_ids = [self.item1.item_id, self.item2.item_id]
-        assert order_from_server['items'][0]['item_id'] in order_items_ids
-        assert order_from_server['items'][1]['item_id'] in order_items_ids
+        order_items_ids = [self.item1.uuid, self.item2.uuid]
+        assert order_from_server['items'][0]['uuid'] in order_items_ids
+        assert order_from_server['items'][1]['uuid'] in order_items_ids
 
         order_total = (self.item1.price * 2) + self.item2.price
         assert order_from_server['total_price'] == order_total
 
     def test_create_order__failure_missing_field(self):
         new_order_data = {
-            'user': self.user1.user_id
+            'user': self.user1.uuid
         }
 
         resp = self.app.post('/orders/', data=new_order_data)
@@ -119,7 +119,7 @@ class TestOrders:
 
     def test_create_order__failure_empty_items(self):
         new_order_data = {
-            'user': self.user1.user_id,
+            'user': self.user1.uuid,
             'items': json.dumps('')
         }
 
@@ -129,7 +129,7 @@ class TestOrders:
 
     def test_create_order__failure_non_existing_items(self):
         new_order_data = {
-            'user': self.user1.user_id,
+            'user': self.user1.uuid,
             'items': json.dumps([
                 [str(uuid.uuid4()), 1], [str(uuid.uuid4()), 1]
             ])
@@ -143,7 +143,7 @@ class TestOrders:
         new_order_data = {
             'user': str(uuid.uuid4()),
             'items': json.dumps([
-                [self.item1.item_id, 1]
+                [self.item1.uuid, 1]
             ])
         }
 
@@ -153,7 +153,7 @@ class TestOrders:
 
     def test_modify_order__success(self):
         order1 = Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             total_price=10,
             user=self.user1.id,
         )
@@ -165,7 +165,7 @@ class TestOrders:
         )
 
         order2 = Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             total_price=12,
             user=self.user1.id,
         )
@@ -183,7 +183,7 @@ class TestOrders:
         }
 
         resp = self.app.put(
-            '/orders/{}'.format(order1.order_id),
+            '/orders/{}'.format(order1.uuid),
             data=updates
         )
         assert resp.status_code == OK
@@ -201,14 +201,14 @@ class TestOrders:
 
     def test_modify_order__failure_non_existing(self):
         Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=str(uuid.uuid4()),
             total_price=10,
             user=self.user1.id,
         )
 
         updates = {
             'items': json.dumps([
-                    [self.item1.item_id, 1]
+                    [self.item1.uuid, 1]
                 ])
         }
 
@@ -221,7 +221,7 @@ class TestOrders:
     def test_modify_order__failure_non_existing_empty_orders(self):
         updates = {
             'items': json.dumps([
-                    [self.item1.item_id, 1]
+                    [self.item1.uuid, 1]
                 ])
         }
 
@@ -231,26 +231,26 @@ class TestOrders:
         )
         assert resp.status_code == NOT_FOUND
 
-    def test_modify_order__failure_changed_order_id(self):
+    def test_modify_order__failure_changed_uuid(self):
         order1 = Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=str(uuid.uuid4()),
             total_price=10,
             user=self.user1.id,
         )
 
         updates = {
-            'order_id': str(uuid.uuid4())
+            'uuid': str(uuid.uuid4())
         }
 
         resp = self.app.put(
-            '/orders/{}'.format(order1.order_id),
+            '/orders/{}'.format(order1.uuid),
             data=updates
         )
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_changed_user(self):
         order1 = Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=str(uuid.uuid4()),
             total_price=10,
             user=self.user1.id,
         )
@@ -260,14 +260,14 @@ class TestOrders:
         }
 
         resp = self.app.put(
-            '/orders/{}'.format(order1.order_id),
+            '/orders/{}'.format(order1.uuid),
             data=updates
         )
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_empty_field(self):
         order1 = Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=str(uuid.uuid4()),
             total_price=10,
             user=self.user1.id,
         )
@@ -277,14 +277,14 @@ class TestOrders:
         }
 
         resp = self.app.put(
-            '/orders/{}'.format(order1.order_id),
+            '/orders/{}'.format(order1.uuid),
             data=updates
         )
         assert resp.status_code == BAD_REQUEST
 
     def test_delete_order__success(self):
         order1 = Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             total_price=10,
             user=self.user1,
         )
@@ -296,7 +296,7 @@ class TestOrders:
         )
 
         order2 = Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=uuid.uuid4(),
             total_price=12,
             user=self.user1,
         )
@@ -307,24 +307,24 @@ class TestOrders:
             subtotal=self.item1.price,
         )
 
-        resp = self.app.delete('/orders/{}'.format(order1.order_id))
+        resp = self.app.delete('/orders/{}'.format(order1.uuid))
         assert resp.status_code == NO_CONTENT
 
         orders = Order.select()
         assert len(orders) == 1
-        assert Order.get(Order.order_id == order2.order_id)
+        assert Order.get(Order.uuid == order2.uuid)
 
         order_items = OrderItem.select().where(OrderItem.order_id == order1.id)
         assert len(order_items) == 0
 
     def test_delete_order__failure_non_existing(self):
         Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=str(uuid.uuid4()),
             total_price=10,
             user=self.user1.id
         )
         Order.create(
-            order_id=str(uuid.uuid4()),
+            uuid=str(uuid.uuid4()),
             total_price=12,
             user=self.user1.id
         )
