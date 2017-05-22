@@ -84,3 +84,9 @@ class OrderItem(BaseModel):
     item = ForeignKeyField(Item)
     quantity = IntegerField()
     subtotal = DecimalField()
+
+
+class Picture(BaseModel):
+    uuid = UUIDField(unique=True)
+    exstension = CharField()
+    item = ForeignKeyField(Item, related_name="pictures")
