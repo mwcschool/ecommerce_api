@@ -54,7 +54,7 @@ class Address(BaseModel):
 
 
 class Order(BaseModel):
-    order_id = UUIDField(unique=True)
+    uuid = UUIDField(unique=True)
     total_price = DecimalField()
     user = ForeignKeyField(User, related_name="orders")
 
