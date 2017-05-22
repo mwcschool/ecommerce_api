@@ -22,21 +22,21 @@ class TestOrders:
             first_name='Name',
             last_name='Surname',
             email='email@domain.com',
-            password='password'
+            password='password',
         )
         cls.item1 = Item.create(
             item_id=str(uuid.uuid4()),
             name='Item one',
             price=10,
             description='Item one description',
-            category='Category one'
+            category='Category one',
         )
         cls.item2 = Item.create(
             item_id=str(uuid.uuid4()),
             name='Item two',
             price=10,
             description='Item two description',
-            category='Category one'
+            category='Category one',
         )
 
         app.config['TESTING'] = True
@@ -55,25 +55,25 @@ class TestOrders:
         order1 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=10,
-            user=self.user1.id
+            user=self.user1.id,
         )
         OrderItem.create(
             order=order1.id,
             item=self.item1.id,
             quantity=1,
-            subtotal=self.item1.price
+            subtotal=self.item1.price,
         )
 
         order2 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=7,
-            user=self.user1.id
+            user=self.user1.id,
         )
         OrderItem.create(
             order=order2.id,
             item=self.item1.id,
             quantity=1,
-            subtotal=self.item1.price
+            subtotal=self.item1.price,
         )
 
         resp = self.app.get('/orders/')
@@ -155,25 +155,25 @@ class TestOrders:
         order1 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=10,
-            user=self.user1.id
+            user=self.user1.id,
         )
         OrderItem.create(
             order=order1.id,
             item=self.item1.id,
             quantity=1,
-            subtotal=self.item1.price
+            subtotal=self.item1.price,
         )
 
         order2 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=12,
-            user=self.user1.id
+            user=self.user1.id,
         )
         OrderItem.create(
             order=order2.id,
             item=self.item1.id,
             quantity=1,
-            subtotal=self.item1.price
+            subtotal=self.item1.price,
         )
 
         updates = {
@@ -203,7 +203,7 @@ class TestOrders:
         Order.create(
             order_id=str(uuid.uuid4()),
             total_price=10,
-            user=self.user1.id
+            user=self.user1.id,
         )
 
         updates = {
@@ -235,7 +235,7 @@ class TestOrders:
         order1 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=10,
-            user=self.user1.id
+            user=self.user1.id,
         )
 
         updates = {
@@ -252,7 +252,7 @@ class TestOrders:
         order1 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=10,
-            user=self.user1.id
+            user=self.user1.id,
         )
 
         updates = {
@@ -269,7 +269,7 @@ class TestOrders:
         order1 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=10,
-            user=self.user1.id
+            user=self.user1.id,
         )
 
         updates = {
@@ -286,25 +286,25 @@ class TestOrders:
         order1 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=10,
-            user=self.user1.id
+            user=self.user1,
         )
         OrderItem.create(
             order=order1.id,
             item=self.item1.id,
             quantity=1,
-            subtotal=self.item1.price
+            subtotal=self.item1.price,
         )
 
         order2 = Order.create(
             order_id=str(uuid.uuid4()),
             total_price=12,
-            user=self.user1.id
+            user=self.user1,
         )
         OrderItem.create(
             order=order2.id,
             item=self.item1.id,
             quantity=1,
-            subtotal=self.item1.price
+            subtotal=self.item1.price,
         )
 
         resp = self.app.delete('/orders/{}'.format(order1.order_id))
