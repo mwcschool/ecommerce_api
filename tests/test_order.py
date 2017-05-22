@@ -188,11 +188,11 @@ class TestOrders:
         )
         assert resp.status_code == OK
 
-        order1_upd = Order.get(Order.order_id == order1.order_id).json()
+        order1_upd = Order.get(Order.uuid == order1.uuid).json()
         total_price = self.item2.price*2
         assert order1_upd['total_price'] == total_price
 
-        order2_db = Order.get(Order.order_id == order2.order_id).json()
+        order2_db = Order.get(Order.uuid == order2.uuid).json()
         assert order2_db == order2.json()
 
         order1_items = OrderItem.select().where(OrderItem.order_id == order1.id)
