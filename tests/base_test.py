@@ -21,8 +21,8 @@ class BaseTest:
         for table in self.tables:
             table.delete().execute()
 
-    def create_user(self, first_name="First Name", last_name="Last name",
-                    email="email@domain.com", password="p4ssw0rd"):
+    def create_user(self, email="email@domain.com", first_name="First Name",
+                    last_name="Last name", password="p4ssw0rd"):
         return User.create(
             user_id=str(uuid.uuid4()),
             first_name=first_name,
