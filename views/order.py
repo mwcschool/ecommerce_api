@@ -105,7 +105,7 @@ class OrderResource(Resource):
                 return None, BAD_REQUEST
 
         with database.transaction():
-            temp_query = OrderItem.select().where(OrderItem.order_id == order.id)
+            temp_query = OrderItem.select().where(OrderItem.order == order.id)
             for order_item in temp_query:
                 item_temp_query = Item.get(Item.id == order_item.item)
                 item_temp_query.availability = (item_temp_query.availability + order_item.quantity)
@@ -136,7 +136,7 @@ class OrderResource(Resource):
             return None, NOT_FOUND
 
         with database.transaction():
-            order_items = OrderItem.select().where(OrderItem.order_id == order.id)
+            order_items = OrderItem.select().where(OrderItem.order == order.id)
 
             for order_item in order_items:
                 temp_query = Item.get(Item.id == order_item.item)
