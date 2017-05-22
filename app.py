@@ -29,4 +29,3 @@ api.add_resource(UsersResource, '/users/')
 api.add_resource(UserResource, '/users/<uuid:user_id>', methods=['put', 'delete'])
 api.add_resource(OrdersResource, '/orders/')
 api.add_resource(OrderResource, '/orders/<uuid:order_id>')
-
