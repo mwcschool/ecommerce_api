@@ -207,7 +207,7 @@ class TestOrders(BaseTest):
         assert len(orders) == 1
         assert Order.get(Order.uuid == order2.uuid)
 
-        order_items = OrderItem.select().where(OrderItem.order_id == order1.id)
+        order_items = OrderItem.select().where(OrderItem.order == order1.id)
         assert len(order_items) == 0
 
     def test_delete_order__failure_non_existing(self):
