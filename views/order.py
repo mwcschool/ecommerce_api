@@ -116,7 +116,7 @@ class OrderResource(Resource):
 
         with database.transaction():
             order_items = OrderItem.select().where(
-                OrderItem.id == order.id)
+                OrderItem.order == order.id)
 
             for order_item in order_items:
                 order_item.delete_instance()
