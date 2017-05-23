@@ -125,9 +125,9 @@ class TestOrders(BaseTest):
         order2_db = Order.get(Order.uuid == order2.uuid).json()
         assert order2_db == order2.json()
 
-        order1_items = OrderItem.select().where(OrderItem.order_id == order1.id)
+        order1_items = OrderItem.select().where(OrderItem.order == order1.id)
         assert len(order1_items) == 1
-        assert str(order1_items[0].item.uuid) == self.item2.uuid
+        assert str(order1_items[0].item.uuid) == str(self.item2.uuid)
 
     def test_modify_order__failure_non_existing(self):
         self.create_order(self.user1)
