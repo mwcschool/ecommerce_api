@@ -1,28 +1,29 @@
+from utils import non_empty_str
 from marshmallow import Schema, fields
-from marshmallow_jsonschema import JSONSchema
+from models import Item, User, Address
 
 
 class ItemSchema(Schema):
-    uuid = fields.UUID()
-    name = fields.Str()
-    price = fields.Decimal()
-    description = fields.Str()
-    category = fields.Str()
+    uuid = fields.UUID(required=True, dump_only=True)
+    name = fields.Str(required=True, validate=non_empty_str)
+    price = fields.Decimal(required=True)
+    description = fields.Str(required=True, validate=non_empty_str)
+    category = fields.Str(required=True, validate=non_empty_str)
 
 
 class UserSchema(Schema):
-    uuid = fields.UUID()
-    first_name = fields.Str()
-    last_name = fields.Str()
-    email = fields.Str()
-    password = fields.Str(load_only=True)
+    uuid = fields.UUID(required=True, dump_only=True)
+    first_name = fields.Str(required=True)
+    last_name = fields.Str(required=True)
+    email = fields.Str(required=True, validate=non_empty_str)
+    password = fields.Str(required=True, validate=non_empty_str, load_only=True)
 
 
 class AddressSchema(Schema):
-    uuid = fields.UUID()
-    user = fields.UUID()
-    nation = fields.Str()
-    city = fields.Str()
-    postal_code = fields.Str()
-    local_address = fields.Str()
-    phone = fields.Str()
+    uuid = fields.UUID(required=True, dump_only=True)
+    user = fields.UUID(required=True, attribute='user.uuid')
+    nation = fields.Str(required=True)
+    city = fields.Str(required=True)
+    postal_code = fields.Str(required=True)
+    local_address = fields.Str(required=True)
+    phone = fields.Str(required=True)
