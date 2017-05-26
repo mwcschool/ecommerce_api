@@ -12,7 +12,7 @@ import uuid
 
 def create_user(id_user, number):
     return User.create(
-        user_id=id_user,
+        uuid=id_user,
         first_name='{}{}'.format('first_name_', number),
         last_name='{}{}'.format('last_name_', number),
         email='{}{}'.format('email_', number),
@@ -22,7 +22,7 @@ def create_user(id_user, number):
 
 def create_item(id_item, number):
     return Item.create(
-        item_id=id_item,
+        uuid=id_item,
         name='{}{}'.format('name_', number),
         price=number,
         description='{}{}'.format('description_', number),
@@ -163,13 +163,13 @@ class TestFavorites:
         item_2 = create_item(id_item_2, 1)
 
         Favorites.create(
-            user=User.get(User.user_id == id_user),
-            item=Item.get(Item.item_id == id_item_1),
+            user=User.get(User.uuid == id_user),
+            item=Item.get(Item.uuid == id_item_1),
         )
 
         Favorites.create(
-            user=User.get(User.user_id == id_user),
-            item=Item.get(Item.item_id == id_item_2),
+            user=User.get(User.uuid == id_user),
+            item=Item.get(Item.uuid == id_item_2),
         )
 
         resp = self.app.delete('/favorites/{}'.format(id_item_1))
@@ -185,8 +185,8 @@ class TestFavorites:
         item_1 = create_item(id_item_1, 1)
 
         Favorites.create(
-            user=User.get(User.user_id == id_user),
-            item=Item.get(Item.item_id == id_item_1),
+            user=User.get(User.uuid == id_user),
+            item=Item.get(Item.uuid == id_item_1),
         )
 
         resp = self.app.delete('/favorites/{}'.format(uuid.uuid4()))
@@ -207,8 +207,8 @@ class TestFavorites:
         item_1 = create_item(id_item_1, 1)
 
         Favorites.create(
-            user=User.get(User.user_id == id_user_2),
-            item=Item.get(Item.item_id == id_item_1),
+            user=User.get(User.uuid == id_user_2),
+            item=Item.get(Item.uuid == id_item_1),
         )
 
         resp = self.app.delete('/favorites/{}'.format(id_item_1))

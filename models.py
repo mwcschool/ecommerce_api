@@ -42,7 +42,7 @@ class Item(BaseModel):
 
     @classmethod
     def exists_uuid(cls, check_uuid):
-        if Item.select().where(Item.item_id == check_uuid).exists():
+        if Item.select().where(Item.uuid == check_uuid).exists():
             return True
         else:
             return False
@@ -152,6 +152,6 @@ class Favorites(BaseModel):
 
     def json(self):
         return {
-            'user': str(self.user.user_id),
-            'item': str(self.item.item_id)
+            'user': str(self.user.uuid),
+            'item': str(self.item.uuid)
         }

@@ -24,7 +24,7 @@ class FavoritesResource(Resource):
         args = parser.parse_args(strict=True)
 
         try:
-            user = User.get(User.user_id == args['id_user'])
+            user = User.get(User.uuid == args['id_user'])
             item = Item.get(Item.item_id == args['id_item'])
 
         except (User.DoesNotExist, Item.DoesNotExist):
@@ -39,8 +39,8 @@ class FavoritesResource(Resource):
         args = parser.parse_args(strict=True)
 
         try:
-            user = User.get(User.user_id == args['id_user'])
-            item = Item.get(Item.item_id == args['id_item'])
+            user = User.get(User.uuid == args['id_user'])
+            item = Item.get(Item.uuid == args['id_item'])
 
         except (User.DoesNotExist, Item.DoesNotExist):
             return None, NOT_FOUND
@@ -57,7 +57,7 @@ class FavoriteResource(Resource):
             return None, NOT_FOUND
 
         try:
-            item = Item.get(Item.item_id == item_id)
+            item = Item.get(Item.uuid == item_id)
         except Item.DoesNotExist:
             return None, NOT_FOUND
 
