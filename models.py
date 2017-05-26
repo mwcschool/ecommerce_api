@@ -41,13 +41,6 @@ class Item(BaseModel):
     def get_schema(cls):
         return ItemSchema()
 
-    @classmethod
-    def exists_uuid(cls, check_uuid):
-        if Item.select().where(Item.uuid == check_uuid).exists():
-            return True
-        else:
-            return False
-
 
 class User(BaseModel):
     uuid = UUIDField(unique=True)
