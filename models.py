@@ -96,3 +96,17 @@ class OrderItem(BaseModel):
     item = ForeignKeyField(Item)
     quantity = IntegerField()
     subtotal = DecimalField()
+
+
+class Picture(BaseModel):
+    uuid = UUIDField(unique=True)
+    title = CharField()
+    exstension = CharField()
+    item = ForeignKeyField(Item, related_name="pictures")
+
+    def json(self):
+        return {
+            'uuid': str(self.uuid),
+            'title': self.name,
+            'extension': self.extension,
+        }
