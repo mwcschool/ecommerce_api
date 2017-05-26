@@ -134,7 +134,6 @@ class Testuser:
             'first_name': 'Anna',
         }
 
-
         resp = self.open_with_auth(
             '/users/{}'.format(user.uuid), 'put', user.email, '1234567', data=data)
         assert resp.status_code == BAD_REQUEST
