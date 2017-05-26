@@ -1,4 +1,4 @@
-from models import database, Item, User, Address, Order, OrderItem
+from models import database, Item, User, Address, Order, OrderItem, Picture
 
 
 def drop_tables():
