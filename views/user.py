@@ -1,7 +1,8 @@
 import uuid
 from models import User
 import auth
-from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST
+from flask import g
+from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, UNAUTHORIZED
 from flask_restful import Resource, reqparse
 import re
 from passlib.hash import pbkdf2_sha256
@@ -49,6 +50,9 @@ class UserResource(Resource):
         except User.DoesNotExist:
             return None, NOT_FOUND
 
+        if obj != g.current_user:
+            return '', UNAUTHORIZED
+
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=utils.non_empty_str, required=True)
         parser.add_argument('last_name', type=utils.non_empty_str, required=True)
@@ -73,6 +77,9 @@ class UserResource(Resource):
             obj = User.get(uuid=uuid)
         except User.DoesNotExist:
             return None, NOT_FOUND
+
+        if obj != g.current_user:
+            return '', UNAUTHORIZED
 
         obj.delete_instance()
         return None, NO_CONTENT
