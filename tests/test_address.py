@@ -6,7 +6,7 @@ from models import User, Address
 from app import app
 
 
-class Testaddress:
+class TestAddress:
     @classmethod
     def setup_class(cls):
         db = SqliteDatabase(':memory:')
@@ -21,7 +21,7 @@ class Testaddress:
             first_name='Mario',
             last_name='Rossi',
             email='email@email.it',
-            password='123456789'
+            password='123456789',
         )
 
     def setup_method(self):
@@ -35,7 +35,7 @@ class Testaddress:
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
-            'phone': '0574100100'
+            'phone': '0574100100',
         }
 
         resp = self.app.post('/addresses/', data=data_address)
@@ -48,7 +48,7 @@ class Testaddress:
             'city': address_from_db.city,
             'postal_code': address_from_db.postal_code,
             'local_address': address_from_db.local_address,
-            'phone': address_from_db.phone
+            'phone': address_from_db.phone,
         }
         assert expected_data == data_address
         assert resp.status_code == CREATED
@@ -65,7 +65,8 @@ class Testaddress:
             city='Prato',
             postal_code='59100',
             local_address='Via Roncioni 10',
-            phone='0574100100')
+            phone='0574100100',
+            )
 
         data_address = {
             'user_id': data_user.uuid,
@@ -73,7 +74,7 @@ class Testaddress:
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
-            'phone': '0574100100'
+            'phone': '0574100100',
         }
 
         resp = self.app.post('/addresses/', data=data_address)
@@ -89,7 +90,7 @@ class Testaddress:
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
-            'phone': '0574100100'
+            'phone': '0574100100',
         }
 
         resp = self.app.post('/addresses/', data=data_address)
@@ -103,7 +104,7 @@ class Testaddress:
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
-            'phone': '0574100100'
+            'phone': '0574100100',
         }
 
         resp = self.app.post('/addresses/', data=data_address)
@@ -117,7 +118,7 @@ class Testaddress:
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
-            'phone': '0574100100'
+            'phone': '0574100100',
         }
 
         resp = self.app.post('/addresses/', data=data_address)
@@ -134,7 +135,8 @@ class Testaddress:
             city='Prato',
             postal_code='59100',
             local_address='Via Roncioni 10',
-            phone='0574100100')
+            phone='0574100100',
+            )
 
         resp = self.app.get('/addresses/{}'.format(address_id_created))
         query = Address.get()
@@ -154,7 +156,8 @@ class Testaddress:
             city='Prato',
             postal_code='59100',
             local_address='Via Roncioni 10',
-            phone='0574100100')
+            phone='0574100100',
+            )
 
         new_data_address = {
             'user_id': data_user.uuid,
@@ -162,7 +165,7 @@ class Testaddress:
             'city': 'Firenze',
             'postal_code': '505050',
             'local_address': 'Via Baracca 15',
-            'phone': '0550550550'
+            'phone': '0550550550',
         }
 
         resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
@@ -173,7 +176,7 @@ class Testaddress:
             'city': address_from_db.city,
             'postal_code': address_from_db.postal_code,
             'local_address': address_from_db.local_address,
-            'phone': address_from_db.phone
+            'phone': address_from_db.phone,
         }
         assert expected_data == new_data_address
         assert resp.status_code == CREATED
@@ -188,7 +191,8 @@ class Testaddress:
             city='Prato',
             postal_code='59100',
             local_address='Via Roncioni 10',
-            phone='0574100100')
+            phone='0574100100',
+            )
 
         new_data_address = {
             'nation': 'Albania',
@@ -206,7 +210,8 @@ class Testaddress:
             city='Prato',
             postal_code='59100',
             local_address='Via Roncioni 10',
-            phone='0574100100')
+            phone='0574100100',
+            )
 
         new_data_address = {
             'user_id': data_user.uuid,
@@ -214,7 +219,7 @@ class Testaddress:
             'city': '',
             'postal_code': '',
             'local_address': '',
-            'phone': ''
+            'phone': '',
         }
 
         resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
@@ -228,7 +233,7 @@ class Testaddress:
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
-            'phone': '0574100100'
+            'phone': '0574100100',
         }
 
         resp = self.app.put('/addresses/{}'.format(uuid.uuid4()), data=data)
@@ -244,14 +249,15 @@ class Testaddress:
             city='Prato',
             postal_code='59100',
             local_address='Via Roncioni 10',
-            phone='0574100100')
+            phone='0574100100',
+            )
         data = {
             'user_id': uuid.uuid4(),
             'nation': 'Italia',
             'city': 'Firenze',
             'postal_code': '505050',
             'local_address': 'Via Roncioni 15',
-            'phone': '0558778666'
+            'phone': '0558778666',
         }
 
         resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=data)
@@ -268,7 +274,8 @@ class Testaddress:
             city='Prato',
             postal_code='59100',
             local_address='Via Roncioni 10',
-            phone='0574100100')
+            phone='0574100100',
+            )
         data_address2 = Address.create(
             uuid=uuid.uuid4(),
             user=data_user,
@@ -276,7 +283,8 @@ class Testaddress:
             city='Firenze',
             postal_code='59000',
             local_address='Via Baracca 10',
-            phone='0558778666')
+            phone='0558778666',
+            )
 
         resp = self.app.delete('/addresses/{}'.format(data_address1.uuid))
         all_addresses = Address.select()
@@ -299,7 +307,8 @@ class Testaddress:
             city='Prato',
             postal_code='59100',
             local_address='Via Roncioni 10',
-            phone='0574100100')
+            phone='0574100100',
+            )
         resp = self.app.delete('/addresses/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 1
