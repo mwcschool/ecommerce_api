@@ -1,5 +1,7 @@
 from flask_httpauth import HTTPBasicAuth
 from models import User
+from flask import g
+
 
 login_manager = HTTPBasicAuth()
 login_required = login_manager.login_required
@@ -12,4 +14,8 @@ def verify_pw(email, password):
     except User.DoesNotExist:
         return False
 
-    return user.verify_password(password)
+    if user.verify_password(password):
+        g.current_user = user
+        return True
+
+    return False
