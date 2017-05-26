@@ -1,4 +1,4 @@
-from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST
+from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, UNAUTHORIZED
 import json
 import uuid
 from views.user import crypt_password
@@ -158,6 +158,55 @@ class Testuser:
             '/users/{}'.format(user.uuid), 'put', user.email, '1234567', data=data)
         assert resp.status_code == BAD_REQUEST
 
+    def test_put__user_unauthorized(self):
+        user = User.create(
+            uuid=uuid.uuid4(),
+            first_name='Giovanni',
+            last_name='Mariani',
+            email='giovanni@mariani.com',
+            password=crypt_password('1234567')
+        )
+
+        data = {
+            'first_name': 'Giovanni',
+            'last_name': 'Pippo',
+            'email': 'giovanni@mariani.com',
+            'password': '1234567'
+        }
+
+        resp = self.open_with_auth(
+            '/users/{}'.format(user.uuid), 'put', user.email, '1234568', data=data)
+        query = User.select().where(User.last_name == user.last_name)
+        assert len(query) == 1
+        assert resp.status_code == UNAUTHORIZED
+
+    def test_put__user_unauthorized_for_modify_another_user(self):
+        user = User.create(
+            uuid=uuid.uuid4(),
+            first_name='Maria',
+            last_name='Rossi',
+            email='maria@rossi.com',
+            password=crypt_password('1234567')
+        )
+        user2 = User.create(
+            uuid=uuid.uuid4(),
+            first_name='Alessandro',
+            last_name='Cappellini',
+            email='abc@abc.com',
+            password=crypt_password('1234567')
+        )
+
+        data = {
+            'first_name': 'Anna',
+            'last_name': 'Rossi',
+            'email': 'maria@rossi.com',
+            'password': '1234567'
+        }
+
+        resp = self.open_with_auth(
+            '/users/{}'.format(user.uuid), 'put', user2.email, '1234567', data=data)
+        assert resp.status_code == UNAUTHORIZED
+
     def test_delete_user__success(self):
         user = User.create(
             uuid=uuid.uuid4(),
@@ -194,3 +243,23 @@ class Testuser:
             '/users/{}'.format(uuid.uuid4), 'delete', 'ciao@libero.it', '1234567', data='')
         assert resp.status_code == NOT_FOUND
         assert len(User.select()) == 1
+
+    def test_delete_user__unauthorized_for_delete_another_user(self):
+        user = User.create(
+            uuid=uuid.uuid4(),
+            first_name='Maria',
+            last_name='Rossi',
+            email='maria@rossi.com',
+            password=crypt_password('1234567')
+        )
+        user2 = User.create(
+            uuid=uuid.uuid4(),
+            first_name='Alessandro',
+            last_name='Cappellini',
+            email='abc@abc.com',
+            password=crypt_password('1234567')
+        )
+
+        resp = self.open_with_auth(
+            '/users/{}'.format(user.uuid), 'delete', user2.email, '1234567', data='')
+        assert resp.status_code == UNAUTHORIZED
