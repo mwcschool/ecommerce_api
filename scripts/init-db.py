@@ -10,6 +10,7 @@ def drop_tables():
     Address.drop_table(fail_silently=True)
     Order.drop_table(fail_silently=True)
     OrderItem.drop_table(fail_silently=True)
+    Picture.drop_table(fail_silently=True)
 
     database.close()
 
@@ -23,6 +24,7 @@ def create_tables():
     Address.create_table()
     Order.create_table()
     OrderItem.create_table()
+    Picture.create_table()
 
     database.close()
 
