@@ -93,7 +93,7 @@ class TestItems(BaseTest):
         resp = self.open_with_auth(
             '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
-        assert Item.row_count() == 0
+        assert Item.count() == 0
 
     def test_create_item__failure_missing_field(self):
         user = self.create_user()
@@ -117,7 +117,7 @@ class TestItems(BaseTest):
         resp = self.open_with_auth(
             '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
-        assert Item.row_count() == 0
+        assert Item.count() == 0
 
     def test_get__item(self):
         item1 = self.create_item()
@@ -152,7 +152,7 @@ class TestItems(BaseTest):
         resp = self.open_with_auth(
             'items/{}'.format(item1.uuid), 'delete', user.email, 'p4ssw0rd', data='')
         assert resp.status_code == NO_CONTENT
-        assert Item.row_count() == 0
+        assert Item.count() == 0
         resp = self.app.get('item/{}'.format(item1.uuid))
         assert resp.status_code == NOT_FOUND
 

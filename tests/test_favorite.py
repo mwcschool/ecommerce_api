@@ -89,7 +89,7 @@ class TestFavorites:
 
         resp = self.app.post('/favorites/', data=sample_favorite)
         assert resp.status_code == CREATED
-        assert Favorites.row_count() == 1
+        assert Favorites.count() == 1
 
     def test_post__failed_item_do_not_exist(self):
         id_user = uuid.uuid4()
@@ -105,7 +105,7 @@ class TestFavorites:
         resp = self.app.post('/favorites/', data=sample_favorite)
 
         assert resp.status_code == NOT_FOUND
-        assert Favorites.row_count() == 0
+        assert Favorites.count() == 0
 
     def test_post__failed_uuid_not_valid(self):
         sample_favorite = {
@@ -114,7 +114,7 @@ class TestFavorites:
         }
         resp = self.app.post('/favorites/', data=sample_favorite)
         assert resp.status_code == BAD_REQUEST
-        assert Favorites.row_count() == 0
+        assert Favorites.count() == 0
 
     def test_post__failed_item_uuid_does_not_exists(self):
         id_user = uuid.uuid4()
@@ -132,7 +132,7 @@ class TestFavorites:
         assert resp.status_code == NOT_FOUND
         data = json.loads(resp.data.decode())
         assert not data
-        assert Favorites.row_count() == 0
+        assert Favorites.count() == 0
 
     def test_post__failed_user_uuid_does_not_exists(self):
         id_user = uuid.uuid4()
@@ -150,7 +150,7 @@ class TestFavorites:
         assert resp.status_code == NOT_FOUND
         data = json.loads(resp.data.decode())
         assert not data
-        assert Favorites.row_count() == 0
+        assert Favorites.count() == 0
 
     def test_delete__favorite_success(self):
         id_user = uuid.uuid4()
@@ -173,7 +173,7 @@ class TestFavorites:
         )
 
         resp = self.app.delete('/favorites/{}'.format(id_item_1))
-        assert Favorites.row_count() == 1
+        assert Favorites.count() == 1
         assert Favorites.item == item_2
         assert resp.status_code == NO_CONTENT
 
@@ -191,7 +191,7 @@ class TestFavorites:
 
         resp = self.app.delete('/favorites/{}'.format(uuid.uuid4()))
 
-        assert Favorites.row_count() == 1
+        assert Favorites.count() == 1
         assert Favorites.item == item_1
         assert resp.status_code == NOT_FOUND
         data = json.loads(resp.data.decode())
@@ -213,7 +213,7 @@ class TestFavorites:
 
         resp = self.app.delete('/favorites/{}'.format(id_item_1))
 
-        assert Favorites.row_count() == 1
+        assert Favorites.count() == 1
         assert Favorites.item == item_1
         assert resp.status_code == NOT_FOUND
         data = json.loads(resp.data.decode())
@@ -228,7 +228,7 @@ class TestFavorites:
 
         resp = self.app.delete('/favorites/{}'.format(id_item))
 
-        assert Favorites.row_count() == 0
+        assert Favorites.count() == 0
         assert resp.status_code == NOT_FOUND
         data = json.loads(resp.data.decode())
         assert not data
