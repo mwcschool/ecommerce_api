@@ -1,5 +1,5 @@
 from peewee import Model, SqliteDatabase, Check
-from peewee import DecimalField, TextField, CharField, BooleanField
+from peewee import DecimalField, TextField, CharField
 from peewee import UUIDField, ForeignKeyField, IntegerField
 from passlib.hash import pbkdf2_sha256
 

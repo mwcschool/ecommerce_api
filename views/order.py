@@ -41,7 +41,7 @@ class OrdersResource(Resource):
 
         for item in items_query:
             item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
-            if item_quantity > item.availability == True:
+            if item_quantity > item.availability:
                 return None, BAD_REQUEST
 
         with database.transaction():
@@ -61,7 +61,6 @@ class OrdersResource(Resource):
                 )
                 item.availability = (item.availability - item_quantity)
                 item.save()
-
 
         return order.json(), CREATED
 
@@ -101,7 +100,7 @@ class OrderResource(Resource):
 
         for item in items_query:
             item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
-            if item_quantity > item.availability == True:
+            if item_quantity > item.availability:
                 return None, BAD_REQUEST
 
         with database.transaction():
