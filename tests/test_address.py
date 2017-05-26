@@ -111,20 +111,6 @@ class TestAddress:
         assert resp.status_code == BAD_REQUEST
         assert len(Address.select()) == 0
 
-    def test_post__user_not_exists(self):
-        data_address = {
-            'user_id': uuid.uuid4(),
-            'nation': 'Italia',
-            'city': 'Prato',
-            'postal_code': '59100',
-            'local_address': 'Via Roncioni 10',
-            'phone': '0574100100',
-        }
-
-        resp = self.app.post('/addresses/', data=data_address)
-        assert resp.status_code == BAD_REQUEST
-        assert len(Address.select()) == 0
-
     def test_get__address_found(self):
         data_user = User.get()
         address_id_created = uuid.uuid4()
@@ -239,31 +225,6 @@ class TestAddress:
         resp = self.app.put('/addresses/{}'.format(uuid.uuid4()), data=data)
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 0
-
-    def test_put__user_id_not_exists(self):
-        data_user = User.get()
-        data_address = Address.create(
-            uuid=uuid.uuid4(),
-            user=data_user,
-            nation='Italia',
-            city='Prato',
-            postal_code='59100',
-            local_address='Via Roncioni 10',
-            phone='0574100100',
-            )
-        data = {
-            'user_id': uuid.uuid4(),
-            'nation': 'Italia',
-            'city': 'Firenze',
-            'postal_code': '505050',
-            'local_address': 'Via Roncioni 15',
-            'phone': '0558778666',
-        }
-
-        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=data)
-        assert resp.status_code == BAD_REQUEST
-        assert len(Address.select()) == 1
-        assert data_address == Address.get()
 
     def test_delete__success(self):
         data_user = User.get()
