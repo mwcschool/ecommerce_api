@@ -10,11 +10,8 @@ from app import app
 import uuid
 
 
-def number_of_rows_in_DB():
-    return len(Item.select())
-
-
 class TestItems:
+    @classmethod
     def setup_class(cls):
         Item._meta.database = SqliteDatabase(':memory:')
         Item.create_table()
@@ -23,225 +20,244 @@ class TestItems:
     def setup_method(self):
         Item.delete().execute()
 
-    def test_get__database_empty(self):
+    def test_get_items__empty(self):
         resp = self.app.get('/items/')
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == []
 
-    def test_get__database_not_empty(self):
-        obj1 = Item.create(
+    def test_get_items(self):
+        item1 = Item.create(
             uuid=uuid.uuid4(),
-            name='cubo',
+            name='Item one',
             price=5,
-            description='dhfsdjòfgjasdògj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
-        obj2 = Item.create(
+        item2 = Item.create(
             uuid=uuid.uuid4(),
-            name='iphone',
+            name='Item two',
             price=15,
-            description='desc2',
-            category='smartphone'
+            description='Description two',
+            category='Category two'
         )
 
         resp = self.app.get('/items/')
         assert resp.status_code == OK
-        assert json.loads(resp.data.decode()) == [obj1.json(), obj2.json()]
+        assert json.loads(resp.data.decode()) == [item1.json(), item2.json()]
 
-    def test_post__create_item_success(self):
-        source_item = {
-            'name': 'cubo',
+    def test_create_item__success(self):
+        new_item_data = {
+            'name': 'Item one',
             'price': 15,
-            'description': 'desc1',
-            'category': 'poligoni'
+            'description': 'Description one',
+            'category': 'Category one'
         }
 
-        resp = self.app.post('/items/', data=source_item)
+        resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == CREATED
 
-        select_query_db = Item.select()
+        item_from_server = json.loads(resp.data.decode())
+        item_from_db = Item.get(Item.uuid == item_from_server['uuid']).json()
 
-        assert len(select_query_db) == 1
+        assert len(Item.select()) == 1
+        assert item_from_db == item_from_server
 
-        item_from_db = select_query_db[0].json()
-        assert item_from_db == json.loads(resp.data.decode())
+        item_from_server.pop('uuid')
+        assert item_from_server == new_item_data
 
-    def test_post__name_with_only_spaces(self):
-        source_item = {
+    def test_create_item__failure_empty_field(self):
+        new_item_data = {
+            'name': '',
+            'price': 10,
+            'description': 'Description one',
+            'category': 'Category one'
+        }
+        resp = self.app.post('/items/', data=new_item_data)
+        assert resp.status_code == BAD_REQUEST
+        assert len(Item.select()) == 0
+
+    def test_create_item__failure_empty_field_only_spaces(self):
+        new_item_data = {
             'name': '    ',
-            'price': 123,
-            'description': 'desc1',
-            'category': 'varie'
+            'price': 10,
+            'description': 'Description one',
+            'category': 'Category one'
         }
-        resp = self.app.post('/items/', data=source_item)
+        resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
-        assert number_of_rows_in_DB() == 0
+        assert len(Item.select()) == 0
 
-    def test_post__item_without_arguments_given(self):
-        source_item = {
-            'name': 'rombo',
-            'description': 'desc2'
+    def test_create_item__failure_missing_field(self):
+        new_item_data = {
+            'name': 'Item one',
+            'description': 'Description one'
         }
-        resp = self.app.post('/items/', data=source_item)
+        resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
-        assert number_of_rows_in_DB() == 0
+        assert len(Item.select()) == 0
 
-    def test_post__price_value_as_a_string(self):
-        source_item = {
-            'name': 'ciao',
-            'price': 'stringa',
-            'description': 'desc3',
-            'category': 'varie'
+    def test_create_item__failure_field_wrong_type(self):
+        new_item_data = {
+            'name': 'Item one',
+            'price': 'Ten',
+            'description': 'Description one',
+            'category': 'Category one'
         }
-        resp = self.app.post('/items/', data=source_item)
+        resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
-        assert number_of_rows_in_DB() == 0
+        assert len(Item.select()) == 0
 
-    def test_get__item_found(self):
-        obj1 = Item.create(
+    def test_get__item(self):
+        item1 = Item.create(
             uuid=uuid.uuid4(),
-            name='cubo',
+            name='Item one',
             price=5,
-            description='dhfsdjofgjasdogj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
-        resp = self.app.get('/item/{}'.format(obj1.uuid))
+        resp = self.app.get('/item/{}'.format(item1.uuid))
         assert resp.status_code == OK
 
-        item = json.loads(resp.data.decode())
-        assert item == obj1.json()
+        item_from_server = json.loads(resp.data.decode())
+        assert item_from_server == item1.json()
 
-    def test_get__item_not_found(self):
+    def test_get_item__empty(self):
+        resp = self.app.get('/item/{}'.format(uuid.uuid4()))
+        assert resp.status_code == NOT_FOUND
+
+    def test_get_item__failure_non_existing_item(self):
+        Item.create(
+            uuid=uuid.uuid4(),
+            name='Item one',
+            price=5,
+            description='Description one',
+            category='Category one'
+        )
 
         resp = self.app.get('/item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
-    def test_delete__item_removed_successfully(self):
-        obj1 = Item.create(
+    def test_delete_item__success(self):
+        item1 = Item.create(
             uuid=uuid.uuid4(),
-            name='cubo',
+            name='Item one',
             price=5,
-            description='dhfsdjòfgjasdògj',
-            category='poligoni'
+            description='Descripion one',
+            category='Category one'
         )
 
-        resp = self.app.delete('item/{}'.format(obj1.uuid))
+        resp = self.app.delete('item/{}'.format(item1.uuid))
         assert resp.status_code == NO_CONTENT
-        assert number_of_rows_in_DB() == 0
-        resp = self.app.get('item/{}'.format(obj1.uuid))
+        assert len(Item.select()) == 0
+        resp = self.app.get('item/{}'.format(item1.uuid))
         assert resp.status_code == NOT_FOUND
 
-    def test_delete__item_not_found(self):
+    def test_delete_item__failure_not_found(self):
         Item.create(
             uuid=uuid.uuid4(),
-            name='cubo',
+            name='Item one',
             price=5,
-            description='dhfsdjòfgjasdògj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
         resp = self.app.delete('item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
+        assert len(Item.select()) == 1
 
-    def test_delete__database_is_empty(self):
+    def test_delete_item__failure_non_existing_empty_items(self):
         resp = self.app.delete('item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
-    def test_post__item_modified_successfully(self):
+    def test_modify_item__success(self):
         static_id = uuid.uuid4()
 
         Item.create(
             uuid=static_id,
-            name='cubo',
+            name='Item one',
             price=5,
-            description='dhfsdjòfgjasdògj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
-        obj2 = {
-            'name': 'triangolo',
+        new_item_data = {
+            'name': 'Item one',
             'price': 10,
-            'description': 'Descrizione sensata',
-            'category': 'Poligoni'
+            'description': 'Description two',
+            'category': 'Category two'
         }
 
-        resp = self.app.put('item/{}'.format(static_id), data=obj2)
+        resp = self.app.put('item/{}'.format(static_id), data=new_item_data)
         assert resp.status_code == OK
-        resp = self.app.get('item/{}'.format(static_id))
 
-        db_data = {
-            'name': json.loads(resp.data.decode())['name'],
-            'price': json.loads(resp.data.decode())['price'],
-            'description': json.loads(resp.data.decode())['description'],
-            'category': json.loads(resp.data.decode())['category']
-        }
+        item_from_server = json.loads(resp.data.decode())
+        item_from_db = Item.get(Item.uuid == item_from_server['uuid']).json()
 
-        assert obj2 == db_data
+        assert item_from_db == item_from_server
 
-    def test_put__item_name_with_only_spaces(self):
-        static_id = uuid.uuid4()
+        item_from_server.pop('uuid')
+        assert new_item_data == item_from_server
 
-        obj = Item.create(
-            uuid=static_id,
-            name='cubo',
+    def test_modify_item__failure_empty_field_only_spaces(self):
+        item = Item.create(
+            uuid=uuid.uuid4(),
+            name='Item one',
             price=5,
-            description='dhfsdjòfgjasdògj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
         modified_content = {
             'name': '      ',
-            'price': '123',
-            'description': 'desc2',
-            'category': '    '
+            'price': 10,
+            'description': 'Description two',
+            'category': 'Category two'
         }
 
-        resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
-        output_from_DB = Item.get(uuid=obj.uuid).json()
-        assert obj.json() == output_from_DB
+        resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
+        item_from_db = Item.get(Item.uuid == item.uuid).json()
+        assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
-    def test_put__item_without_an_argument_given(self):
-        static_id = uuid.uuid4()
-
-        obj = Item.create(
-            uuid=static_id,
-            name='cubo',
+    def test_modify_item__failure_missing_argument(self):
+        item = Item.create(
+            uuid=uuid.uuid4(),
+            name='Item one',
             price=5,
-            description='dhfsdjòfgjasdògj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
         modified_content = {
-            'name': 'rombo',
-            'description': 'desc2'
+            'name': 'Item two',
+            'price': 10,
+            'description': 'Description two'
         }
 
-        resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
-        output_from_DB = Item.get(uuid=obj.uuid).json()
-        assert obj.json() == output_from_DB
+        resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
+        item_from_db = Item.get(Item.uuid == item.uuid).json()
+        assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
-    def test_put__item_price_value_as_a_string(self):
-        static_id = uuid.uuid4()
-
-        obj = Item.create(
-            uuid=static_id,
-            name='cubo',
+    def test_modify_item__failure_field_wrong_type(self):
+        item = Item.create(
+            uuid=uuid.uuid4(),
+            name='Item one',
             price=5,
-            description='dhfsdjòfgjasdògj',
-            category='poligoni'
+            description='Description one',
+            category='Category one'
         )
 
         modified_content = {
-            'name': 'rombo',
-            'price': 'asdasd',
-            'description': 'Ciaociao',
-            'category': 'asdfdafdf'
+            'name': 'Item one',
+            'price': 'Ten',
+            'description': 'Description two',
+            'category': 'Category two'
         }
-        resp = self.app.put('/item/{}'.format(static_id), data=modified_content)
+        resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
         assert resp.status_code == BAD_REQUEST
-        output_from_DB = Item.get(uuid=obj.uuid).json()
-        assert obj.json() == output_from_DB
+
+        item_from_db = Item.get(uuid=item.uuid).json()
+        assert item.json() == item_from_db
