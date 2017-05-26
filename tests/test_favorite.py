@@ -59,6 +59,7 @@ class TestFavorites:
             1)
 
         Favorites.create(
+            uuid=uuid.uuid4(),
             user=user_db,
             item=item_db
         )
@@ -163,11 +164,13 @@ class TestFavorites:
         item_2 = create_item(id_item_2, 1)
 
         Favorites.create(
+            uuid=uuid.uuid4(),
             user=User.get(User.uuid == id_user),
             item=Item.get(Item.uuid == id_item_1),
         )
 
         Favorites.create(
+            uuid=uuid.uuid4(),
             user=User.get(User.uuid == id_user),
             item=Item.get(Item.uuid == id_item_2),
         )
@@ -185,6 +188,7 @@ class TestFavorites:
         item_1 = create_item(id_item_1, 1)
 
         Favorites.create(
+            uuid=uuid.uuid4(),
             user=User.get(User.uuid == id_user),
             item=Item.get(Item.uuid == id_item_1),
         )
@@ -207,6 +211,7 @@ class TestFavorites:
         item_1 = create_item(id_item_1, 1)
 
         Favorites.create(
+            uuid=uuid.uuid4(),
             user=User.get(User.uuid == id_user_2),
             item=Item.get(Item.uuid == id_item_1),
         )
