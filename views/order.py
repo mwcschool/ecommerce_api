@@ -110,7 +110,7 @@ class OrderResource(Resource):
                 item_temp_query.availability = (item_temp_query.availability + order_item.quantity)
                 item_temp_query.save()
 
-            OrderItem.delete().where(OrderItem.order_id == order.id).execute()
+            OrderItem.delete().where(OrderItem.order == order.id).execute()
 
             for item in items_query:
                 item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
