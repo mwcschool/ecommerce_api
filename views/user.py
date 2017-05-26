@@ -1,6 +1,8 @@
 import uuid
 from models import User
-from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST
+import auth
+from flask import g
+from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, UNAUTHORIZED
 from flask_restful import Resource, reqparse
 import re
 from passlib.hash import pbkdf2_sha256
@@ -26,7 +28,7 @@ class UsersResource(Resource):
         parser.add_argument('password', type=utils.non_empty_str, required=True)
         args = parser.parse_args(strict=True)
 
-        if valid_email(args['email']) is not None and len(args['password']) > 6:
+        if valid_email(args['email']) and len(args['password']) > 6:
             obj = User.create(
                 uuid=uuid.uuid4(),
                 first_name=args['first_name'],
@@ -41,11 +43,15 @@ class UsersResource(Resource):
 
 
 class UserResource(Resource):
+    @auth.login_required
     def put(self, uuid):
         try:
             obj = User.get(uuid=uuid)
         except User.DoesNotExist:
             return None, NOT_FOUND
+
+        if obj != g.current_user:
+            return '', UNAUTHORIZED
 
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=utils.non_empty_str, required=True)
@@ -65,11 +71,15 @@ class UserResource(Resource):
         else:
             return '', BAD_REQUEST
 
+    @auth.login_required
     def delete(self, uuid):
         try:
             obj = User.get(uuid=uuid)
         except User.DoesNotExist:
             return None, NOT_FOUND
+
+        if obj != g.current_user:
+            return '', UNAUTHORIZED
 
         obj.delete_instance()
         return None, NO_CONTENT
