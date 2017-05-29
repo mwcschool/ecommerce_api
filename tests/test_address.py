@@ -1,15 +1,22 @@
 from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, OK
 import json
 import uuid
+from peewee import SqliteDatabase
+from models import User, Address
+from app import app
 
 from .base_test import BaseTest
 
 
 class TestAddress(BaseTest):
+    def setup_method(self):
+        super(TestAddress, self).setup_method()
+        self.user = self.create_user()
+
     def test_post__success_empty_db(self):
-        data_user = User.get()
+
         data_address = {
-            'user_id': data_user.uuid,
+            'user_id': self.user.uuid,
             'nation': 'Italia',
             'city': 'Prato',
             'postal_code': '59100',
@@ -35,11 +42,11 @@ class TestAddress(BaseTest):
         assert query.get().json() == json.loads(resp.data.decode())
 
     def test_post__success(self):
-        data_user = User.get()
+
         address_id_created = uuid.uuid4()
         Address.create(
             uuid=address_id_created,
-            user=data_user,
+            user=self.user,
             nation='Italia',
             city='Prato',
             postal_code='59100',
@@ -48,7 +55,7 @@ class TestAddress(BaseTest):
         )
 
         data_address = {
-            'user_id': data_user.uuid,
+            'user_id': self.user.uuid,
             'nation': 'Italia',
             'city': 'Prato',
             'postal_code': '59100',
@@ -62,9 +69,9 @@ class TestAddress(BaseTest):
         assert query.get().json() == json.loads(resp.data.decode())
 
     def test_post__empty_field(self):
-        data_user = User.get()
+
         data_address = {
-            'user_id': data_user.uuid,
+            'user_id': self.user.uuid,
             'nation': '',
             'city': 'Prato',
             'postal_code': '59100',
@@ -77,9 +84,9 @@ class TestAddress(BaseTest):
         assert len(Address.select()) == 0
 
     def test_post__field_not_exists(self):
-        data_user = User.get()
+
         data_address = {
-            'user_id': data_user.uuid,
+            'user_id': self.user.uuid,
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
@@ -91,11 +98,11 @@ class TestAddress(BaseTest):
         assert len(Address.select()) == 0
 
     def test_get__address_found(self):
-        data_user = User.get()
+
         address_id_created = uuid.uuid4()
         Address.create(
             uuid=address_id_created,
-            user=data_user,
+            user=self.user,
             nation='Italia',
             city='Prato',
             postal_code='59100',
@@ -113,10 +120,10 @@ class TestAddress(BaseTest):
         assert resp.status_code == NOT_FOUND
 
     def test_put__success(self):
-        data_user = User.get()
+
         data_address = Address.create(
             uuid=uuid.uuid4(),
-            user=data_user,
+            user=self.user,
             nation='Italia',
             city='Prato',
             postal_code='59100',
@@ -125,7 +132,7 @@ class TestAddress(BaseTest):
         )
 
         new_data_address = {
-            'user_id': data_user.uuid,
+            'user_id': self.user.uuid,
             'nation': 'Italia',
             'city': 'Firenze',
             'postal_code': '505050',
@@ -148,10 +155,10 @@ class TestAddress(BaseTest):
         assert address_from_db.json() == json.loads(resp.data.decode())
 
     def test_put__modify_one_field(self):
-        data_user = User.get()
+
         data_address = Address.create(
             uuid=uuid.uuid4(),
-            user=data_user,
+            user=self.user,
             nation='Italia',
             city='Prato',
             postal_code='59100',
@@ -167,10 +174,10 @@ class TestAddress(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_put__modify_empty_fields(self):
-        data_user = User.get()
+
         data_address = Address.create(
             uuid=uuid.uuid4(),
-            user=data_user,
+            user=self.user,
             nation='Italia',
             city='Prato',
             postal_code='59100',
@@ -179,7 +186,7 @@ class TestAddress(BaseTest):
         )
 
         new_data_address = {
-            'user_id': data_user.uuid,
+            'user_id': self.user.uuid,
             'nation': '',
             'city': '',
             'postal_code': '',
@@ -191,9 +198,9 @@ class TestAddress(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_put__address_id_not_exists(self):
-        data_user = User.get()
+
         data = {
-            'user_id': data_user.uuid,
+            'user_id': self.user.uuid,
             'nation': 'Italia',
             'city': 'Prato',
             'postal_code': '59100',
@@ -206,10 +213,10 @@ class TestAddress(BaseTest):
         assert len(Address.select()) == 0
 
     def test_delete__success(self):
-        data_user = User.get()
+
         data_address1 = Address.create(
             uuid=uuid.uuid4(),
-            user=data_user,
+            user=self.user,
             nation='Italia',
             city='Prato',
             postal_code='59100',
@@ -218,7 +225,7 @@ class TestAddress(BaseTest):
         )
         data_address2 = Address.create(
             uuid=uuid.uuid4(),
-            user=data_user,
+            user=self.user,
             nation='Italia',
             city='Firenze',
             postal_code='59000',
@@ -239,10 +246,10 @@ class TestAddress(BaseTest):
         assert len(Address.select()) == 0
 
     def test_delete__address_id_not_exists(self):
-        data_user = User.get()
+
         Address.create(
             uuid=uuid.uuid4(),
-            user=data_user,
+            user=self.user,
             nation='Italia',
             city='Prato',
             postal_code='59100',
