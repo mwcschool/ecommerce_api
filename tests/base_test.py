@@ -1,4 +1,5 @@
 from models import Item, User, Address, Order, OrderItem
+from views.user import crypt_password
 from peewee import SqliteDatabase
 from app import app
 import uuid
@@ -28,7 +29,7 @@ class BaseTest:
             first_name=first_name,
             last_name=last_name,
             email=email,
-            password=password,
+            password=crypt_password(password),
         )
 
     def create_item(self, name="Item name", price=7,
