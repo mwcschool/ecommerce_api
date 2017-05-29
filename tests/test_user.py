@@ -134,7 +134,7 @@ class Testuser(BaseTest):
         }
 
         resp = self.open_with_auth(
-            '/users/{}'.format(user.uuid), 'put', user.email, 'p4ssw0rd', data=data)
+            '/users/{}'.format(user.uuid), 'put', user.email, 'wr0ng_p4ssw0rd', data=data)
         query = User.select().where(User.last_name == user.last_name)
         assert len(query) == 1
         assert resp.status_code == UNAUTHORIZED
