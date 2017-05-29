@@ -87,6 +87,23 @@ class BaseTest:
 
         return order
 
+    def create_address(self, user=None, nation="Italy", city="Prato",
+                       postal_code="59100", local_address="Via Roncioni 10",
+                       phone="0574100100"):
+
+        if not user:
+            user = self.create_user()
+
+        return Address.create(
+            uuid=uuid.uuid4(),
+            user=user,
+            nation=nation,
+            city=city,
+            postal_code=postal_code,
+            local_address=local_address,
+            phone=phone,
+        )
+
     def open_with_auth(self, url, method, email, password, data):
         return self.app.open(
             url, method=method, headers={'Authorization': 'Basic ' + base64.b64encode(
