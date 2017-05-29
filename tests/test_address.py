@@ -25,7 +25,6 @@ class TestAddress(BaseTest):
 
         resp = self.app.post('/addresses/', data=data_address)
 
-        query = Address.select()
         address_from_db = Address.get()
         expected_data = {
             'user_id': address_from_db.user.uuid,
@@ -37,8 +36,8 @@ class TestAddress(BaseTest):
         }
         assert expected_data == data_address
         assert resp.status_code == CREATED
-        assert len(query) == 1
-        assert query.get().json() == json.loads(resp.data.decode())
+        assert len(Address.select()) == 1
+        assert address_from_db.json() == json.loads(resp.data.decode())
 
     def test_post__success(self):
         address_id_created = uuid.uuid4()
