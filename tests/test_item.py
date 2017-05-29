@@ -104,7 +104,6 @@ class TestItems(BaseTest):
         assert resp.status_code == NOT_FOUND
 
         item = json.loads(resp.data.decode())
-        assert item == item1.json()
 
     def test_get_item__failure_non_existing_item(self):
         Item.create(
