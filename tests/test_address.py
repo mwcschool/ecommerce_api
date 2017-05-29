@@ -14,7 +14,6 @@ class TestAddress(BaseTest):
         self.user = self.create_user()
 
     def test_post__success_empty_db(self):
-
         data_address = {
             'user_id': self.user.uuid,
             'nation': 'Italia',
@@ -42,7 +41,6 @@ class TestAddress(BaseTest):
         assert query.get().json() == json.loads(resp.data.decode())
 
     def test_post__success(self):
-
         address_id_created = uuid.uuid4()
         Address.create(
             uuid=address_id_created,
@@ -69,7 +67,6 @@ class TestAddress(BaseTest):
         assert query.get().json() == json.loads(resp.data.decode())
 
     def test_post__empty_field(self):
-
         data_address = {
             'user_id': self.user.uuid,
             'nation': '',
@@ -84,7 +81,6 @@ class TestAddress(BaseTest):
         assert len(Address.select()) == 0
 
     def test_post__field_not_exists(self):
-
         data_address = {
             'user_id': self.user.uuid,
             'city': 'Prato',
@@ -98,7 +94,6 @@ class TestAddress(BaseTest):
         assert len(Address.select()) == 0
 
     def test_get__address_found(self):
-
         address_id_created = uuid.uuid4()
         Address.create(
             uuid=address_id_created,
@@ -120,7 +115,6 @@ class TestAddress(BaseTest):
         assert resp.status_code == NOT_FOUND
 
     def test_put__success(self):
-
         data_address = Address.create(
             uuid=uuid.uuid4(),
             user=self.user,
@@ -155,7 +149,6 @@ class TestAddress(BaseTest):
         assert address_from_db.json() == json.loads(resp.data.decode())
 
     def test_put__modify_one_field(self):
-
         data_address = Address.create(
             uuid=uuid.uuid4(),
             user=self.user,
@@ -174,7 +167,6 @@ class TestAddress(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_put__modify_empty_fields(self):
-
         data_address = Address.create(
             uuid=uuid.uuid4(),
             user=self.user,
@@ -198,7 +190,6 @@ class TestAddress(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_put__address_id_not_exists(self):
-
         data = {
             'user_id': self.user.uuid,
             'nation': 'Italia',
@@ -213,7 +204,6 @@ class TestAddress(BaseTest):
         assert len(Address.select()) == 0
 
     def test_delete__success(self):
-
         data_address1 = Address.create(
             uuid=uuid.uuid4(),
             user=self.user,
@@ -246,7 +236,6 @@ class TestAddress(BaseTest):
         assert len(Address.select()) == 0
 
     def test_delete__address_id_not_exists(self):
-
         Address.create(
             uuid=uuid.uuid4(),
             user=self.user,
