@@ -134,7 +134,7 @@ class Testuser(BaseTest):
         }
 
         resp = self.open_with_auth(
-            '/users/{}'.format(user.uuid), 'put', user.email, '1234568', data=data)
+            '/users/{}'.format(user.uuid), 'put', user.email, 'p4ssw0rd', data=data)
         query = User.select().where(User.last_name == user.last_name)
         assert len(query) == 1
         assert resp.status_code == UNAUTHORIZED
@@ -151,7 +151,7 @@ class Testuser(BaseTest):
         }
 
         resp = self.open_with_auth(
-            '/users/{}'.format(user.uuid), 'put', user2.email, '1234567', data=data)
+            '/users/{}'.format(user.uuid), 'put', user2.email, 'p4ssw0rd', data=data)
         assert resp.status_code == UNAUTHORIZED
 
     def test_delete_user__success(self):
@@ -159,7 +159,7 @@ class Testuser(BaseTest):
         user2 = self.create_user("email2@domain.com")
 
         resp = self.open_with_auth(
-            '/users/{}'.format(user.uuid), 'delete', user.email, '1234567', data='')
+            '/users/{}'.format(user.uuid), 'delete', user.email, 'p4ssw0rd', data='')
 
         all_users = User.select()
         user_from_db = all_users.get()
@@ -171,7 +171,7 @@ class Testuser(BaseTest):
         self.create_user()
 
         resp = self.open_with_auth(
-            '/users/{}'.format(uuid.uuid4), 'delete', 'ciao@libero.it', '1234567', data='')
+            '/users/{}'.format(uuid.uuid4), 'delete', 'ciao@libero.it', 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
         assert len(User.select()) == 1
 
@@ -180,5 +180,5 @@ class Testuser(BaseTest):
         user2 = self.create_user("email2@doamin.com")
 
         resp = self.open_with_auth(
-            '/users/{}'.format(user.uuid), 'delete', user2.email, '1234567', data='')
+            '/users/{}'.format(user.uuid), 'delete', user2.email, 'p4ssw0rd', data='')
         assert resp.status_code == UNAUTHORIZED
