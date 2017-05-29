@@ -55,7 +55,13 @@ class TestAddress(BaseTest):
 
         address_from_db = Address.get(Address.uuid == address_from_server['uuid'])
         assert resp.status_code == CREATED
-        assert address_from_db.json() == json.loads(resp.data.decode())
+
+        data_address['user'] = str(data_address['user_id'])
+        data_address.pop('user_id')
+
+        address_from_server.pop('uuid')
+
+        assert address_from_server == data_address
 
     def test_post__empty_field(self):
         data_address = {
