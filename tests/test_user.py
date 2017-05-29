@@ -84,7 +84,7 @@ class Testuser(BaseTest):
         }
 
         resp = self.open_with_auth(
-            '/users/{}'.format(user.uuid), 'put', user.email, '1234567', data=data)
+            '/users/{}'.format(user.uuid), 'put', user.email, 'p4ssw0rd', data=data)
         query = User.select()
         user_from_db = query.get()
         expected_data = {
@@ -106,7 +106,7 @@ class Testuser(BaseTest):
         }
 
         resp = self.open_with_auth(
-            '/users/{}'.format(user.uuid), 'put', user.email, '1234567', data=data)
+            '/users/{}'.format(user.uuid), 'put', user.email, 'p4ssw0rd', data=data)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__empty_fields(self):
@@ -120,7 +120,7 @@ class Testuser(BaseTest):
         }
 
         resp = self.open_with_auth(
-            '/users/{}'.format(user.uuid), 'put', user.email, '1234567', data=data)
+            '/users/{}'.format(user.uuid), 'put', user.email, 'p4ssw0rd', data=data)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__user_unauthorized(self):
