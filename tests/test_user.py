@@ -124,13 +124,7 @@ class Testuser(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_put__user_unauthorized(self):
-        user = User.create(
-            uuid=uuid.uuid4(),
-            first_name='Giovanni',
-            last_name='Mariani',
-            email='giovanni@mariani.com',
-            password=crypt_password('1234567')
-        )
+        user = self.create_user()
 
         data = {
             'first_name': 'Giovanni',
@@ -146,20 +140,8 @@ class Testuser(BaseTest):
         assert resp.status_code == UNAUTHORIZED
 
     def test_put__user_unauthorized_for_modify_another_user(self):
-        user = User.create(
-            uuid=uuid.uuid4(),
-            first_name='Maria',
-            last_name='Rossi',
-            email='maria@rossi.com',
-            password=crypt_password('1234567')
-        )
-        user2 = User.create(
-            uuid=uuid.uuid4(),
-            first_name='Alessandro',
-            last_name='Cappellini',
-            email='abc@abc.com',
-            password=crypt_password('1234567')
-        )
+        user = self.create_user()
+        user2 = self.create_user("email2@domain.com")
 
         data = {
             'first_name': 'Anna',
@@ -194,20 +176,8 @@ class Testuser(BaseTest):
         assert len(User.select()) == 1
 
     def test_delete_user__unauthorized_for_delete_another_user(self):
-        user = User.create(
-            uuid=uuid.uuid4(),
-            first_name='Maria',
-            last_name='Rossi',
-            email='maria@rossi.com',
-            password=crypt_password('1234567')
-        )
-        user2 = User.create(
-            uuid=uuid.uuid4(),
-            first_name='Alessandro',
-            last_name='Cappellini',
-            email='abc@abc.com',
-            password=crypt_password('1234567')
-        )
+        user = self.create_user()
+        user2 = self.create_user("email2@doamin.com")
 
         resp = self.open_with_auth(
             '/users/{}'.format(user.uuid), 'delete', user2.email, '1234567', data='')
