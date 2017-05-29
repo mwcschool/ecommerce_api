@@ -2,6 +2,7 @@ from models import Item, User, Address, Order, OrderItem
 from views.user import crypt_password
 from peewee import SqliteDatabase
 from app import app
+import base64
 import uuid
 
 
@@ -85,3 +86,8 @@ class BaseTest:
             )
 
         return order
+
+    def open_with_auth(self, url, method, email, password, data):
+        return self.app.open(
+            url, method=method, headers={'Authorization': 'Basic ' + base64.b64encode(
+                bytes(email + ":" + password, 'ascii')).decode('ascii')}, data=data)

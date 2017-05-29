@@ -1,18 +1,12 @@
 from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, UNAUTHORIZED
 import json
 import uuid
-import base64
 from models import User
 
 from .base_test import BaseTest
 
 
 class Testuser(BaseTest):
-    def open_with_auth(self, url, method, email, password, data):
-        return self.app.open(
-            url, method=method, headers={'Authorization': 'Basic ' + base64.b64encode(
-                bytes(email + ":" + password, 'ascii')).decode('ascii')}, data=data)
-
     def test_post__success_empty_db(self):
         data = {
             'first_name': 'Alessandro',
