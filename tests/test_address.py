@@ -1,9 +1,7 @@
 from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, OK
 import json
 import uuid
-from peewee import SqliteDatabase
-from models import User, Address
-from app import app
+from models import Address
 
 from .base_test import BaseTest
 
@@ -53,7 +51,6 @@ class TestAddress(BaseTest):
 
         address_from_server = json.loads(resp.data.decode())
 
-        address_from_db = Address.get(Address.uuid == address_from_server['uuid'])
         assert resp.status_code == CREATED
 
         data_address['user'] = str(data_address['user_id'])
