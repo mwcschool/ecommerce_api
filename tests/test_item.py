@@ -103,8 +103,6 @@ class TestItems(BaseTest):
         resp = self.app.get('/item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
-        item = json.loads(resp.data.decode())
-
     def test_get_item__failure_non_existing_item(self):
         Item.create(
             uuid=uuid.uuid4(),

@@ -1,7 +1,6 @@
 from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, UNAUTHORIZED
 import json
 import uuid
-from views.user import crypt_password
 import base64
 from models import User
 
