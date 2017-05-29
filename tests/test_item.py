@@ -10,10 +10,6 @@ import uuid
 from .base_test import BaseTest
 
 
-def number_of_rows_in_DB():
-    return len(Item.select())
-
-
 class TestItems(BaseTest):
     def test_get_items__empty(self):
         resp = self.app.get('/items/')
@@ -120,7 +116,7 @@ class TestItems(BaseTest):
 
         resp = self.app.delete('item/{}'.format(item1.uuid))
         assert resp.status_code == NO_CONTENT
-        assert number_of_rows_in_DB() == 0
+        assert len(Item.select()) == 0
         resp = self.app.get('item/{}'.format(item1.uuid))
         assert resp.status_code == NOT_FOUND
 
