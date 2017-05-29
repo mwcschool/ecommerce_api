@@ -1,32 +1,11 @@
 from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, OK
 import json
 import uuid
-from peewee import SqliteDatabase
-from models import User, Address
-from app import app
+
+from .base_test import BaseTest
 
 
-class TestAddress:
-    @classmethod
-    def setup_class(cls):
-        db = SqliteDatabase(':memory:')
-        User._meta.database = db
-        Address._meta.database = db
-        User.create_table()
-        Address.create_table()
-        cls.app = app.test_client()
-
-        User.create(
-            uuid=uuid.uuid4(),
-            first_name='Mario',
-            last_name='Rossi',
-            email='email@email.it',
-            password='123456789',
-        )
-
-    def setup_method(self):
-        Address.delete().execute()
-
+class TestAddress(BaseTest):
     def test_post__success_empty_db(self):
         data_user = User.get()
         data_address = {
@@ -66,7 +45,7 @@ class TestAddress:
             postal_code='59100',
             local_address='Via Roncioni 10',
             phone='0574100100',
-            )
+        )
 
         data_address = {
             'user_id': data_user.uuid,
@@ -122,7 +101,7 @@ class TestAddress:
             postal_code='59100',
             local_address='Via Roncioni 10',
             phone='0574100100',
-            )
+        )
 
         resp = self.app.get('/addresses/{}'.format(address_id_created))
         query = Address.get()
@@ -143,7 +122,7 @@ class TestAddress:
             postal_code='59100',
             local_address='Via Roncioni 10',
             phone='0574100100',
-            )
+        )
 
         new_data_address = {
             'user_id': data_user.uuid,
@@ -178,7 +157,7 @@ class TestAddress:
             postal_code='59100',
             local_address='Via Roncioni 10',
             phone='0574100100',
-            )
+        )
 
         new_data_address = {
             'nation': 'Albania',
@@ -197,7 +176,7 @@ class TestAddress:
             postal_code='59100',
             local_address='Via Roncioni 10',
             phone='0574100100',
-            )
+        )
 
         new_data_address = {
             'user_id': data_user.uuid,
@@ -236,7 +215,7 @@ class TestAddress:
             postal_code='59100',
             local_address='Via Roncioni 10',
             phone='0574100100',
-            )
+        )
         data_address2 = Address.create(
             uuid=uuid.uuid4(),
             user=data_user,
@@ -245,7 +224,7 @@ class TestAddress:
             postal_code='59000',
             local_address='Via Baracca 10',
             phone='0558778666',
-            )
+        )
 
         resp = self.app.delete('/addresses/{}'.format(data_address1.uuid))
         all_addresses = Address.select()
@@ -269,7 +248,7 @@ class TestAddress:
             postal_code='59100',
             local_address='Via Roncioni 10',
             phone='0574100100',
-            )
+        )
         resp = self.app.delete('/addresses/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 1
