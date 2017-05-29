@@ -40,17 +40,6 @@ class TestAddress(BaseTest):
         assert address_from_db.json() == json.loads(resp.data.decode())
 
     def test_post__success(self):
-        address_id_created = uuid.uuid4()
-        Address.create(
-            uuid=address_id_created,
-            user=self.user,
-            nation='Italia',
-            city='Prato',
-            postal_code='59100',
-            local_address='Via Roncioni 10',
-            phone='0574100100',
-        )
-
         data_address = {
             'user_id': self.user.uuid,
             'nation': 'Italia',
@@ -61,9 +50,12 @@ class TestAddress(BaseTest):
         }
 
         resp = self.app.post('/addresses/', data=data_address)
-        query = Address.select().where(Address.uuid != address_id_created)
+
+        address_from_server = json.loads(resp.data.decode())
+
+        address_from_db = Address.get(Address.uuid == address_from_server['uuid'])
         assert resp.status_code == CREATED
-        assert query.get().json() == json.loads(resp.data.decode())
+        assert address_from_db.json() == json.loads(resp.data.decode())
 
     def test_post__empty_field(self):
         data_address = {
