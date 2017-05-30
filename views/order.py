@@ -40,7 +40,7 @@ class OrdersResource(Resource):
             total_price += float(item.price * item_quantity)
 
         for item in items_query:
-            item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
+            item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
             if item_quantity > item.availability:
                 return None, BAD_REQUEST
 
@@ -99,7 +99,7 @@ class OrderResource(Resource):
             total_price += float(item.price * item_quantity)
 
         for item in items_query:
-            item_quantity = [x[1] for x in items if x[0] == str(item.item_id)][0]
+            item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
             if item_quantity > item.availability:
                 return None, BAD_REQUEST
 
