@@ -51,6 +51,37 @@ class TestOrders(BaseTest):
         resp= self.app.get('/orders/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
+    def test_get_order__success(self):
+        order1 = Order.create(
+            uuid=uuid.uuid4(),
+            total_price=10,
+            user=self.user1,
+        )
+        OrderItem.create(
+            order=order1,
+            item=self.item1,
+            quantity=1,
+            subtotal=self.item1.price,
+        )
+
+        order2 = Order.create(
+            uuid=uuid.uuid4(),
+            total_price=10,
+            user=self.user1,
+        )
+        OrderItem.create(
+            order=order2,
+            item=self.item1,
+            quantity=1,
+            subtotal=self.item1.price,
+        )
+
+        resp = self.app.get('/orders/{}'.format(order1.uuid))
+        assert resp.status_code == OK
+
+        order_from_server = json.loads(resp.data.decode())
+
+        assert order_from_server == order1.json()
 
     def test_create_order__success(self):
         new_order_data = {
