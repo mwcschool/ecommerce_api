@@ -31,6 +31,10 @@ class TestOrders(BaseTest):
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == [order1.json(), order2.json()]
 
+    def test_get_order__empty(self):
+        resp= self.app.get('/orders/{}'.format(uuid.uuid4()))
+        assert resp.status_code == NOT_FOUND
+
     def test_create_order__success(self):
         new_order_data = {
             'user': self.user1.uuid,
