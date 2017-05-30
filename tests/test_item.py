@@ -108,7 +108,8 @@ class TestItems(BaseTest):
             name='Item one',
             price=5,
             description='Description one',
-            category='Category one'
+            category='Category one',
+            availability=45
         )
 
         resp = self.app.get('/items/{}'.format(uuid.uuid4()))
