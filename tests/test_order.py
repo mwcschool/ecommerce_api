@@ -32,7 +32,7 @@ class TestOrders(BaseTest):
         assert json.loads(resp.data.decode()) == [order1.json(), order2.json()]
 
     def test_get_order__empty(self):
-        resp= self.app.get('/orders/{}'.format(uuid.uuid4()))
+        resp = self.app.get('/orders/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
     def test_get_order__failure_non_existing_order(self):
@@ -48,7 +48,7 @@ class TestOrders(BaseTest):
             subtotal=self.item1.price,
         )
 
-        resp= self.app.get('/orders/{}'.format(uuid.uuid4()))
+        resp = self.app.get('/orders/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
     def test_get_order__success(self):
