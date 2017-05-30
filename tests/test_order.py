@@ -35,6 +35,23 @@ class TestOrders(BaseTest):
         resp= self.app.get('/orders/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
+    def test_get_order__failure_non_existing_order(self):
+        order1 = Order.create(
+            uuid=uuid.uuid4(),
+            total_price=10,
+            user=self.user1,
+        )
+        OrderItem.create(
+            order=order1,
+            item=self.item1,
+            quantity=1,
+            subtotal=self.item1.price,
+        )
+
+        resp= self.app.get('/orders/{}'.format(uuid.uuid4()))
+        assert resp.status_code == NOT_FOUND
+
+
     def test_create_order__success(self):
         new_order_data = {
             'user': self.user1.uuid,
