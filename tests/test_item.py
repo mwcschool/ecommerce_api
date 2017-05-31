@@ -1,46 +1,24 @@
 import json
-from peewee import SqliteDatabase
 from http.client import CREATED
 from http.client import NO_CONTENT
 from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
 from models import Item
-from app import app
 import uuid
 
+from .base_test import BaseTest
 
-class TestItems:
-    @classmethod
-    def setup_class(cls):
-        Item._meta.database = SqliteDatabase(':memory:')
-        Item.create_table()
-        cls.app = app.test_client()
 
-    def setup_method(self):
-        Item.delete().execute()
-
+class TestItems(BaseTest):
     def test_get_items__empty(self):
         resp = self.app.get('/items/')
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == []
 
     def test_get_items(self):
-        item1 = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one'
-        )
-
-        item2 = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item two',
-            price=15,
-            description='Description two',
-            category='Category two'
-        )
+        item1 = self.create_item()
+        item2 = self.create_item()
 
         resp = self.app.get('/items/')
         assert resp.status_code == OK
@@ -109,13 +87,7 @@ class TestItems:
         assert len(Item.select()) == 0
 
     def test_get__item(self):
-        item1 = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one'
-        )
+        item1 = self.create_item()
 
         resp = self.app.get('/item/{}'.format(item1.uuid))
         assert resp.status_code == OK
@@ -140,13 +112,7 @@ class TestItems:
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__success(self):
-        item1 = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Descripion one',
-            category='Category one'
-        )
+        item1 = self.create_item()
 
         resp = self.app.delete('item/{}'.format(item1.uuid))
         assert resp.status_code == NO_CONTENT
@@ -155,13 +121,7 @@ class TestItems:
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__failure_not_found(self):
-        Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one'
-        )
+        self.create_item()
 
         resp = self.app.delete('item/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND

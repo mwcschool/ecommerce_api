@@ -49,7 +49,7 @@ class OrdersResource(Resource):
             for item in items_query:
                 item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
                 OrderItem.create(
-                    order=order.id,
+                    order=order,
                     item=item.id,
                     quantity=item_quantity,
                     subtotal=float(item.price * item_quantity)
@@ -92,12 +92,12 @@ class OrderResource(Resource):
             total_price += float(item.price * item_quantity)
 
         with database.transaction():
-            OrderItem.delete().where(OrderItem.id == order.id).execute()
+            OrderItem.delete().where(OrderItem.order == order).execute()
 
             for item in items_query:
                 item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
                 OrderItem.create(
-                    order=order.id,
+                    order=order,
                     item=item.id,
                     quantity=item_quantity,
                     subtotal=float(item.price * item_quantity)
@@ -116,7 +116,7 @@ class OrderResource(Resource):
 
         with database.transaction():
             order_items = OrderItem.select().where(
-                OrderItem.id == order.id)
+                OrderItem.order == order)
 
             for order_item in order_items:
                 order_item.delete_instance()
