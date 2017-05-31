@@ -71,7 +71,7 @@ class BaseTest:
         order = Order.create(
             uuid=uuid.uuid4(),
             total_price=total_price,
-            user=user.id
+            user=user
         )
 
         for item in items:
@@ -79,8 +79,8 @@ class BaseTest:
             item = item[0]
 
             OrderItem.create(
-                order=order.id,
-                item=item.id,
+                order=order,
+                item=item,
                 quantity=item_quantity,
                 subtotal=float(item.price * item_quantity)
             )

@@ -125,7 +125,7 @@ class TestOrders(BaseTest):
         order2_db = Order.get(Order.uuid == order2.uuid).json()
         assert order2_db == order2.json()
 
-        order1_items = OrderItem.select().where(OrderItem.order == order1.id)
+        order1_items = OrderItem.select().where(OrderItem.order == order1)
         assert len(order1_items) == 1
         assert str(order1_items[0].item.uuid) == str(self.item2.uuid)
 
@@ -207,7 +207,7 @@ class TestOrders(BaseTest):
         assert len(orders) == 1
         assert Order.get(Order.uuid == order2.uuid)
 
-        order_items = OrderItem.select().where(OrderItem.order == order1.id)
+        order_items = OrderItem.select().where(OrderItem.order == order1)
         assert len(order_items) == 0
 
     def test_delete_order__failure_non_existing(self):
