@@ -30,7 +30,7 @@ class TestItems(BaseTest):
             'price': 15,
             'description': 'desc1',
             'category': 'poligoni',
-            'availability': 3
+            'availability': 11
         }
 
         resp = self.app.post('/items/', data=new_item_data)
@@ -59,10 +59,10 @@ class TestItems(BaseTest):
     def test_create_item__failure_empty_field_only_spaces(self):
         new_item_data = {
             'name': '    ',
-            'price': 123,
+            'price': 5,
             'description': 'desc1',
             'category': 'varie',
-            'availability': 25
+            'availability': 11
         }
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
@@ -83,7 +83,7 @@ class TestItems(BaseTest):
             'price': 'Ten',
             'description': 'Description one',
             'category': 'Category one',
-            'availability': 40
+            'availability': 11
         }
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
@@ -109,7 +109,7 @@ class TestItems(BaseTest):
             price=5,
             description='Description one',
             category='Category one',
-            availability=45
+            availability=11
         )
 
         resp = self.app.get('/items/{}'.format(uuid.uuid4()))
@@ -144,7 +144,7 @@ class TestItems(BaseTest):
             price=5,
             description='Description one',
             category='Category one',
-            availability=22
+            availability=11
         )
 
         new_item_data = {
@@ -173,7 +173,7 @@ class TestItems(BaseTest):
             price=5,
             description='Description one',
             category='Category one',
-            availability=12
+            availability=11
         )
 
         modified_content = {
@@ -181,7 +181,7 @@ class TestItems(BaseTest):
             'price': 10,
             'description': 'Description two',
             'category': 'Category two',
-            'availability': 12
+            'availability': 11
         }
 
         resp = self.app.put('/items/{}'.format(item.uuid), data=modified_content)
@@ -196,7 +196,7 @@ class TestItems(BaseTest):
             price=5,
             description='Description one',
             category='Category one',
-            availability=37
+            availability=11
         )
 
         modified_content = {
@@ -217,7 +217,7 @@ class TestItems(BaseTest):
             price=5,
             description='Description one',
             category='Category one',
-            availability=6
+            availability=11
         )
 
         modified_content = {
