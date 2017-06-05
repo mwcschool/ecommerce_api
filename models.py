@@ -17,7 +17,7 @@ class BaseModel(Model):
 
     def json(self):
         schema = self.get_schema()
-        return schema.dump(self)
+        return schema.dump(self).data
 
 
 class Item(BaseModel):
