@@ -7,12 +7,14 @@ from http.client import BAD_REQUEST
 import uuid
 from models import Item
 import utils
+import auth
 
 
 class ItemsResource(Resource):
     def get(self):
         return [obj.json() for obj in Item.select()], OK
 
+    @auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
@@ -49,6 +51,7 @@ class ItemResource(Resource):
         except Item.DoesNotExist:
             return None, NOT_FOUND
 
+    @auth.login_required
     def delete(self, uuid):
         try:
             item = Item.get(Item.uuid == uuid)
@@ -58,6 +61,7 @@ class ItemResource(Resource):
         item.delete_instance()
         return None, NO_CONTENT
 
+    @auth.login_required
     def put(self, uuid):
         try:
             obj = Item.get(uuid=uuid)
