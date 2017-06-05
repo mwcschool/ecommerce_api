@@ -14,6 +14,8 @@ from views.address import AddressResource, AddressesResource
 app = Flask(__name__)
 api = Api(app)
 
+app.config['UPLOADS_FOLDER'] = 'uploads'
+
 
 @api.representation('application/json')
 def output_json(data, code, headers=None):
