@@ -4,12 +4,8 @@ from http.client import NOT_FOUND
 from http.client import CREATED
 from http.client import BAD_REQUEST
 from http.client import NO_CONTENT
-from http.client import UNAUTHORIZED
-from peewee import SqliteDatabase
 from models import Item, User, Favorites
-from app import app
 from views.user import crypt_password
-import base64
 import uuid
 
 from .base_test import BaseTest
@@ -68,7 +64,7 @@ class TestFavorites(BaseTest):
             id_user,
             1)
 
-        item_db = self.create_item(
+        self.create_item(
             id_item,
             1)
 

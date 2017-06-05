@@ -4,7 +4,7 @@ from http.client import OK
 from http.client import NO_CONTENT
 from http.client import CREATED
 from http.client import BAD_REQUEST
-from models import Item, User, Favorites
+from models import Item, Favorites
 import uuid
 import auth
 from flask import g
