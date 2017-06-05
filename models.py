@@ -69,7 +69,7 @@ class User(BaseModel):
         return favorite
 
     def remove_favorite(self, item):
-        Favorites.delete().where(Favorites.item == item).where(Favorites.user == self).execute()
+        Favorites.delete().where(Favorites.item == item, Favorites.user == self).execute()
         return None
 
 
