@@ -89,14 +89,14 @@ class TestItems(BaseTest):
     def test_get__item(self):
         item1 = self.create_item()
 
-        resp = self.app.get('/item/{}'.format(item1.uuid))
+        resp = self.app.get('/items/{}'.format(item1.uuid))
         assert resp.status_code == OK
 
         item_from_server = json.loads(resp.data.decode())
         assert item_from_server == item1.json()
 
     def test_get_item__empty(self):
-        resp = self.app.get('/item/{}'.format(uuid.uuid4()))
+        resp = self.app.get('/items/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
     def test_get_item__failure_non_existing_item(self):
@@ -108,27 +108,27 @@ class TestItems(BaseTest):
             category='Category one'
         )
 
-        resp = self.app.get('/item/{}'.format(uuid.uuid4()))
+        resp = self.app.get('/items/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__success(self):
         item1 = self.create_item()
 
-        resp = self.app.delete('item/{}'.format(item1.uuid))
+        resp = self.app.delete('/items/{}'.format(item1.uuid))
         assert resp.status_code == NO_CONTENT
         assert len(Item.select()) == 0
-        resp = self.app.get('item/{}'.format(item1.uuid))
+        resp = self.app.get('/items/{}'.format(item1.uuid))
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__failure_not_found(self):
         self.create_item()
 
-        resp = self.app.delete('item/{}'.format(uuid.uuid4()))
+        resp = self.app.delete('/items/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
         assert len(Item.select()) == 1
 
     def test_delete_item__failure_non_existing_empty_items(self):
-        resp = self.app.delete('item/{}'.format(uuid.uuid4()))
+        resp = self.app.delete('/items/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
     def test_modify_item__success(self):
@@ -149,7 +149,7 @@ class TestItems(BaseTest):
             'category': 'Category two'
         }
 
-        resp = self.app.put('item/{}'.format(static_id), data=new_item_data)
+        resp = self.app.put('/items/{}'.format(static_id), data=new_item_data)
         assert resp.status_code == OK
 
         item_from_server = json.loads(resp.data.decode())
@@ -176,7 +176,7 @@ class TestItems(BaseTest):
             'category': 'Category two'
         }
 
-        resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
+        resp = self.app.put('/items/{}'.format(item.uuid), data=modified_content)
         item_from_db = Item.get(Item.uuid == item.uuid).json()
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
@@ -196,7 +196,7 @@ class TestItems(BaseTest):
             'description': 'Description two'
         }
 
-        resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
+        resp = self.app.put('/items/{}'.format(item.uuid), data=modified_content)
         item_from_db = Item.get(Item.uuid == item.uuid).json()
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
@@ -216,7 +216,7 @@ class TestItems(BaseTest):
             'description': 'Description two',
             'category': 'Category two'
         }
-        resp = self.app.put('/item/{}'.format(item.uuid), data=modified_content)
+        resp = self.app.put('/items/{}'.format(item.uuid), data=modified_content)
         assert resp.status_code == BAD_REQUEST
 
         item_from_db = Item.get(uuid=item.uuid).json()
