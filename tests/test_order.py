@@ -36,21 +36,21 @@ class TestOrders(BaseTest):
         assert resp.status_code == NOT_FOUND
 
     def test_get_order__failure_non_existing_order(self):
-        order1 = self.create_order(self.user1)
+        self.create_order(self.user1)
 
         resp = self.app.get('/orders/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
     def test_get_order__success(self):
-        order1 = self.create_order(self.user1)
-        order2 = self.create_order(self.user1)
+        self.create_order(self.user1)
+        order = self.create_order(self.user1)
 
-        resp = self.app.get('/orders/{}'.format(order1.uuid))
+        resp = self.app.get('/orders/{}'.format(order.uuid))
         assert resp.status_code == OK
 
         order_from_server = json.loads(resp.data.decode())
 
-        assert order_from_server == order1.json()
+        assert order_from_server == order.json()
 
     def test_create_order__success(self):
         new_order_data = {
