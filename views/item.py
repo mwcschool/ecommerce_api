@@ -26,6 +26,9 @@ class ItemsResource(Resource):
         except ValueError:
             return None, BAD_REQUEST
 
+        if args["availability"] < 0:
+            return None, BAD_REQUEST
+
         obj = Item.create(
             uuid=uuid.uuid4(),
             name=args["name"],
@@ -71,6 +74,9 @@ class ItemResource(Resource):
         try:
             utils.non_empty_str(args['name'], 'name')
         except ValueError:
+            return None, BAD_REQUEST
+
+        if args["availability"] < 0:
             return None, BAD_REQUEST
 
         obj.name = args["name"]
