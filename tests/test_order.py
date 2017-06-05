@@ -19,7 +19,7 @@ class TestOrders(BaseTest):
         ]
 
     def test_get_orders__empty(self):
-        resp = self.app.get('/orders/')
+        resp = self.open_with_auth('/orders/', 'get', self.user1.email, 'p4ssw0rd', data='')
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == []
 
@@ -27,25 +27,25 @@ class TestOrders(BaseTest):
         order1 = self.create_order(self.user1)
         order2 = self.create_order(self.user1)
 
-        resp = self.app.get('/orders/')
+        resp = self.open_with_auth('/orders/', 'get',self.user1.email, 'p4ssw0rd', data='')
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == [order1.json(), order2.json()]
 
     def test_get_order__empty(self):
-        resp = self.app.get('/orders/{}'.format(uuid.uuid4()))
+        resp = self.open_with_auth('/orders/{}'.format(uuid.uuid4()), 'get',self.user1.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
 
     def test_get_order__failure_non_existing_order(self):
         self.create_order(self.user1)
 
-        resp = self.app.get('/orders/{}'.format(uuid.uuid4()))
+        resp = self.open_with_auth('/orders/{}'.format(uuid.uuid4()), 'get',self.user1.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
 
     def test_get_order__success(self):
         self.create_order(self.user1)
         order = self.create_order(self.user1)
 
-        resp = self.app.get('/orders/{}'.format(order.uuid))
+        resp = self.open_with_auth('/orders/{}'.format(order.uuid), 'get',self.user1.email, 'p4ssw0rd', data='')
         assert resp.status_code == OK
 
         order_from_server = json.loads(resp.data.decode())
@@ -62,7 +62,7 @@ class TestOrders(BaseTest):
             ])
         }
 
-        resp = self.app.post('/orders/', data=new_order_data)
+        resp = self.open_with_auth('/orders/', 'post', self.user1.email, 'p4ssw0rd', data=new_order_data)
         assert resp.status_code == CREATED
 
         order_from_server = json.loads(resp.data.decode())
@@ -100,7 +100,7 @@ class TestOrders(BaseTest):
             'user': self.user1.uuid
         }
 
-        resp = self.app.post('/orders/', data=new_order_data)
+        resp = self.open_with_auth('/orders/', 'post', self.user1.email, 'p4ssw0rd', data=new_order_data)
         assert resp.status_code == BAD_REQUEST
         assert len(Order.select()) == 0
 
@@ -110,7 +110,7 @@ class TestOrders(BaseTest):
             'items': json.dumps('')
         }
 
-        resp = self.app.post('/orders/', data=new_order_data)
+        resp = self.open_with_auth('/orders/', 'post', self.user1.email, 'p4ssw0rd', data=new_order_data)
         assert resp.status_code == BAD_REQUEST
         assert len(Order.select()) == 0
 
@@ -122,7 +122,7 @@ class TestOrders(BaseTest):
             ])
         }
 
-        resp = self.app.post('/orders/', data=new_order_data)
+        resp = self.open_with_auth('/orders/', 'post', self.user1.email, 'p4ssw0rd', data=new_order_data)
         assert resp.status_code == BAD_REQUEST
         assert len(Order.select()) == 0
 
@@ -134,7 +134,7 @@ class TestOrders(BaseTest):
             ])
         }
 
-        resp = self.app.post('/orders/', data=new_order_data)
+        resp = self.open_with_auth('/orders/', 'post', self.user1.email, 'p4ssw0rd', data=new_order_data)
         assert resp.status_code == BAD_REQUEST
         assert len(Order.select()) == 0
 
@@ -150,10 +150,8 @@ class TestOrders(BaseTest):
             ])
         }
 
-        resp = self.app.put(
-            '/orders/{}'.format(order1.uuid),
-            data=updates
-        )
+        resp = self.open_with_auth(
+            '/orders/{}'.format(order1.uuid), 'put', self.user1.email, 'p4ssw0rd', data=updates)
         assert resp.status_code == OK
 
         order1_upd = Order.get(Order.uuid == order1.uuid).json()
@@ -194,10 +192,8 @@ class TestOrders(BaseTest):
             ])
         }
 
-        resp = self.app.put(
-            '/orders/{}'.format(str(uuid.uuid4())),
-            data=updates
-        )
+        resp = self.open_with_auth(
+            '/orders/{}'.format(str(uuid.uuid4())), 'put', self.user1.email, 'p4ssw0rd', data=updates)
         assert resp.status_code == NOT_FOUND
 
     def test_modify_order__failure_non_existing_empty_orders(self):
@@ -207,10 +203,8 @@ class TestOrders(BaseTest):
             ])
         }
 
-        resp = self.app.put(
-            '/orders/{}'.format(str(uuid.uuid4())),
-            data=updates
-        )
+        resp = self.open_with_auth(
+            '/orders/{}'.format(str(uuid.uuid4())), 'put', self.user1.email, 'p4ssw0rd', data=updates)
         assert resp.status_code == NOT_FOUND
 
     def test_modify_order__failure_changed_order_id(self):
@@ -220,10 +214,8 @@ class TestOrders(BaseTest):
             'uuid': str(uuid.uuid4())
         }
 
-        resp = self.app.put(
-            '/orders/{}'.format(order1.uuid),
-            data=updates
-        )
+        resp = self.open_with_auth(
+            '/orders/{}'.format(order1.uuid), 'put', self.user1.email, 'p4ssw0rd', data=updates)
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_changed_user(self):
@@ -233,10 +225,8 @@ class TestOrders(BaseTest):
             'user': str(uuid.uuid4())
         }
 
-        resp = self.app.put(
-            '/orders/{}'.format(order1.uuid),
-            data=updates
-        )
+        resp = self.open_with_auth(
+            '/orders/{}'.format(order1.uuid), 'put', self.user1.email, 'p4ssw0rd', data=updates)
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_empty_field(self):
@@ -246,10 +236,8 @@ class TestOrders(BaseTest):
             'items': json.dumps('')
         }
 
-        resp = self.app.put(
-            '/orders/{}'.format(order1.uuid),
-            data=updates
-        )
+        resp = self.open_with_auth(
+            '/orders/{}'.format(order1.uuid), 'put', self.user1.email, 'p4ssw0rd', data=updates)
         assert resp.status_code == BAD_REQUEST
 
     def test_delete_order__success(self):
@@ -261,7 +249,8 @@ class TestOrders(BaseTest):
             for oi in order1.order_items
         }
 
-        resp = self.app.delete('/orders/{}'.format(order1.uuid))
+        resp = self.open_with_auth(
+            '/orders/{}'.format(str(order1.uuid)), 'delete', self.user1.email, 'p4ssw0rd', data='')
         assert resp.status_code == NO_CONTENT
 
         orders = Order.select()
@@ -279,10 +268,12 @@ class TestOrders(BaseTest):
         self.create_order(self.user1)
         self.create_order(self.user1)
 
-        resp = self.app.delete('/orders/{}'.format(str(uuid.uuid4())))
+        resp = self.open_with_auth(
+            '/orders/{}'.format(str(uuid.uuid4())), 'delete', self.user1.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
         assert len(Order.select()) == 2
 
     def test_delete_order__failure_non_existing_empty_orders(self):
-        resp = self.app.delete('/orders/{}'.format(str(uuid.uuid4())))
+        resp = self.open_with_auth(
+            '/orders/{}'.format(str(uuid.uuid4())), 'delete', self.user1.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
