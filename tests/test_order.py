@@ -2,7 +2,7 @@ import uuid
 import json
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 
-from models import Order, OrderItem
+from models import Order, OrderItem, Item
 
 from .base_test import BaseTest
 
@@ -53,6 +53,9 @@ class TestOrders(BaseTest):
         assert order_from_server == order.json()
 
     def test_create_order__success(self):
+        temp_item = Item.get(Item.uuid == self.item1.uuid)
+        start_availability = temp_item.availability
+
         new_order_data = {
             'user': self.user1.uuid,
             'items': json.dumps([
@@ -79,6 +82,9 @@ class TestOrders(BaseTest):
 
         order_total = (self.item1.price * 2) + self.item2.price
         assert order_from_server['total_price'] == order_total
+
+        temp_item = Item.get(Item.uuid == self.item1.uuid)
+        assert temp_item.availability == (start_availability - 2)
 
     def test_create_order__failure_invalid_field_value(self):
         new_order_data = {
@@ -138,6 +144,9 @@ class TestOrders(BaseTest):
         order1 = self.create_order(self.user1)
         order2 = self.create_order(self.user1)
 
+        temp_item = Item.get(Item.uuid == self.item2.uuid)
+        start_availability = temp_item.availability
+
         updates = {
             'items': json.dumps([
                 [str(self.item2.uuid), 2]
@@ -160,6 +169,9 @@ class TestOrders(BaseTest):
         order1_items = OrderItem.select().where(OrderItem.order == order1)
         assert len(order1_items) == 1
         assert str(order1_items[0].item.uuid) == str(self.item2.uuid)
+
+        temp_item = Item.get(Item.uuid == self.item2.uuid)
+        assert temp_item.availability == (start_availability - 2)
 
     def test_modify_order__failure_invalid_field_value(self):
         order1 = self.create_order(self.user1)
