@@ -5,7 +5,7 @@ from flask_restful import Api
 
 from models import database
 
-from views.item import ItemResource, ItemsResource
+from views.item import ItemResource, ItemsResource, ItemPicturesResource
 from views.order import OrderResource, OrdersResource
 from views.user import UserResource, UsersResource
 from views.address import AddressResource, AddressesResource
@@ -37,6 +37,7 @@ def database_disconnect(response):
 
 api.add_resource(ItemsResource, '/items/')
 api.add_resource(ItemResource, '/items/<uuid:uuid>')
+api.add_resource(ItemPicturesResource, '/items/<uuid:uuid>/pictures')
 api.add_resource(UsersResource, '/users/')
 api.add_resource(UserResource, '/users/<uuid:uuid>')
 api.add_resource(OrdersResource, '/orders/')
