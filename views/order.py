@@ -2,6 +2,7 @@ from flask_restful import reqparse, Resource
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 import uuid
 import json
+import auth
 
 from models import Order, OrderItem, Item, User, database
 
@@ -15,6 +16,7 @@ def is_valid_item_list(json_item_list):
 
 
 class OrdersResource(Resource):
+    @auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user', type=is_valid_uuid, required=True)
@@ -64,17 +66,20 @@ class OrdersResource(Resource):
 
         return order.json(), CREATED
 
+    @auth.login_required
     def get(self):
         return [order.json() for order in Order.select()], OK
 
 
 class OrderResource(Resource):
+    @auth.login_required
     def get(self, uuid):
         try:
             return Order.get(uuid=uuid).json(), OK
         except Order.DoesNotExist:
             return None, NOT_FOUND
 
+    @auth.login_required
     def put(self, uuid):
         try:
             order = Order.get(uuid=uuid)
@@ -127,6 +132,7 @@ class OrderResource(Resource):
 
         return order.json(), OK
 
+    @auth.login_required
     def delete(self, uuid):
         try:
             order = Order.get(Order.uuid == uuid)
