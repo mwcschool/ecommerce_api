@@ -3,9 +3,11 @@ from models import User, Address
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, OK
 from flask_restful import Resource, reqparse
 import utils
+import auth
 
 
 class AddressesResource(Resource):
+    @auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
         # TODO Security issue, grab user_id from user authentication
@@ -40,6 +42,7 @@ class AddressesResource(Resource):
 
 
 class AddressResource(Resource):
+    @auth.login_required
     def get(self, address_id):
         try:
             address = Address.get(Address.uuid == address_id)
@@ -48,6 +51,7 @@ class AddressResource(Resource):
 
         return address.json(), OK
 
+    @auth.login_required
     def put(self, address_id):
         try:
             address = Address.get(Address.uuid == address_id)
@@ -80,6 +84,7 @@ class AddressResource(Resource):
         else:
             return '', BAD_REQUEST
 
+    @auth.login_required
     def delete(self, address_id):
         try:
             address = Address.get(Address.uuid == address_id)
