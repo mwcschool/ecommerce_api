@@ -21,7 +21,8 @@ class TestAddress(BaseTest):
             'phone': '0574100100',
         }
 
-        resp = self.app.post('/addresses/', data=data_address)
+        resp = self.open_with_auth(
+            '/addresses/', 'post', self.user.email, 'p4ssw0rd', data=data_address)
 
         address_from_db = Address.get()
         expected_data = {
@@ -47,7 +48,8 @@ class TestAddress(BaseTest):
             'phone': '0574100100',
         }
 
-        resp = self.app.post('/addresses/', data=data_address)
+        resp = self.open_with_auth(
+            '/addresses/', 'post', self.user.email, 'p4ssw0rd', data=data_address)
 
         address_from_server = json.loads(resp.data.decode())
 
@@ -70,7 +72,8 @@ class TestAddress(BaseTest):
             'phone': '0574100100',
         }
 
-        resp = self.app.post('/addresses/', data=data_address)
+        resp = self.open_with_auth(
+            '/addresses/', 'post', self.user.email, 'p4ssw0rd', data=data_address)
         assert resp.status_code == BAD_REQUEST
         assert len(Address.select()) == 0
 
@@ -83,20 +86,23 @@ class TestAddress(BaseTest):
             'phone': '0574100100',
         }
 
-        resp = self.app.post('/addresses/', data=data_address)
+        resp = self.open_with_auth(
+            '/addresses/', 'post', self.user.email, 'p4ssw0rd', data=data_address)
         assert resp.status_code == BAD_REQUEST
         assert len(Address.select()) == 0
 
     def test_get__address_found(self):
         address = self.create_address(self.user)
 
-        resp = self.app.get('/addresses/{}'.format(address.uuid))
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(address.uuid), 'get', self.user.email, 'p4ssw0rd', data='')
         query = Address.get()
         assert resp.status_code == OK
         assert query.json() == json.loads(resp.data.decode())
 
     def test_get__address_not_found(self):
-        resp = self.app.get('/addresses/{}'.format(uuid.uuid4()))
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(uuid.uuid4()), 'get', self.user.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
 
     def test_put__success(self):
@@ -111,7 +117,9 @@ class TestAddress(BaseTest):
             'phone': '0550550550',
         }
 
-        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address.uuid), 'put', self.user.email, 'p4ssw0rd',
+            data=new_data_address)
         address_from_db = Address.get()
         expected_data = {
             'user_id': address_from_db.user.uuid,
@@ -132,7 +140,9 @@ class TestAddress(BaseTest):
             'nation': 'Albania',
         }
 
-        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address.uuid), 'put', self.user.email, 'p4ssw0rd',
+            data=new_data_address)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__modify_empty_fields(self):
@@ -147,7 +157,9 @@ class TestAddress(BaseTest):
             'phone': '',
         }
 
-        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address.uuid), 'put', self.user.email, 'p4ssw0rd',
+            data=new_data_address)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__address_id_not_exists(self):
@@ -160,7 +172,9 @@ class TestAddress(BaseTest):
             'phone': '0574100100',
         }
 
-        resp = self.app.put('/addresses/{}'.format(uuid.uuid4()), data=data)
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(uuid.uuid4()), 'put', self.user.email, 'p4ssw0rd',
+            data=data)
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 0
 
@@ -170,7 +184,9 @@ class TestAddress(BaseTest):
         # TODO: Is ok to have a duplicated address for a single user?
         data_address2 = self.create_address(self.user)
 
-        resp = self.app.delete('/addresses/{}'.format(data_address1.uuid))
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address1.uuid), 'delete', self.user.email, 'p4ssw0rd',
+            data='')
         all_addresses = Address.select()
         address_from_db = all_addresses.get()
         assert resp.status_code == NO_CONTENT
@@ -178,13 +194,17 @@ class TestAddress(BaseTest):
         assert address_from_db.uuid == data_address2.uuid
 
     def test_delete__empty_db_address_id_not_exists(self):
-        resp = self.app.delete('/addresses/{}'.format(uuid.uuid4()))
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(uuid.uuid4()), 'delete', self.user.email, 'p4ssw0rd',
+            data='')
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 0
 
     def test_delete__address_id_not_exists(self):
         self.create_address(self.user)
 
-        resp = self.app.delete('/addresses/{}'.format(uuid.uuid4()))
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(uuid.uuid4()), 'delete', self.user.email, 'p4ssw0rd',
+            data='')
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 1
