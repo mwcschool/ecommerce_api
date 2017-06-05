@@ -4,9 +4,12 @@ from http.client import NOT_FOUND
 from http.client import CREATED
 from http.client import BAD_REQUEST
 from http.client import NO_CONTENT
+from http.client import UNAUTHORIZED
 from peewee import SqliteDatabase
 from models import Item, User, Favorites
 from app import app
+from views.user import crypt_password
+import base64
 import uuid
 
 
@@ -16,7 +19,7 @@ def create_user(id_user, number):
         first_name='{}{}'.format('first_name_', number),
         last_name='{}{}'.format('last_name_', number),
         email='{}{}'.format('email_', number),
-        password='{}{}'.format('password_', number),
+        password=crypt_password('{}{}'.format('password_', number)),
     )
 
 
@@ -31,6 +34,12 @@ def create_item(id_item, number):
 
 
 class TestFavorites:
+
+    def open_with_auth(self, url, method, email, password, data):
+        return self.app.open(
+            url, method=method, headers={'Authorization': 'Basic ' + base64.b64encode(
+                bytes(email + ":" + password, 'ascii')).decode('ascii')}, data=data)
+
     @classmethod
     def setup_class(cls):
         db = SqliteDatabase(':memory:')
@@ -64,17 +73,33 @@ class TestFavorites:
             item=item_db
         )
 
-        resp = self.app.get('/favorites/')
+        resp = self.open_with_auth(
+            '/favorites/', 'get', 'email_1', 'password_1', data=None)
+
         assert resp.status_code == OK
         data = json.loads(resp.data.decode())
         assert len(data) == 1
         assert user_db.favorite_items() == data
 
-    def test_get__favorites_empty(self):
-        resp = self.app.get('/favorites/')
+    def test_get__favorites_is_empty(self):
+        id_user = uuid.uuid4()
+        id_item = uuid.uuid4()
+
+        user_db = create_user(
+            id_user,
+            1)
+
+        item_db = create_item(
+            id_item,
+            1)
+
+        resp = self.open_with_auth(
+            '/favorites/', 'get', 'email_1', 'password_1', data=None)
+
+        assert resp.status_code == OK
         data = json.loads(resp.data.decode())
-        assert not data
-        assert resp.status_code == NOT_FOUND
+        assert len(data) == 0
+        assert user_db.favorite_items() == []
 
     def test_post__create_favorite_success(self):
         id_user = uuid.uuid4()
@@ -84,40 +109,29 @@ class TestFavorites:
         create_item(id_item, 1)
 
         sample_favorite = {
-            'id_user': id_user,
             'id_item': id_item
         }
 
-        resp = self.app.post('/favorites/', data=sample_favorite)
+        resp = self.open_with_auth(
+            '/favorites/', 'post', 'email_1', 'password_1', data=sample_favorite)
         assert resp.status_code == CREATED
         assert Favorites.count() == 1
 
-    def test_post__failed_item_do_not_exist(self):
+    def test_post__failed_item_uuid_not_valid(self):
         id_user = uuid.uuid4()
 
         create_user(id_user, 1)
-        create_item(uuid.uuid4(), 1)
 
         sample_favorite = {
-            'id_user': id_user,
-            'id_item': uuid.uuid4()
-        }
-
-        resp = self.app.post('/favorites/', data=sample_favorite)
-
-        assert resp.status_code == NOT_FOUND
-        assert Favorites.count() == 0
-
-    def test_post__failed_uuid_not_valid(self):
-        sample_favorite = {
-            'id_user':  "Stringa di prova",
             'id_item': 123123
         }
-        resp = self.app.post('/favorites/', data=sample_favorite)
+
+        resp = self.open_with_auth(
+            '/favorites/', 'post', 'email_1', 'password_1', data=sample_favorite)
         assert resp.status_code == BAD_REQUEST
         assert Favorites.count() == 0
 
-    def test_post__failed_item_uuid_does_not_exists(self):
+    def test_post__failed_item_does_not_exists(self):
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
@@ -125,30 +139,12 @@ class TestFavorites:
         create_item(id_item, 1)
 
         sample_favorite = {
-            'id_user': id_user,
             'id_item': uuid.uuid4()
         }
 
-        resp = self.app.post('/favorites/', data=sample_favorite)
-        assert resp.status_code == NOT_FOUND
-        data = json.loads(resp.data.decode())
-        assert not data
-        assert Favorites.count() == 0
-
-    def test_post__failed_user_uuid_does_not_exists(self):
-        id_user = uuid.uuid4()
-        id_item = uuid.uuid4()
-
-        create_user(id_user, 1)
-        create_item(id_item, 1)
-
-        sample_favorite = {
-            'id_user': uuid.uuid4(),
-            'id_item': id_item
-        }
-
-        resp = self.app.post('/favorites/', data=sample_favorite)
-        assert resp.status_code == NOT_FOUND
+        resp = self.open_with_auth(
+            '/favorites/', 'post', 'email_1', 'password_1', data=sample_favorite)
+        assert resp.status_code == BAD_REQUEST
         data = json.loads(resp.data.decode())
         assert not data
         assert Favorites.count() == 0
@@ -175,7 +171,8 @@ class TestFavorites:
             item=Item.get(Item.uuid == id_item_2),
         )
 
-        resp = self.app.delete('/favorites/{}'.format(id_item_1))
+        resp = self.open_with_auth(
+            '/favorites/{}'.format(id_item_1), 'delete', 'email_1', 'password_1', data=None)
         assert Favorites.count() == 1
         assert Favorites.item == item_2
         assert resp.status_code == NO_CONTENT
@@ -193,7 +190,8 @@ class TestFavorites:
             item=Item.get(Item.uuid == id_item_1),
         )
 
-        resp = self.app.delete('/favorites/{}'.format(uuid.uuid4()))
+        resp = self.open_with_auth(
+            '/favorites/{}'.format(uuid.uuid4()), 'delete', 'email_1', 'password_1', data=None)
 
         assert Favorites.count() == 1
         assert Favorites.item == item_1
@@ -216,7 +214,8 @@ class TestFavorites:
             item=Item.get(Item.uuid == id_item_1),
         )
 
-        resp = self.app.delete('/favorites/{}'.format(id_item_1))
+        resp = self.open_with_auth(
+            '/favorites/{}'.format(id_item_1), 'delete', 'email_1', 'password_1', data=None)
 
         assert Favorites.count() == 1
         assert Favorites.item == item_1
@@ -231,7 +230,8 @@ class TestFavorites:
         create_user(id_user, 1)
         create_item(id_item, 1)
 
-        resp = self.app.delete('/favorites/{}'.format(id_item))
+        resp = self.open_with_auth(
+            '/favorites/{}'.format(id_item), 'delete', 'email_1', 'password_1', data=None)
 
         assert Favorites.count() == 0
         assert resp.status_code == NOT_FOUND
