@@ -80,6 +80,17 @@ class TestOrders(BaseTest):
         order_total = (self.item1.price * 2) + self.item2.price
         assert order_from_server['total_price'] == order_total
 
+    def test_create_order__failure_invalid_field_value(self):
+        new_order_data = {
+            'user': self.user1.uuid,
+            'items': json.dumps([
+                [str(self.item1.uuid), 888], [str(self.item2.uuid), 1]
+            ])
+        }
+
+        resp = self.app.post('/orders/', data=new_order_data)
+        assert resp.status_code == BAD_REQUEST
+
     def test_create_order__failure_missing_field(self):
         new_order_data = {
             'user': self.user1.uuid
@@ -149,6 +160,22 @@ class TestOrders(BaseTest):
         order1_items = OrderItem.select().where(OrderItem.order == order1)
         assert len(order1_items) == 1
         assert str(order1_items[0].item.uuid) == str(self.item2.uuid)
+
+    def test_modify_order__failure_invalid_field_value(self):
+        order1 = self.create_order(self.user1)
+        order2 = self.create_order(self.user1)
+
+        updates = {
+            'items': json.dumps([
+                [str(self.item2.uuid), 888]
+            ])
+        }
+
+        resp = self.app.put(
+            '/orders/{}'.format(order1.uuid),
+            data=updates
+        )
+        assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_non_existing(self):
         self.create_order(self.user1)
