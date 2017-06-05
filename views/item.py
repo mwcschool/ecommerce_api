@@ -90,3 +90,11 @@ class ItemResource(Resource):
         obj.save()
 
         return obj.json(), OK
+
+
+class ItemPicturesResource(Resource):
+    def get(self, uuid):
+        pass
+
+    def post(self, uuid):
+        pass
