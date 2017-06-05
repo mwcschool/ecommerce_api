@@ -1,6 +1,5 @@
 from utils import non_empty_str
 from marshmallow import Schema, fields
-from models import Item, User, Address
 
 
 class ItemSchema(Schema):
