@@ -163,7 +163,6 @@ class TestOrders(BaseTest):
 
     def test_modify_order__failure_invalid_field_value(self):
         order1 = self.create_order(self.user1)
-        order2 = self.create_order(self.user1)
 
         updates = {
             'items': json.dumps([
