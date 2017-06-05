@@ -44,7 +44,6 @@ class ItemsResource(Resource):
 
 
 class ItemResource(Resource):
-
     def get(self, uuid):
         try:
             return Item.get(Item.uuid == uuid).json(), OK
