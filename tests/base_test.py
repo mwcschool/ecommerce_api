@@ -34,13 +34,14 @@ class BaseTest:
         )
 
     def create_item(self, name="Item name", price=7,
-                    description="Item description", category="Category"):
+                    description="Item description", category="Category", availability=11):
         return Item.create(
             uuid=uuid.uuid4(),
             name=name,
             price=price,
             description=description,
             category=category,
+            availability=availability,
         )
 
     def create_order(self, user=None, items=None):
