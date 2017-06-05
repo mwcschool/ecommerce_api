@@ -12,58 +12,37 @@ from views.user import crypt_password
 import base64
 import uuid
 
-
-def create_user(id_user, number):
-    return User.create(
-        uuid=id_user,
-        first_name='{}{}'.format('first_name_', number),
-        last_name='{}{}'.format('last_name_', number),
-        email='{}{}'.format('email_', number),
-        password=crypt_password('{}{}'.format('password_', number)),
-    )
+from .base_test import BaseTest
 
 
-def create_item(id_item, number):
-    return Item.create(
-        uuid=id_item,
-        name='{}{}'.format('name_', number),
-        price=number,
-        description='{}{}'.format('description_', number),
-        category='{}{}'.format('category_', number),
-    )
+class TestFavorites(BaseTest):
+    def create_user(self, id_user, number):
+        return User.create(
+            uuid=id_user,
+            first_name='{}{}'.format('first_name_', number),
+            last_name='{}{}'.format('last_name_', number),
+            email='{}{}'.format('email_', number),
+            password=crypt_password('{}{}'.format('password_', number)),
+        )
 
-
-class TestFavorites:
-
-    def open_with_auth(self, url, method, email, password, data):
-        return self.app.open(
-            url, method=method, headers={'Authorization': 'Basic ' + base64.b64encode(
-                bytes(email + ":" + password, 'ascii')).decode('ascii')}, data=data)
-
-    @classmethod
-    def setup_class(cls):
-        db = SqliteDatabase(':memory:')
-        tables = [Favorites, Item, User]
-        for table in tables:
-            table._meta.database = db
-            table.create_table()
-
-        cls.app = app.test_client()
-
-    def setup_method(self):
-        Item.delete().execute()
-        Favorites.delete().execute()
-        User.delete().execute()
+    def create_item(self, id_item, number):
+        return Item.create(
+            uuid=id_item,
+            name='{}{}'.format('name_', number),
+            price=number,
+            description='{}{}'.format('description_', number),
+            category='{}{}'.format('category_', number),
+        )
 
     def test_get__favorites(self):
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
-        user_db = create_user(
+        user_db = self.create_user(
             id_user,
             1)
 
-        item_db = create_item(
+        item_db = self.create_item(
             id_item,
             1)
 
@@ -85,11 +64,11 @@ class TestFavorites:
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
-        user_db = create_user(
+        user_db = self.create_user(
             id_user,
             1)
 
-        item_db = create_item(
+        item_db = self.create_item(
             id_item,
             1)
 
@@ -105,8 +84,8 @@ class TestFavorites:
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
-        create_user(id_user, 1)
-        create_item(id_item, 1)
+        self.create_user(id_user, 1)
+        self.create_item(id_item, 1)
 
         sample_favorite = {
             'id_item': id_item
@@ -120,7 +99,7 @@ class TestFavorites:
     def test_post__failed_item_uuid_not_valid(self):
         id_user = uuid.uuid4()
 
-        create_user(id_user, 1)
+        self.create_user(id_user, 1)
 
         sample_favorite = {
             'id_item': 123123
@@ -135,8 +114,8 @@ class TestFavorites:
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
-        create_user(id_user, 1)
-        create_item(id_item, 1)
+        self.create_user(id_user, 1)
+        self.create_item(id_item, 1)
 
         sample_favorite = {
             'id_item': uuid.uuid4()
@@ -154,10 +133,10 @@ class TestFavorites:
         id_item_1 = uuid.uuid4()
         id_item_2 = uuid.uuid4()
 
-        create_user(id_user, 1)
-        create_item(id_item_1, 1)
+        self.create_user(id_user, 1)
+        self.create_item(id_item_1, 1)
 
-        item_2 = create_item(id_item_2, 1)
+        item_2 = self.create_item(id_item_2, 1)
 
         Favorites.create(
             uuid=uuid.uuid4(),
@@ -181,8 +160,8 @@ class TestFavorites:
         id_user = uuid.uuid4()
         id_item_1 = uuid.uuid4()
 
-        create_user(id_user, 1)
-        item_1 = create_item(id_item_1, 1)
+        self.create_user(id_user, 1)
+        item_1 = self.create_item(id_item_1, 1)
 
         Favorites.create(
             uuid=uuid.uuid4(),
@@ -204,9 +183,9 @@ class TestFavorites:
         id_user_2 = uuid.uuid4()
         id_item_1 = uuid.uuid4()
 
-        create_user(id_user_1, 1)
-        create_user(id_user_2, 2)
-        item_1 = create_item(id_item_1, 1)
+        self.create_user(id_user_1, 1)
+        self.create_user(id_user_2, 2)
+        item_1 = self.create_item(id_item_1, 1)
 
         Favorites.create(
             uuid=uuid.uuid4(),
@@ -227,8 +206,8 @@ class TestFavorites:
         id_user = uuid.uuid4()
         id_item = uuid.uuid4()
 
-        create_user(id_user, 1)
-        create_item(id_item, 1)
+        self.create_user(id_user, 1)
+        self.create_item(id_item, 1)
 
         resp = self.open_with_auth(
             '/favorites/{}'.format(id_item), 'delete', 'email_1', 'password_1', data=None)
