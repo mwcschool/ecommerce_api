@@ -1,4 +1,5 @@
 import json
+from werkzeug.datastructures import FileStorage
 from http.client import CREATED
 from http.client import NO_CONTENT
 from http.client import NOT_FOUND
@@ -7,6 +8,7 @@ from http.client import BAD_REQUEST
 from models import Item
 import uuid
 import os
+import base64
 
 from .base_test import BaseTest
 
@@ -329,17 +331,13 @@ class TestItems(BaseTest):
 
     def test_create_item_pictures__success(self):
         with open(os.path.join('.', 'tests', 'test_image.jpg'), 'rb') as test_image:
-            image = test_image.read()
+            item = self.create_item()
 
-        item = self.create_item()
+            picture_data = {
+                'title': 'Example image',
+                'file': FileStorage(test_image),
+            }
 
-        picture_data = {
-            'title': 'Image Name',
-            'extension': 'jpg',
-            'item': item,
-            'file': image,
-        }
-
-        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
-                             content_type='multipart/form-data', data=picture_data)
-        assert resp.status_code == CREATED
+            resp = self.app.post('/items/{}/pictures'.format(item.uuid),
+                                 content_type='multipart/form-data', data=picture_data)
+            assert resp.status_code == CREATED
