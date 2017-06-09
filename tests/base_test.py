@@ -1,6 +1,9 @@
 from models import Item, User, Address, Order, OrderItem, Picture
 from views.user import crypt_password
 from peewee import SqliteDatabase
+from tempfile import mkdtemp
+import shutil
+
 from app import app
 import base64
 import uuid
@@ -16,8 +19,16 @@ class BaseTest:
             table._meta.database = database
             table.create_table()
 
+        cls.temp_dir = mkdtemp()
+
         app.config['TESTING'] = True
+        app.config['UPLOADS_FOLDER'] = cls.temp_dir
+
         cls.app = app.test_client()
+
+    @classmethod
+    def teardown_class(cls):
+        shutil.rmtree(cls.temp_dir)
 
     def setup_method(self):
         for table in self.tables:
