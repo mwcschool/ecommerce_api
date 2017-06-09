@@ -112,6 +112,11 @@ class ItemPicturesResource(Resource):
         pass
 
     def post(self, uuid):
+        try:
+            item = Item.get(Item.uuid == uuid)
+        except Item.DoesNotExist:
+            return None, NOT_FOUND
+
         parser = reqparse.RequestParser()
         parser.add_argument('file', type=FileStorage, location='files', required=True)
 
