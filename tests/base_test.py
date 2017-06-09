@@ -9,6 +9,7 @@ from views.user import crypt_password
 from app import app
 import base64
 import uuid
+import os
 
 
 class BaseTest:
