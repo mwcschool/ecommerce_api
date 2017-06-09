@@ -1,5 +1,5 @@
 import uuid
-from models import User, Address
+from models import Address
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, OK
 from flask_restful import Resource, reqparse
 from flask import g
@@ -11,8 +11,6 @@ class AddressesResource(Resource):
     @auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
-        # TODO Security issue, grab user_id from user authentication
-        parser.add_argument('user_id', type=utils.non_empty_str, required=True)
         parser.add_argument('nation', type=utils.non_empty_str, required=True)
         parser.add_argument('city', type=utils.non_empty_str, required=True)
         parser.add_argument('postal_code', type=utils.non_empty_str, required=True)
@@ -24,14 +22,9 @@ class AddressesResource(Resource):
             if len(args[parm]) < 3:
                 return '', BAD_REQUEST
 
-        try:
-            user = User.get(User.uuid == args['user_id'])
-        except User.DoesNotExist:
-            return '', BAD_REQUEST
-
         address = Address.create(
             uuid=uuid.uuid4(),
-            user=user,
+            user=g.current_user,
             nation=args['nation'],
             city=args['city'],
             postal_code=args['postal_code'],
@@ -68,8 +61,6 @@ class AddressResource(Resource):
             return None, NOT_FOUND
 
         parser = reqparse.RequestParser()
-        # TODO Security issue, grab user_id from user authentication
-        parser.add_argument('user_id', type=utils.non_empty_str, required=True)
         parser.add_argument('nation', type=utils.non_empty_str, required=True)
         parser.add_argument('city', type=utils.non_empty_str, required=True)
         parser.add_argument('postal_code', type=utils.non_empty_str, required=True)
@@ -81,7 +72,7 @@ class AddressResource(Resource):
             if len(args[parm]) < 3:
                 return '', BAD_REQUEST
 
-        if str(address.user.uuid) == args['user_id']:
+        if  address.user.uuid == g.current_user.uuid:
             address.nation = args['nation']
             address.city = args['city']
             address.postal_code = args['postal_code']
