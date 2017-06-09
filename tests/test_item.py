@@ -199,7 +199,7 @@ class TestItems(BaseTest):
             'availability': -8
         }
 
-        resp = self.app.put('item/{}'.format(static_id), data=new_item_data)
+        resp = self.app.put('items/{}'.format(static_id), data=new_item_data)
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_item__failure_empty_field_only_spaces(self):
