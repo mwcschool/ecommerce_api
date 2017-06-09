@@ -5,6 +5,9 @@ from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
 import uuid
+from werkzeug.datastructures import FileStorage
+import os
+
 from models import Item
 import utils
 import auth
@@ -104,4 +107,23 @@ class ItemPicturesResource(Resource):
         pass
 
     def post(self, uuid):
-        pass
+        parser = reqparse.RequestParser()
+        parser.add_argument('file', type=FileStorage, location='files', required=True)
+
+        args = parser.parse_args(strict=True)
+
+        image = args['file']
+
+        extension = image.filename.rsplit('.', 1)[1].lower()
+        if '.' in image.filename and not extension in ALLOWED_EXTENSIONS:
+            abort(400, message="Extension not supported.")
+
+        save_path = os.path.join('.', UPLOADS_FOLDER, 'items', str(uuid))
+
+        os.makedirs(save_path, exist_ok=True)
+
+        new_filename = '.'.join([str(uuid.uuid4()), extension])
+
+        image.save(os.path.join(save_path, new_filename))
+
+        return new_filename, CREATED
