@@ -49,6 +49,8 @@ class TestItems(BaseTest):
         assert item_from_server == new_item_data
 
     def test_create_item__failure_invalid_field_value(self):
+        user = self.create_user()
+        
         new_item_data = {
             'name': 'Item one',
             'price': 15,
@@ -57,7 +59,8 @@ class TestItems(BaseTest):
             'availability': -8
         }
 
-        resp = self.app.post('/items/', data=new_item_data)
+        resp = self.open_with_auth(
+            '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
 
     def test_create_item__failure_empty_field(self):
@@ -148,7 +151,7 @@ class TestItems(BaseTest):
         item1 = self.create_item()
 
         resp = self.open_with_auth(
-            'item/{}'.format(item1.uuid), 'delete', user.email, 'p4ssw0rd', data='')
+            'items/{}'.format(item1.uuid), 'delete', user.email, 'p4ssw0rd', data='')
         assert resp.status_code == NO_CONTENT
         assert len(Item.select()) == 0
         resp = self.app.get('/items/{}'.format(item1.uuid))
@@ -159,7 +162,7 @@ class TestItems(BaseTest):
         self.create_item()
 
         resp = self.open_with_auth(
-            'item/{}'.format(uuid.uuid4()), 'delete', user.email, 'p4ssw0rd', data='')
+            'items/{}'.format(uuid.uuid4()), 'delete', user.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
         assert len(Item.select()) == 1
 
@@ -167,7 +170,7 @@ class TestItems(BaseTest):
         user = self.create_user()
 
         resp = self.open_with_auth(
-            'item/{}'.format(uuid.uuid4()), 'delete', user.email, 'p4ssw0rd', data='')
+            'items/{}'.format(uuid.uuid4()), 'delete', user.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
 
     def test_modify_item__success(self):
@@ -192,7 +195,7 @@ class TestItems(BaseTest):
         }
 
         resp = self.open_with_auth(
-            'item/{}'.format(static_id), 'put', user.email, 'p4ssw0rd', data=new_item_data)
+            'items/{}'.format(static_id), 'put', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == OK
 
         item_from_server = json.loads(resp.data.decode())
@@ -205,6 +208,7 @@ class TestItems(BaseTest):
 
     def test_modify_item__failure_invalid_field_value(self):
         static_id = uuid.uuid4()
+        user = self.create_user()
 
         Item.create(
             uuid=static_id,
@@ -223,7 +227,8 @@ class TestItems(BaseTest):
             'availability': -8
         }
 
-        resp = self.app.put('items/{}'.format(static_id), data=new_item_data)
+        resp = self.open_with_auth(
+            '/items/{}'.format(static_id), 'put', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_item__failure_empty_field_only_spaces(self):
@@ -247,7 +252,7 @@ class TestItems(BaseTest):
         }
 
         resp = self.open_with_auth(
-            'item/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=modified_content)
+            'items/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=modified_content)
         item_from_db = Item.get(Item.uuid == item.uuid).json()
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
@@ -271,7 +276,7 @@ class TestItems(BaseTest):
         }
 
         resp = self.open_with_auth(
-            'item/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=modified_content)
+            'items/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=modified_content)
         item_from_db = Item.get(Item.uuid == item.uuid).json()
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
@@ -295,7 +300,7 @@ class TestItems(BaseTest):
             'availability': 6
         }
         resp = self.open_with_auth(
-            'item/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=modified_content)
+            'items/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=modified_content)
         assert resp.status_code == BAD_REQUEST
 
         item_from_db = Item.get(uuid=item.uuid).json()
