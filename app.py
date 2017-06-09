@@ -13,7 +13,7 @@ from views.address import AddressResource, AddressesResource
 
 app = Flask(__name__)
 api = Api(app)
-app.config['UPLOADS_FOLDER'] = 'uploads'
+app.config['UPLOADS_FOLDER'] = 'images'
 app.config['ALLOWED_EXTENSIONS'] = set(['jpg', 'jpeg', 'png'])
 
 app.config['UPLOADS_FOLDER'] = 'uploads'
