@@ -40,7 +40,7 @@ def database_disconnect(response):
 
 
 api.add_resource(ItemsResource, '/items/')
-api.add_resource(ItemResource, '/item/<uuid:uuid>')
+api.add_resource(ItemResource, '/items/<uuid:uuid>')
 api.add_resource(ItemPicturesResource, '/items/<uuid:item_id>/pictures')
 api.add_resource(UsersResource, '/users/')
 api.add_resource(UserResource, '/users/<uuid:uuid>')
