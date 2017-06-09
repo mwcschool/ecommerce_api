@@ -1,14 +1,19 @@
 from models import database, Item, User, Address, Order, OrderItem
 from faker import Factory
 from random import seed, randint
+import argparse
 
 
 def main():
-    database.connect()
-    seed(2)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('seed')
+    parser.add_argument('fakeseed')
+    args = parser.parse_args()
 
+    database.connect()
+    seed(args.seed)
+    fake.seed(args.fakeseed)
     fake = Factory.create('it_IT')
-    fake.seed(99)
 
     items_list = []
     users_list = []
