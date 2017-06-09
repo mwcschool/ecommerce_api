@@ -106,9 +106,8 @@ class OrderResource(Resource):
         with database.transaction():
             temp_query = OrderItem.select().where(OrderItem.order == order.id)
             for order_item in temp_query:
-                item_temp_query = Item.get(Item.id == order_item.item)
-                item_temp_query.availability = (item_temp_query.availability + order_item.quantity)
-                item_temp_query.save()
+                order_item.item.availability = (order_item.item.availability + order_item.quantity)
+                order_item.item.save()
 
             OrderItem.delete().where(OrderItem.order == order.id).execute()
 
@@ -135,14 +134,11 @@ class OrderResource(Resource):
             return None, NOT_FOUND
 
         with database.transaction():
-            order_items = OrderItem.select().where(OrderItem.order == order.id)
+            for order_item in order.order_items:
+                order_item.item.availability += order_item.quantity
+                order_item.item.save()
 
-            for order_item in order_items:
-                temp_query = Item.get(Item.id == order_item.item)
-                temp_query.availability = temp_query.availability + order_item.quantity
-                temp_query.save()
-
-            for order_item in order_items:
+            for order_item in order.order_items:
                 order_item.delete_instance()
 
             order.delete_instance()
