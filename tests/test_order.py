@@ -259,10 +259,10 @@ class TestOrders(BaseTest):
         order1 = self.create_order(self.user1)
         order2 = self.create_order(self.user1)
 
-        temp_order_item = OrderItem.get(OrderItem.order == order1.id)
-        temp_item = Item.get(Item.id == temp_order_item.item)
-        temp_item.availability -= temp_order_item.quantity
-        temp_item.save()
+        items_quantity = {
+            oi.item.uuid: (oi.item.availability, oi.quantity)
+            for oi in order1.order_items
+        }
 
         resp = self.app.delete('/orders/{}'.format(order1.uuid))
         assert resp.status_code == NO_CONTENT
@@ -274,8 +274,9 @@ class TestOrders(BaseTest):
         order_items = OrderItem.select().where(OrderItem.order == order1)
         assert len(order_items) == 0
 
-        temp_item = Item.get(Item.id == temp_order_item.item)
-        assert (temp_item.availability == 11)
+        for item_uuid, (availability, quantity) in items_quantity.items():
+            item = Item.get(Item.uuid == item_uuid)
+            assert item.availability == availability + quantity
 
     def test_delete_order__failure_non_existing(self):
         self.create_order(self.user1)
