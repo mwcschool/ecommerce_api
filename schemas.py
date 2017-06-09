@@ -8,6 +8,7 @@ class ItemSchema(Schema):
     price = fields.Decimal(required=True)
     description = fields.Str(required=True, validate=non_empty_str)
     category = fields.Str(required=True, validate=non_empty_str)
+    availability = fields.Int(required=True, default=0)
 
 
 class UserSchema(Schema):
