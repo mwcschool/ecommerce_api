@@ -62,7 +62,8 @@ class TestItems(BaseTest):
             'name': '',
             'price': 10,
             'description': 'Description one',
-            'category': 'Category one'
+            'category': 'Category one',
+            'availability': 11
         }
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
