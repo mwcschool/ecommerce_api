@@ -6,6 +6,7 @@ from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
 from models import Item
+import hashlib
 import uuid
 import os
 import base64
@@ -347,3 +348,10 @@ class TestItems(BaseTest):
         picture_from_server = json.loads(resp.data.decode())
         assert picture_from_server['title'] == picture_data['title']
         assert picture_from_server['extension'] == 'jpg'
+
+        server_image_path = os.path.join(
+            self.temp_dir, 'items', str(item.uuid), '{}.jpg'.format(picture_from_server['uuid']))
+
+        test_image_hash = hashlib.sha256(open(test_image_path, 'rb').read()).digest()
+        server_image_hash = hashlib.sha256(open(server_image_path, 'rb').read()).digest()
+        assert test_image_hash == server_image_hash
