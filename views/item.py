@@ -18,11 +18,6 @@ def non_empty_string(string):
     return str(string).strip()
 
 
-def generate_uuid4():
-    '''Helper function to avoid name clash between argument "uuid" and module "uuid"'''
-    return uuid.uuid4()
-
-
 class ItemsResource(Resource):
     def get(self):
         return [obj.json() for obj in Item.select()], OK
@@ -45,7 +40,7 @@ class ItemsResource(Resource):
             return None, BAD_REQUEST
 
         obj = Item.create(
-            uuid=generate_uuid4(),
+            uuid=uuid.uuid4(),
             name=args["name"],
             price=args["price"],
             description=args["description"],
@@ -109,9 +104,9 @@ class ItemPicturesResource(Resource):
     def get(self, uuid):
         pass
 
-    def post(self, uuid):
+    def post(self, item_id):
         try:
-            item = Item.get(Item.uuid == uuid)
+            item = Item.get(Item.uuid == item_id)
         except Item.DoesNotExist:
             return None, NOT_FOUND
 
@@ -130,13 +125,13 @@ class ItemPicturesResource(Resource):
             abort(400, message="Extension not supported.")
 
         picture = Picture.create(
-            uuid=generate_uuid4(),
+            uuid=uuid.uuid4(),
             title=title,
             extension=extension,
             item=item
         )
 
-        save_path = os.path.join('.', config['UPLOADS_FOLDER'], 'items', str(uuid))
+        save_path = os.path.join('.', config['UPLOADS_FOLDER'], 'items', str(item_id))
         new_filename = '.'.join([str(picture.uuid), extension])
 
         os.makedirs(save_path, exist_ok=True)
