@@ -53,8 +53,7 @@ class TestOrders(BaseTest):
         assert order_from_server == order.json()
 
     def test_create_order__success(self):
-        temp_item = Item.get(Item.uuid == self.item1.uuid)
-        start_availability = temp_item.availability
+        start_availability = self.item1.availability
 
         new_order_data = {
             'user': self.user1.uuid,
@@ -83,8 +82,7 @@ class TestOrders(BaseTest):
         order_total = (self.item1.price * 2) + self.item2.price
         assert order_from_server['total_price'] == order_total
 
-        temp_item = Item.get(Item.uuid == self.item1.uuid)
-        assert temp_item.availability == (start_availability - 2)
+        assert self.item1.get().availability == (start_availability - 2)
 
     def test_create_order__failure_invalid_field_value(self):
         new_order_data = {
@@ -144,8 +142,7 @@ class TestOrders(BaseTest):
         order1 = self.create_order(self.user1)
         order2 = self.create_order(self.user1)
 
-        temp_item = Item.get(Item.uuid == self.item2.uuid)
-        start_availability = temp_item.availability
+        start_availability = self.item2.availability
 
         updates = {
             'items': json.dumps([
