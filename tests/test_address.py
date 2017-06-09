@@ -1,7 +1,7 @@
 from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, OK
 import json
 import uuid
-from models import Address
+from models import Address, User
 
 from .base_test import BaseTest
 
@@ -13,7 +13,6 @@ class TestAddress(BaseTest):
 
     def test_post__success_empty_db(self):
         data_address = {
-            'user_id': self.user.uuid,
             'nation': 'Italia',
             'city': 'Prato',
             'postal_code': '59100',
@@ -21,11 +20,11 @@ class TestAddress(BaseTest):
             'phone': '0574100100',
         }
 
-        resp = self.app.post('/addresses/', data=data_address)
+        resp = self.open_with_auth(
+            '/addresses/', 'post', self.user.email, 'p4ssw0rd', data=data_address)
 
         address_from_db = Address.get()
         expected_data = {
-            'user_id': address_from_db.user.uuid,
             'nation': address_from_db.nation,
             'city': address_from_db.city,
             'postal_code': address_from_db.postal_code,
@@ -39,7 +38,6 @@ class TestAddress(BaseTest):
 
     def test_post__success(self):
         data_address = {
-            'user_id': self.user.uuid,
             'nation': 'Italia',
             'city': 'Prato',
             'postal_code': '59100',
@@ -47,22 +45,22 @@ class TestAddress(BaseTest):
             'phone': '0574100100',
         }
 
-        resp = self.app.post('/addresses/', data=data_address)
+        current_user = User.get(User.email == self.user.email)
+
+        resp = self.open_with_auth(
+            '/addresses/', 'post', self.user.email, 'p4ssw0rd', data=data_address)
 
         address_from_server = json.loads(resp.data.decode())
 
         assert resp.status_code == CREATED
 
-        data_address['user'] = str(data_address['user_id'])
-        data_address.pop('user_id')
-
+        data_address['user'] = str(current_user.uuid)
         address_from_server.pop('uuid')
 
         assert address_from_server == data_address
 
     def test_post__empty_field(self):
         data_address = {
-            'user_id': self.user.uuid,
             'nation': '',
             'city': 'Prato',
             'postal_code': '59100',
@@ -70,40 +68,42 @@ class TestAddress(BaseTest):
             'phone': '0574100100',
         }
 
-        resp = self.app.post('/addresses/', data=data_address)
+        resp = self.open_with_auth(
+            '/addresses/', 'post', self.user.email, 'p4ssw0rd', data=data_address)
         assert resp.status_code == BAD_REQUEST
         assert len(Address.select()) == 0
 
     def test_post__field_not_exists(self):
         data_address = {
-            'user_id': self.user.uuid,
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
             'phone': '0574100100',
         }
 
-        resp = self.app.post('/addresses/', data=data_address)
+        resp = self.open_with_auth(
+            '/addresses/', 'post', self.user.email, 'p4ssw0rd', data=data_address)
         assert resp.status_code == BAD_REQUEST
         assert len(Address.select()) == 0
 
     def test_get__address_found(self):
         address = self.create_address(self.user)
 
-        resp = self.app.get('/addresses/{}'.format(address.uuid))
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(address.uuid), 'get', self.user.email, 'p4ssw0rd', data='')
         query = Address.get()
         assert resp.status_code == OK
         assert query.json() == json.loads(resp.data.decode())
 
     def test_get__address_not_found(self):
-        resp = self.app.get('/addresses/{}'.format(uuid.uuid4()))
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(uuid.uuid4()), 'get', self.user.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
 
     def test_put__success(self):
         data_address = self.create_address(self.user)
 
         new_data_address = {
-            'user_id': self.user.uuid,
             'nation': 'Italia',
             'city': 'Firenze',
             'postal_code': '505050',
@@ -111,10 +111,15 @@ class TestAddress(BaseTest):
             'phone': '0550550550',
         }
 
-        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
+        current_user = User.get(User.email == self.user.email)
+
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address.uuid), 'put', self.user.email, 'p4ssw0rd',
+            data=new_data_address)
+        new_data_address['user'] = str(current_user.uuid)
         address_from_db = Address.get()
         expected_data = {
-            'user_id': address_from_db.user.uuid,
+            'user': str(address_from_db.user.uuid),
             'nation': address_from_db.nation,
             'city': address_from_db.city,
             'postal_code': address_from_db.postal_code,
@@ -132,7 +137,9 @@ class TestAddress(BaseTest):
             'nation': 'Albania',
         }
 
-        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address.uuid), 'put', self.user.email, 'p4ssw0rd',
+            data=new_data_address)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__modify_empty_fields(self):
@@ -147,7 +154,9 @@ class TestAddress(BaseTest):
             'phone': '',
         }
 
-        resp = self.app.put('/addresses/{}'.format(data_address.uuid), data=new_data_address)
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address.uuid), 'put', self.user.email, 'p4ssw0rd',
+            data=new_data_address)
         assert resp.status_code == BAD_REQUEST
 
     def test_put__address_id_not_exists(self):
@@ -160,7 +169,9 @@ class TestAddress(BaseTest):
             'phone': '0574100100',
         }
 
-        resp = self.app.put('/addresses/{}'.format(uuid.uuid4()), data=data)
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(uuid.uuid4()), 'put', self.user.email, 'p4ssw0rd',
+            data=data)
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 0
 
@@ -170,7 +181,9 @@ class TestAddress(BaseTest):
         # TODO: Is ok to have a duplicated address for a single user?
         data_address2 = self.create_address(self.user)
 
-        resp = self.app.delete('/addresses/{}'.format(data_address1.uuid))
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address1.uuid), 'delete', self.user.email, 'p4ssw0rd',
+            data='')
         all_addresses = Address.select()
         address_from_db = all_addresses.get()
         assert resp.status_code == NO_CONTENT
@@ -178,13 +191,32 @@ class TestAddress(BaseTest):
         assert address_from_db.uuid == data_address2.uuid
 
     def test_delete__empty_db_address_id_not_exists(self):
-        resp = self.app.delete('/addresses/{}'.format(uuid.uuid4()))
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(uuid.uuid4()), 'delete', self.user.email, 'p4ssw0rd',
+            data='')
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 0
 
     def test_delete__address_id_not_exists(self):
         self.create_address(self.user)
 
-        resp = self.app.delete('/addresses/{}'.format(uuid.uuid4()))
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(uuid.uuid4()), 'delete', self.user.email, 'p4ssw0rd',
+            data='')
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 1
+
+    def test_get__address_found_different_user(self):
+        user2 = self.create_user("acaca@bababa.it")
+        address = self.create_address(self.user)
+
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(address.uuid), 'get', user2.email, 'p4ssw0rd', data='')
+        assert resp.status_code == NOT_FOUND
+
+    def test_delete__address_different_user(self):
+        user2 = self.create_user('user2@email.com')
+        address = self.create_address(self.user)
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(address.uuid), 'delete', user2.email, 'p4ssw0rd', data='')
+        assert resp.status_code == NOT_FOUND
