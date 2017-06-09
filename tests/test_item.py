@@ -407,3 +407,14 @@ class TestItems(BaseTest):
         resp = self.app.post('/items/{}/pictures'.format(item.uuid),
                              content_type='multipart/form-data', data=picture_data)
         assert resp.status_code == BAD_REQUEST
+
+    def test_get_item_pictures__success(self):
+        item = self.create_item()
+
+        image1 = self.create_item_picture(item)
+        image2 = self.create_item_picture(item)
+
+        resp = self.app.get('/items/{}/pictures'.format(item.uuid))
+
+        assert resp.status_code == OK
+        assert json.loads(resp.data.decode()) == [image1.json(), image2.json()]
