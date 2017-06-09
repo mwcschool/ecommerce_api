@@ -8,7 +8,7 @@ import uuid
 from werkzeug.datastructures import FileStorage
 import os
 
-from models import Item
+from models import Item, Picture
 import utils
 import auth
 
@@ -118,22 +118,30 @@ class ItemPicturesResource(Resource):
             return None, NOT_FOUND
 
         parser = reqparse.RequestParser()
+        parser.add_argument('title', type=non_empty_string, required=True)
         parser.add_argument('file', type=FileStorage, location='files', required=True)
 
         args = parser.parse_args(strict=True)
 
         image = args['file']
+        title = args['title']
 
         extension = image.filename.rsplit('.', 1)[1].lower()
         if '.' in image.filename and not extension in ALLOWED_EXTENSIONS:
             abort(400, message="Extension not supported.")
 
+        picture = Picture.create(
+            uuid=generate_uuid4(),
+            title=title,
+            extension=extension,
+            item=item
+        )
+
         save_path = os.path.join('.', UPLOADS_FOLDER, 'items', str(uuid))
+        new_filename = '.'.join([str(picture.uuid), extension])
 
         os.makedirs(save_path, exist_ok=True)
 
-        new_filename = '.'.join([str(generate_uuid4()), extension])
-
         image.save(os.path.join(save_path, new_filename))
 
-        return new_filename, CREATED
+        return picture.json(), CREATED
