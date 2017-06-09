@@ -50,7 +50,6 @@ class TestItems(BaseTest):
 
     def test_create_item__failure_invalid_field_value(self):
         user = self.create_user()
-        
         new_item_data = {
             'name': 'Item one',
             'price': 15,

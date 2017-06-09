@@ -50,7 +50,6 @@ class TestOrders(BaseTest):
         resp = self.open_with_auth(
             '/orders/{}'.format(order.uuid), 'get', self.user1.email, 'p4ssw0rd', data='')
         assert resp.status_code == OK
-
         order_from_server = json.loads(resp.data.decode())
 
         assert order_from_server == order.json()
@@ -188,7 +187,6 @@ class TestOrders(BaseTest):
 
         resp = self.open_with_auth(
             '/orders/{}'.format(order1.uuid), 'put', self.user1.email, 'p4ssw0rd', data=updates)
-        
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_non_existing(self):
