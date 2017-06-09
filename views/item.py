@@ -106,8 +106,13 @@ class ItemResource(Resource):
 
 
 class ItemPicturesResource(Resource):
-    def get(self, uuid):
-        pass
+    def get(self, item_id):
+        try:
+            item = Item.get(Item.uuid == item_id)
+        except Item.DoesNotExist:
+            return None, NOT_FOUND
+
+        return [pic.json() for pic in item.pictures], OK
 
     def post(self, item_id):
         try:
