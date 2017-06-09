@@ -340,4 +340,9 @@ class TestItems(BaseTest):
 
             resp = self.app.post('/items/{}/pictures'.format(item.uuid),
                                  content_type='multipart/form-data', data=picture_data)
+
             assert resp.status_code == CREATED
+
+            picture_from_server = json.loads(resp.data.decode())
+            assert picture_from_server['title'] == picture_data['title']
+            assert picture_from_server['extension'] == 'jpg'
