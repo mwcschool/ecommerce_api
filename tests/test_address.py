@@ -1,7 +1,7 @@
 from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, OK
 import json
 import uuid
-from models import Address
+from models import Address, User
 
 from .base_test import BaseTest
 
@@ -13,7 +13,6 @@ class TestAddress(BaseTest):
 
     def test_post__success_empty_db(self):
         data_address = {
-            'user_id': self.user.uuid,
             'nation': 'Italia',
             'city': 'Prato',
             'postal_code': '59100',
@@ -26,7 +25,6 @@ class TestAddress(BaseTest):
 
         address_from_db = Address.get()
         expected_data = {
-            'user_id': address_from_db.user.uuid,
             'nation': address_from_db.nation,
             'city': address_from_db.city,
             'postal_code': address_from_db.postal_code,
@@ -40,13 +38,14 @@ class TestAddress(BaseTest):
 
     def test_post__success(self):
         data_address = {
-            'user_id': self.user.uuid,
             'nation': 'Italia',
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
             'phone': '0574100100',
         }
+
+        current_user = User.get(User.email == self.user.email)
 
         resp = self.open_with_auth(
             '/addresses/', 'post', self.user.email, 'p4ssw0rd', data=data_address)
@@ -55,16 +54,13 @@ class TestAddress(BaseTest):
 
         assert resp.status_code == CREATED
 
-        data_address['user'] = str(data_address['user_id'])
-        data_address.pop('user_id')
-
+        data_address['user'] = str(current_user.uuid)
         address_from_server.pop('uuid')
 
         assert address_from_server == data_address
 
     def test_post__empty_field(self):
         data_address = {
-            'user_id': self.user.uuid,
             'nation': '',
             'city': 'Prato',
             'postal_code': '59100',
@@ -79,7 +75,6 @@ class TestAddress(BaseTest):
 
     def test_post__field_not_exists(self):
         data_address = {
-            'user_id': self.user.uuid,
             'city': 'Prato',
             'postal_code': '59100',
             'local_address': 'Via Roncioni 10',
@@ -109,7 +104,6 @@ class TestAddress(BaseTest):
         data_address = self.create_address(self.user)
 
         new_data_address = {
-            'user_id': self.user.uuid,
             'nation': 'Italia',
             'city': 'Firenze',
             'postal_code': '505050',
@@ -117,12 +111,15 @@ class TestAddress(BaseTest):
             'phone': '0550550550',
         }
 
+        current_user = User.get(User.email == self.user.email)
+
         resp = self.open_with_auth(
             '/addresses/{}'.format(data_address.uuid), 'put', self.user.email, 'p4ssw0rd',
             data=new_data_address)
+        new_data_address['user'] = str(current_user.uuid)
         address_from_db = Address.get()
         expected_data = {
-            'user_id': address_from_db.user.uuid,
+            'user': str(address_from_db.user.uuid),
             'nation': address_from_db.nation,
             'city': address_from_db.city,
             'postal_code': address_from_db.postal_code,
