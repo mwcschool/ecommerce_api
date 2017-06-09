@@ -1,4 +1,4 @@
-from models import Item, User, Address, Order, OrderItem
+from models import Item, User, Address, Order, OrderItem, Picture
 from views.user import crypt_password
 from peewee import SqliteDatabase
 from app import app
@@ -11,7 +11,7 @@ class BaseTest:
     def setup_class(cls):
         database = SqliteDatabase(':memory:')
 
-        cls.tables = [Item, User, Address, Order, OrderItem]
+        cls.tables = [Item, User, Address, Order, OrderItem, Picture]
         for table in cls.tables:
             table._meta.database = database
             table.create_table()
