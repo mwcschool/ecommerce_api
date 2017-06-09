@@ -27,6 +27,7 @@ class Testuser(BaseTest):
         assert resp.status_code == CREATED
         assert len(query) == 1
         assert query.get().json() == json.loads(resp.data.decode())
+        assert user_from_db.superuser == False
 
     def test_post__success(self):
         data = {
@@ -42,6 +43,7 @@ class Testuser(BaseTest):
         query = User.select().where(User.uuid != user1.uuid)
         assert resp.status_code == CREATED
         assert query.get().json() == json.loads(resp.data.decode())
+        assert User.superuser == False
 
     def test_post__empty_field(self):
         data = {
@@ -90,6 +92,7 @@ class Testuser(BaseTest):
         assert expected_data == data
         assert resp.status_code == CREATED
         assert query.get().json() == json.loads(resp.data.decode())
+        assert user_from_db.superuser == False
 
     def test_put__modify_one_field(self):
         user = self.create_user()
