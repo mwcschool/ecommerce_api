@@ -269,3 +269,24 @@ class TestItems(BaseTest):
 
         item_from_db = Item.get(uuid=item.uuid).json()
         assert item.json() == item_from_db
+
+    def test_reload(self):
+        item = self.create_item(availability=5)
+        assert item.availability == 5
+
+        item.availability = 1
+        assert item.availability == 1
+
+        item.update(availability=0).where(Item.uuid == item.uuid).execute()
+        assert item.availability == 1
+
+        item = item.reload()
+        assert item.availability == 0
+
+        item_old = Item.get(Item.uuid == item.uuid)
+
+        item.availability = 1
+        item.save()
+
+        assert item_old.availability == 0
+        assert item_old.reload().availability == 1
