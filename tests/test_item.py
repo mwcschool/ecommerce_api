@@ -426,3 +426,8 @@ class TestItems(BaseTest):
 
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == []
+
+    def test_get_item_pictures__failure_non_existing_item(self):
+        resp = self.app.get('/items/{}/pictures'.format(uuid.uuid4()))
+
+        assert resp.status_code == NOT_FOUND
