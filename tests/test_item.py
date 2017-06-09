@@ -370,6 +370,18 @@ class TestItems(BaseTest):
                              content_type='multipart/form-data', data=picture_data)
         assert resp.status_code == BAD_REQUEST
 
+    def test_create_item_pictures__failure_missing_image(self):
+        item = self.create_item()
+
+        picture_data = {
+            'title': 'Example image',
+            'file': None,
+        }
+
+        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
+                             content_type='multipart/form-data', data=picture_data)
+        assert resp.status_code == BAD_REQUEST
+
     def test_create_item_pictures__failure_non_existing_item(self):
         test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
 
