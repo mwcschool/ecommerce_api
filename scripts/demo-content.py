@@ -6,14 +6,13 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('seed')
-    parser.add_argument('fakeseed')
+    parser.add_argument('seed', type=int)
+    parser.add_argument('fakeseed', type=int)
     args = parser.parse_args()
-
     database.connect()
     seed(args.seed)
-    fake.seed(args.fakeseed)
     fake = Factory.create('it_IT')
+    fake.seed(args.fakeseed)
 
     items_list = []
     users_list = []
