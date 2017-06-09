@@ -17,7 +17,7 @@ ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'png'])
 
 
 def non_empty_string(string):
-    return str(val).strip()
+    return str(string).strip()
 
 
 def generate_uuid4():
