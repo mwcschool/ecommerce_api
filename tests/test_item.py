@@ -330,7 +330,7 @@ class TestItems(BaseTest):
         assert item_old.reload().availability == 1
 
     def test_create_item_pictures__success(self):
-        with open(os.path.join('.', 'tests', 'test_image.jpg'), 'rb') as test_image:
+        with open(os.path.join('.', 'tests', 'images', 'test_image.jpg'), 'rb') as test_image:
             item = self.create_item()
 
             picture_data = {
