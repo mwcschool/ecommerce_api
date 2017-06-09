@@ -16,7 +16,11 @@ import auth
 
 
 def non_empty_string(string):
-    return str(string).strip()
+    string = str(string).strip()
+    if string:
+        return string
+    else:
+        raise ValueError
 
 
 class ItemsResource(Resource):
