@@ -61,6 +61,7 @@ class BaseTest:
         if not item:
             item = self.create_item()
 
+        # TODO: Add option for different images and extensions?
         extension = 'jpg'
 
         picture = Picture.create(
