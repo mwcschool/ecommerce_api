@@ -7,6 +7,7 @@ from http.client import OK
 from http.client import BAD_REQUEST
 import uuid
 from werkzeug.datastructures import FileStorage
+from werkzeug.utils import secure_filename
 import os
 
 from models import Item, Picture
@@ -132,7 +133,7 @@ class ItemPicturesResource(Resource):
         )
 
         save_path = os.path.join('.', config['UPLOADS_FOLDER'], 'items', str(item_id))
-        new_filename = '.'.join([str(picture.uuid), extension])
+        new_filename = secure_filename('.'.join([str(picture.uuid), extension]))
 
         os.makedirs(save_path, exist_ok=True)
 
