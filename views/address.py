@@ -2,6 +2,7 @@ import uuid
 from models import User, Address
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, OK
 from flask_restful import Resource, reqparse
+from flask import g
 import utils
 import auth
 
@@ -45,7 +46,11 @@ class AddressResource(Resource):
     @auth.login_required
     def get(self, address_id):
         try:
-            address = Address.get(Address.uuid == address_id)
+            address = (
+                Address.select()
+                .where(Address.uuid == address_id)
+                .where(Address.user == g.current_user)
+                .get())
         except Address.DoesNotExist:
             return None, NOT_FOUND
 
@@ -54,7 +59,11 @@ class AddressResource(Resource):
     @auth.login_required
     def put(self, address_id):
         try:
-            address = Address.get(Address.uuid == address_id)
+            address = (
+                Address.select()
+                .where(Address.uuid == address_id)
+                .where(Address.user == g.current_user)
+                .get())
         except Address.DoesNotExist:
             return None, NOT_FOUND
 
@@ -87,7 +96,11 @@ class AddressResource(Resource):
     @auth.login_required
     def delete(self, address_id):
         try:
-            address = Address.get(Address.uuid == address_id)
+            address = (
+                Address.select()
+                .where(Address.uuid == address_id)
+                .where(Address.user == g.current_user)
+                .get())
         except Address.DoesNotExist:
             return None, NOT_FOUND
 

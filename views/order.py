@@ -1,9 +1,9 @@
 from flask_restful import reqparse, Resource
-from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
+from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST, UNAUTHORIZED
 import uuid
 import json
 import auth
-
+from flask import g
 from models import Order, OrderItem, Item, User, database
 
 
@@ -28,8 +28,10 @@ class OrdersResource(Resource):
         except User.DoesNotExist:
             return None, BAD_REQUEST
 
-        total_price = 0
+        if user != g.current_user:
+            return '', UNAUTHORIZED
 
+        total_price = 0
         items = args['items']
         items_uuid = [i[0] for i in items]
         items_query = Item.select().where(Item.uuid << items_uuid)
@@ -75,14 +77,20 @@ class OrderResource(Resource):
     @auth.login_required
     def get(self, uuid):
         try:
-            return Order.get(uuid=uuid).json(), OK
+            order = (
+                Order.select().where(Order.uuid == uuid).where(Order.user == g.current_user)
+                .get())
         except Order.DoesNotExist:
             return None, NOT_FOUND
+
+        return order.json(), OK
 
     @auth.login_required
     def put(self, uuid):
         try:
-            order = Order.get(uuid=uuid)
+            order = (
+                Order.select().where(Order.uuid == uuid).where(Order.user == g.current_user)
+                .get())
         except Order.DoesNotExist:
             return None, NOT_FOUND
 
@@ -135,7 +143,11 @@ class OrderResource(Resource):
     @auth.login_required
     def delete(self, uuid):
         try:
-            order = Order.get(Order.uuid == uuid)
+            order = (
+                Order.select()
+                .where(Order.uuid == uuid)
+                .where(Order.user == g.current_user)
+                .get())
         except Order.DoesNotExist:
             return None, NOT_FOUND
 
