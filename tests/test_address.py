@@ -1,4 +1,4 @@
-from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, OK
+from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, OK, UNAUTHORIZED
 import json
 import uuid
 from models import Address
@@ -208,3 +208,18 @@ class TestAddress(BaseTest):
             data='')
         assert resp.status_code == NOT_FOUND
         assert len(Address.select()) == 1
+
+    def test_get__address_found_different_user(self):
+        user2 = self.create_user("acaca@bababa.it")
+        address = self.create_address(self.user)
+
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(address.uuid), 'get', user2.email, 'p4ssw0rd', data='')
+        assert resp.status_code == NOT_FOUND
+
+    def test_delete__address_different_user(self):
+        user2 = self.create_user('user2@email.com')
+        address = self.create_address(self.user)
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(address.uuid), 'delete', user2.email, 'p4ssw0rd', data='')
+        assert resp.status_code == NOT_FOUND
