@@ -11,6 +11,10 @@ class BaseModel(Model):
     class Meta:
         database = database
 
+    def reload(self):
+        cls = type(self)
+        return cls.get(cls.id == self.id)
+
     @classmethod
     def get_schema(cls):
         raise NotImplementedError
