@@ -131,7 +131,7 @@ class ItemPicturesResource(Resource):
 
         extension = image.filename.rsplit('.', 1)[1].lower()
         config = current_app.config
-        if '.' in image.filename and not extension in config['ALLOWED_EXTENSIONS']:
+        if '.' in image.filename and extension not in config['ALLOWED_EXTENSIONS']:
             abort(400, message="Extension not supported.")
 
         picture = Picture.create(

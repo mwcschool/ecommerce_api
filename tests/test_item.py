@@ -9,7 +9,6 @@ from models import Item
 import hashlib
 import uuid
 import os
-import base64
 
 from .base_test import BaseTest
 
