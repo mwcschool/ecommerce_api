@@ -12,6 +12,7 @@ from views.address import AddressResource, AddressesResource
 from views.favorites import FavoritesResource, FavoriteResource
 from views.picture import PictureResource
 
+
 app = Flask(__name__)
 api = Api(app)
 app.config['UPLOADS_FOLDER'] = 'images'
