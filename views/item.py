@@ -20,6 +20,11 @@ def non_empty_string(string):
     return str(val).strip()
 
 
+def generate_uuid4():
+    '''Helper function to avoid name clash between argument "uuid" and module "uuid"'''
+    return uuid.uuid4()
+
+
 class ItemsResource(Resource):
     def get(self):
         return [obj.json() for obj in Item.select()], OK
@@ -42,7 +47,7 @@ class ItemsResource(Resource):
             return None, BAD_REQUEST
 
         obj = Item.create(
-            uuid=uuid.uuid4(),
+            uuid=generate_uuid4(),
             name=args["name"],
             price=args["price"],
             description=args["description"],
@@ -122,7 +127,7 @@ class ItemPicturesResource(Resource):
 
         os.makedirs(save_path, exist_ok=True)
 
-        new_filename = '.'.join([str(uuid.uuid4()), extension])
+        new_filename = '.'.join([str(generate_uuid4()), extension])
 
         image.save(os.path.join(save_path, new_filename))
 
