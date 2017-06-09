@@ -72,7 +72,7 @@ class AddressResource(Resource):
             if len(args[parm]) < 3:
                 return '', BAD_REQUEST
 
-        if  address.user.uuid == g.current_user.uuid:
+        if address.user.uuid == g.current_user.uuid:
             address.nation = args['nation']
             address.city = args['city']
             address.postal_code = args['postal_code']
