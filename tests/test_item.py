@@ -381,3 +381,17 @@ class TestItems(BaseTest):
         resp = self.app.post('/items/{}/pictures'.format(item.uuid),
                              content_type='multipart/form-data', data=picture_data)
         assert resp.status_code == BAD_REQUEST
+
+    def test_create_item_pictures__failure_unsupported_image_extension(self):
+        test_image_path = os.path.join('.', 'tests', 'images', 'wrong_file_format.gif')
+
+        item = self.create_item()
+
+        picture_data = {
+            'title': 'Example image',
+            'file': FileStorage(open(test_image_path, 'rb')),
+        }
+
+        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
+                             content_type='multipart/form-data', data=picture_data)
+        assert resp.status_code == BAD_REQUEST
