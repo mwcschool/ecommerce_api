@@ -4,13 +4,11 @@ from marshmallow import Schema, fields, ValidationError
 def check_empty_str(value):
     if str(value).strip() == '':
         raise ValidationError('String field must not be empty')
-    return True
 
 
 def check_negative_number(value):
     if value < 0:
         raise ValidationError('Number must be greater than or equal to zero')
-    return True
 
 
 class ItemSchema(Schema):
