@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse, abort
+from flask import current_app
 from http.client import CREATED
 from http.client import NO_CONTENT
 from http.client import NOT_FOUND
@@ -11,9 +12,6 @@ import os
 from models import Item, Picture
 import utils
 import auth
-
-UPLOADS_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'png'])
 
 
 def non_empty_string(string):
@@ -127,7 +125,8 @@ class ItemPicturesResource(Resource):
         title = args['title']
 
         extension = image.filename.rsplit('.', 1)[1].lower()
-        if '.' in image.filename and not extension in ALLOWED_EXTENSIONS:
+        config = current_app.config
+        if '.' in image.filename and not extension in config['ALLOWED_EXTENSIONS']:
             abort(400, message="Extension not supported.")
 
         picture = Picture.create(
@@ -137,7 +136,7 @@ class ItemPicturesResource(Resource):
             item=item
         )
 
-        save_path = os.path.join('.', UPLOADS_FOLDER, 'items', str(uuid))
+        save_path = os.path.join('.', config['UPLOADS_FOLDER'], 'items', str(uuid))
         new_filename = '.'.join([str(picture.uuid), extension])
 
         os.makedirs(save_path, exist_ok=True)
