@@ -2,4 +2,4 @@ database.db
 .cache/
 __pycache__
 *.pyc
-images
+/images/
