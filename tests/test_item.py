@@ -367,3 +367,17 @@ class TestItems(BaseTest):
         resp = self.app.post('/items/{}/pictures'.format(uuid.uuid4),
                              content_type='multipart/form-data', data=picture_data)
         assert resp.status_code == NOT_FOUND
+
+    def test_create_item_pictures__failure_not_an_image(self):
+        test_image_path = os.path.join('.', 'tests', 'images', 'not_an_image.log')
+
+        item = self.create_item()
+
+        picture_data = {
+            'title': 'Example image',
+            'file': FileStorage(open(test_image_path, 'rb')),
+        }
+
+        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
+                             content_type='multipart/form-data', data=picture_data)
+        assert resp.status_code == BAD_REQUEST
