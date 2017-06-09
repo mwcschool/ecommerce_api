@@ -345,12 +345,12 @@ class TestItems(BaseTest):
 
         assert resp.status_code == CREATED
 
-        picture_from_server = json.loads(resp.data.decode())
-        assert picture_from_server['title'] == picture_data['title']
-        assert picture_from_server['extension'] == 'jpg'
+        image_from_server = json.loads(resp.data.decode())
+        assert image_from_server['title'] == picture_data['title']
+        assert image_from_server['extension'] == 'jpg'
 
         server_image_path = os.path.join(
-            self.temp_dir, 'items', str(item.uuid), '{}.jpg'.format(picture_from_server['uuid']))
+            self.temp_dir, 'items', str(item.uuid), '{}.jpg'.format(image_from_server['uuid']))
 
         test_image_hash = hashlib.sha256(open(test_image_path, 'rb').read()).digest()
         server_image_hash = hashlib.sha256(open(server_image_path, 'rb').read()).digest()
