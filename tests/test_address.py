@@ -1,4 +1,4 @@
-from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, OK, UNAUTHORIZED
+from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, OK
 import json
 import uuid
 from models import Address

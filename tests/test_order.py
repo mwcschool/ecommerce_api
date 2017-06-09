@@ -301,4 +301,3 @@ class TestOrders(BaseTest):
         resp = self.open_with_auth(
             '/orders/{}'.format(order1.uuid), 'delete', user2.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
-
