@@ -10,7 +10,6 @@ class BaseModel(Model):
     class Meta:
         database = database
 
-
 class Item(BaseModel):
     uuid = UUIDField(unique=True)
     name = CharField()
@@ -28,7 +27,6 @@ class Item(BaseModel):
             'category': self.category,
             'availability': self.availability,
         }
-
 
 class User(BaseModel):
     uuid = UUIDField(unique=True)
