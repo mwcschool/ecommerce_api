@@ -418,3 +418,11 @@ class TestItems(BaseTest):
 
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == [image1.json(), image2.json()]
+
+    def test_get_item_pictures__success_empty_pictures(self):
+        item = self.create_item()
+
+        resp = self.app.get('/items/{}/pictures'.format(item.uuid))
+
+        assert resp.status_code == OK
+        assert json.loads(resp.data.decode()) == []
