@@ -330,19 +330,20 @@ class TestItems(BaseTest):
         assert item_old.reload().availability == 1
 
     def test_create_item_pictures__success(self):
-        with open(os.path.join('.', 'tests', 'images', 'test_image.jpg'), 'rb') as test_image:
-            item = self.create_item()
+        test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
 
-            picture_data = {
-                'title': 'Example image',
-                'file': FileStorage(test_image),
-            }
+        item = self.create_item()
 
-            resp = self.app.post('/items/{}/pictures'.format(item.uuid),
-                                 content_type='multipart/form-data', data=picture_data)
+        picture_data = {
+            'title': 'Example image',
+            'file': FileStorage(open(test_image_path, 'rb')),
+        }
 
-            assert resp.status_code == CREATED
+        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
+                             content_type='multipart/form-data', data=picture_data)
 
-            picture_from_server = json.loads(resp.data.decode())
-            assert picture_from_server['title'] == picture_data['title']
-            assert picture_from_server['extension'] == 'jpg'
+        assert resp.status_code == CREATED
+
+        picture_from_server = json.loads(resp.data.decode())
+        assert picture_from_server['title'] == picture_data['title']
+        assert picture_from_server['extension'] == 'jpg'
