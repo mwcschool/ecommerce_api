@@ -28,8 +28,9 @@ class TestItems(BaseTest):
         new_item_data = {
             'name': 'Item one',
             'price': 15,
-            'description': 'Description one',
-            'category': 'Category one'
+            'description': 'desc1',
+            'category': 'poligoni',
+            'availability': 11
         }
 
         resp = self.app.post('/items/', data=new_item_data)
@@ -44,12 +45,25 @@ class TestItems(BaseTest):
         item_from_server.pop('uuid')
         assert item_from_server == new_item_data
 
+    def test_create_item__failure_invalid_field_value(self):
+        new_item_data = {
+            'name': 'Item one',
+            'price': 15,
+            'description': 'desc1',
+            'category': 'poligoni',
+            'availability': -8
+        }
+
+        resp = self.app.post('/items/', data=new_item_data)
+        assert resp.status_code == BAD_REQUEST
+
     def test_create_item__failure_empty_field(self):
         new_item_data = {
             'name': '',
             'price': 10,
             'description': 'Description one',
-            'category': 'Category one'
+            'category': 'Category one',
+            'availability': 11
         }
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
@@ -58,9 +72,10 @@ class TestItems(BaseTest):
     def test_create_item__failure_empty_field_only_spaces(self):
         new_item_data = {
             'name': '    ',
-            'price': 10,
-            'description': 'Description one',
-            'category': 'Category one'
+            'price': 5,
+            'description': 'desc1',
+            'category': 'varie',
+            'availability': 11
         }
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
@@ -80,7 +95,8 @@ class TestItems(BaseTest):
             'name': 'Item one',
             'price': 'Ten',
             'description': 'Description one',
-            'category': 'Category one'
+            'category': 'Category one',
+            'availability': 11
         }
         resp = self.app.post('/items/', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
@@ -105,7 +121,8 @@ class TestItems(BaseTest):
             name='Item one',
             price=5,
             description='Description one',
-            category='Category one'
+            category='Category one',
+            availability=11
         )
 
         resp = self.app.get('/items/{}'.format(uuid.uuid4()))
@@ -139,14 +156,16 @@ class TestItems(BaseTest):
             name='Item one',
             price=5,
             description='Description one',
-            category='Category one'
+            category='Category one',
+            availability=11
         )
 
         new_item_data = {
             'name': 'Item one',
             'price': 10,
-            'description': 'Description two',
-            'category': 'Category two'
+            'description': 'Descrizione sensata',
+            'category': 'Poligoni',
+            'availability': 0
         }
 
         resp = self.app.put('/items/{}'.format(static_id), data=new_item_data)
@@ -160,20 +179,45 @@ class TestItems(BaseTest):
         item_from_server.pop('uuid')
         assert new_item_data == item_from_server
 
+    def test_modify_item__failure_invalid_field_value(self):
+        static_id = uuid.uuid4()
+
+        Item.create(
+            uuid=static_id,
+            name='Item one',
+            price=5,
+            description='Description one',
+            category='Category one',
+            availability=11
+        )
+
+        new_item_data = {
+            'name': 'Item one',
+            'price': 10,
+            'description': 'Descrizione sensata',
+            'category': 'Poligoni',
+            'availability': -8
+        }
+
+        resp = self.app.put('items/{}'.format(static_id), data=new_item_data)
+        assert resp.status_code == BAD_REQUEST
+
     def test_modify_item__failure_empty_field_only_spaces(self):
         item = Item.create(
             uuid=uuid.uuid4(),
             name='Item one',
             price=5,
             description='Description one',
-            category='Category one'
+            category='Category one',
+            availability=11
         )
 
         modified_content = {
             'name': '      ',
             'price': 10,
             'description': 'Description two',
-            'category': 'Category two'
+            'category': 'Category two',
+            'availability': 11
         }
 
         resp = self.app.put('/items/{}'.format(item.uuid), data=modified_content)
@@ -187,7 +231,8 @@ class TestItems(BaseTest):
             name='Item one',
             price=5,
             description='Description one',
-            category='Category one'
+            category='Category one',
+            availability=11
         )
 
         modified_content = {
@@ -207,15 +252,18 @@ class TestItems(BaseTest):
             name='Item one',
             price=5,
             description='Description one',
-            category='Category one'
+            category='Category one',
+            availability=11
         )
 
         modified_content = {
             'name': 'Item one',
             'price': 'Ten',
             'description': 'Description two',
-            'category': 'Category two'
+            'category': 'Category two',
+            'availability': 6
         }
+
         resp = self.app.put('/items/{}'.format(item.uuid), data=modified_content)
         assert resp.status_code == BAD_REQUEST
 

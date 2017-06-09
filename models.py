@@ -1,4 +1,4 @@
-from peewee import Model, SqliteDatabase
+from peewee import Model, SqliteDatabase, Check
 from peewee import DecimalField, TextField, CharField
 from peewee import UUIDField, ForeignKeyField, IntegerField
 from passlib.hash import pbkdf2_sha256
@@ -17,6 +17,7 @@ class Item(BaseModel):
     price = DecimalField()
     description = TextField()
     category = CharField()
+    availability = IntegerField(constraints=[Check('availability >= 0')])
 
     def json(self):
         return {
@@ -24,7 +25,8 @@ class Item(BaseModel):
             'name': self.name,
             'price': int(self.price),
             'description': self.description,
-            'category': self.category
+            'category': self.category,
+            'availability': self.availability,
         }
 
 
@@ -61,7 +63,7 @@ class Address(BaseModel):
             'city': self.city,
             'postal_code': self.postal_code,
             'local_address': self.local_address,
-            'phone': self.phone
+            'phone': self.phone,
         }
 
 
@@ -75,7 +77,7 @@ class Order(BaseModel):
             'uuid': str(self.uuid),
             'total_price': float(self.total_price),
             'user': str(self.user.uuid),
-            'items': self._get_order_items()
+            'items': self._get_order_items(),
         }
 
     def _get_order_items(self):
@@ -86,7 +88,7 @@ class Order(BaseModel):
                 'uuid': str(item.uuid),
                 'name': item.name,
                 'quantity': order_item.quantity,
-                'subtotal': float(order_item.subtotal)
+                'subtotal': float(order_item.subtotal),
             })
         return data
 

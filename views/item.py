@@ -19,10 +19,14 @@ class ItemsResource(Resource):
         parser.add_argument('price', type=int, required=True)
         parser.add_argument('description', type=str, required=True)
         parser.add_argument('category', type=str, required=True)
+        parser.add_argument('availability', type=int, required=True)
         args = parser.parse_args(strict=True)
         try:
             utils.non_empty_str(args['name'], 'name')
         except ValueError:
+            return None, BAD_REQUEST
+
+        if args["availability"] < 0:
             return None, BAD_REQUEST
 
         obj = Item.create(
@@ -30,7 +34,8 @@ class ItemsResource(Resource):
             name=args["name"],
             price=args["price"],
             description=args["description"],
-            category=args["category"]
+            category=args["category"],
+            availability=args["availability"]
         )
 
         return obj.json(), CREATED
@@ -64,16 +69,21 @@ class ItemResource(Resource):
         parser.add_argument('price', type=int, required=True)
         parser.add_argument('description', type=str, required=True)
         parser.add_argument('category', type=str, required=True)
+        parser.add_argument('availability', type=int, required=True)
         args = parser.parse_args(strict=True)
         try:
             utils.non_empty_str(args['name'], 'name')
         except ValueError:
             return None, BAD_REQUEST
 
+        if args["availability"] < 0:
+            return None, BAD_REQUEST
+
         obj.name = args["name"]
         obj.price = args["price"]
         obj.description = args["description"]
         obj.category = args["category"]
+        obj.availability = args["availability"]
         obj.save()
 
         return obj.json(), OK

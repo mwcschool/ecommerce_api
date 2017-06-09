@@ -39,6 +39,11 @@ class OrdersResource(Resource):
             item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
             total_price += float(item.price * item_quantity)
 
+        for item in items_query:
+            item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
+            if item_quantity > item.availability:
+                return None, BAD_REQUEST
+
         with database.transaction():
             order = Order.create(
                 uuid=uuid.uuid4(),
@@ -54,6 +59,8 @@ class OrdersResource(Resource):
                     quantity=item_quantity,
                     subtotal=float(item.price * item_quantity)
                 )
+                item.availability = (item.availability - item_quantity)
+                item.save()
 
         return order.json(), CREATED
 
@@ -91,8 +98,18 @@ class OrderResource(Resource):
             item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
             total_price += float(item.price * item_quantity)
 
+        for item in items_query:
+            item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
+            if item_quantity > item.availability:
+                return None, BAD_REQUEST
+
         with database.transaction():
-            OrderItem.delete().where(OrderItem.order == order).execute()
+            temp_query = OrderItem.select().where(OrderItem.order == order.id)
+            for order_item in temp_query:
+                order_item.item.availability = (order_item.item.availability + order_item.quantity)
+                order_item.item.save()
+
+            OrderItem.delete().where(OrderItem.order == order.id).execute()
 
             for item in items_query:
                 item_quantity = [x[1] for x in items if x[0] == str(item.uuid)][0]
@@ -102,6 +119,8 @@ class OrderResource(Resource):
                     quantity=item_quantity,
                     subtotal=float(item.price * item_quantity)
                 )
+                item.availability = (item.availability - item_quantity)
+                item.save()
 
             order.total_price = total_price
             order.save()
@@ -115,10 +134,11 @@ class OrderResource(Resource):
             return None, NOT_FOUND
 
         with database.transaction():
-            order_items = OrderItem.select().where(
-                OrderItem.order == order)
+            for order_item in order.order_items:
+                order_item.item.availability += order_item.quantity
+                order_item.item.save()
 
-            for order_item in order_items:
+            for order_item in order.order_items:
                 order_item.delete_instance()
 
             order.delete_instance()

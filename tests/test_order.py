@@ -2,7 +2,7 @@ import uuid
 import json
 from http.client import OK, NOT_FOUND, NO_CONTENT, CREATED, BAD_REQUEST
 
-from models import Order, OrderItem
+from models import Order, OrderItem, Item
 
 from .base_test import BaseTest
 
@@ -53,6 +53,8 @@ class TestOrders(BaseTest):
         assert order_from_server == order.json()
 
     def test_create_order__success(self):
+        start_availability = self.item1.availability
+
         new_order_data = {
             'user': self.user1.uuid,
             'items': json.dumps([
@@ -79,6 +81,19 @@ class TestOrders(BaseTest):
 
         order_total = (self.item1.price * 2) + self.item2.price
         assert order_from_server['total_price'] == order_total
+
+        assert self.item1.get().availability == (start_availability - 2)
+
+    def test_create_order__failure_invalid_field_value(self):
+        new_order_data = {
+            'user': self.user1.uuid,
+            'items': json.dumps([
+                [str(self.item1.uuid), 888], [str(self.item2.uuid), 1]
+            ])
+        }
+
+        resp = self.app.post('/orders/', data=new_order_data)
+        assert resp.status_code == BAD_REQUEST
 
     def test_create_order__failure_missing_field(self):
         new_order_data = {
@@ -127,6 +142,8 @@ class TestOrders(BaseTest):
         order1 = self.create_order(self.user1)
         order2 = self.create_order(self.user1)
 
+        start_availability = self.item2.availability
+
         updates = {
             'items': json.dumps([
                 [str(self.item2.uuid), 2]
@@ -149,6 +166,24 @@ class TestOrders(BaseTest):
         order1_items = OrderItem.select().where(OrderItem.order == order1)
         assert len(order1_items) == 1
         assert str(order1_items[0].item.uuid) == str(self.item2.uuid)
+
+        temp_item = Item.get(Item.uuid == self.item2.uuid)
+        assert temp_item.availability == (start_availability - 2)
+
+    def test_modify_order__failure_invalid_field_value(self):
+        order1 = self.create_order(self.user1)
+
+        updates = {
+            'items': json.dumps([
+                [str(self.item2.uuid), 888]
+            ])
+        }
+
+        resp = self.app.put(
+            '/orders/{}'.format(order1.uuid),
+            data=updates
+        )
+        assert resp.status_code == BAD_REQUEST
 
     def test_modify_order__failure_non_existing(self):
         self.create_order(self.user1)
@@ -221,6 +256,11 @@ class TestOrders(BaseTest):
         order1 = self.create_order(self.user1)
         order2 = self.create_order(self.user1)
 
+        items_quantity = {
+            oi.item.uuid: (oi.item.availability, oi.quantity)
+            for oi in order1.order_items
+        }
+
         resp = self.app.delete('/orders/{}'.format(order1.uuid))
         assert resp.status_code == NO_CONTENT
 
@@ -230,6 +270,10 @@ class TestOrders(BaseTest):
 
         order_items = OrderItem.select().where(OrderItem.order == order1)
         assert len(order_items) == 0
+
+        for item_uuid, (availability, quantity) in items_quantity.items():
+            item = Item.get(Item.uuid == item_uuid)
+            assert item.availability == availability + quantity
 
     def test_delete_order__failure_non_existing(self):
         self.create_order(self.user1)
