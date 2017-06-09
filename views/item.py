@@ -1,4 +1,4 @@
-from flask_restful import Resource, reqparse
+from flask_restful import Resource, reqparse, abort
 from http.client import CREATED
 from http.client import NO_CONTENT
 from http.client import NOT_FOUND
@@ -8,6 +8,13 @@ import uuid
 from models import Item
 import utils
 import auth
+
+UPLOADS_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'png'])
+
+
+def non_empty_string(string):
+    return str(val).strip()
 
 
 class ItemsResource(Resource):
