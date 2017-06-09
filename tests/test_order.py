@@ -239,6 +239,13 @@ class TestOrders(BaseTest):
             '/orders/{}'.format(order1.uuid), 'put', self.user1.email, 'p4ssw0rd', data=updates)
         assert resp.status_code == BAD_REQUEST
 
+    def test_modify_order__failure_different_user(self):
+        order1 = self.create_order(self.user1)
+        user2 = self.create_user('user2@email.com')
+        resp = self.open_with_auth(
+            '/orders/{}'.format(order1.uuid), 'put', user2.email, 'p4ssw0rd', data='')
+        assert resp.status_code == NOT_FOUND
+
     def test_modify_order__failure_empty_field(self):
         order1 = self.create_order(self.user1)
 
@@ -287,3 +294,11 @@ class TestOrders(BaseTest):
         resp = self.open_with_auth(
             '/orders/{}'.format(str(uuid.uuid4())), 'delete', self.user1.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
+
+    def test_delete_order__failure_different_user(self):
+        order1 = self.create_order(self.user1)
+        user2 = self.create_user('user2@email.com')
+        resp = self.open_with_auth(
+            '/orders/{}'.format(order1.uuid), 'delete', user2.email, 'p4ssw0rd', data='')
+        assert resp.status_code == NOT_FOUND
+
