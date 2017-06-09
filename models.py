@@ -1,6 +1,7 @@
 from peewee import Model, SqliteDatabase, Check
 from peewee import DecimalField, TextField, CharField
 from peewee import UUIDField, ForeignKeyField, IntegerField
+from schemas import ItemSchema, UserSchema, AddressSchema
 from passlib.hash import pbkdf2_sha256
 
 database = SqliteDatabase('database.db')
@@ -9,6 +10,14 @@ database = SqliteDatabase('database.db')
 class BaseModel(Model):
     class Meta:
         database = database
+
+    @classmethod
+    def get_schema(cls):
+        raise NotImplementedError
+
+    def json(self):
+        schema = self.get_schema()
+        return schema.dump(self).data
 
 
 class Item(BaseModel):
@@ -19,15 +28,9 @@ class Item(BaseModel):
     category = CharField()
     availability = IntegerField(constraints=[Check('availability >= 0')])
 
-    def json(self):
-        return {
-            'uuid': str(self.uuid),
-            'name': self.name,
-            'price': int(self.price),
-            'description': self.description,
-            'category': self.category,
-            'availability': self.availability,
-        }
+    @classmethod
+    def get_schema(cls):
+        return ItemSchema()
 
 
 class User(BaseModel):
@@ -37,10 +40,9 @@ class User(BaseModel):
     email = CharField(unique=True)
     password = CharField()
 
-    def json(self):
-        return {
-            'user_id': str(self.uuid)
-        }
+    @classmethod
+    def get_schema(cls):
+        return UserSchema()
 
     def verify_password(self, origin_password):
         return pbkdf2_sha256.verify(origin_password, self.password)
@@ -55,16 +57,9 @@ class Address(BaseModel):
     local_address = CharField()
     phone = CharField()
 
-    def json(self):
-        return {
-            'uuid': str(self.uuid),
-            'user': str(self.user.uuid),
-            'nation': self.nation,
-            'city': self.city,
-            'postal_code': self.postal_code,
-            'local_address': self.local_address,
-            'phone': self.phone,
-        }
+    @classmethod
+    def get_schema(cls):
+        return AddressSchema()
 
 
 class Order(BaseModel):
