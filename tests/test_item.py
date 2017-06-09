@@ -356,6 +356,20 @@ class TestItems(BaseTest):
         server_image_hash = hashlib.sha256(open(server_image_path, 'rb').read()).digest()
         assert test_image_hash == server_image_hash
 
+    def test_create_item_pictures__failure_empty_title_only_spaces(self):
+        test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
+
+        item = self.create_item()
+
+        picture_data = {
+            'title': '  ',
+            'file': FileStorage(open(test_image_path, 'rb')),
+        }
+
+        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
+                             content_type='multipart/form-data', data=picture_data)
+        assert resp.status_code == BAD_REQUEST
+
     def test_create_item_pictures__failure_non_existing_item(self):
         test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
 
