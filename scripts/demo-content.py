@@ -20,6 +20,7 @@ def main():
             price=fake.random_int(),
             description=fake.sentence(),
             category=fake.word(),
+            availability=randint(1, 10),
             )
         items_list.append(item)
 
