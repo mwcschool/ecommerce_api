@@ -1,11 +1,7 @@
-<< << << < HEAD
-from models import Item, User, Address, Order, OrderItem, Picture
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
-== == == =
-from models import Item, User, Address, Order, OrderItem, Favorites
+from models import Item, User, Address, Order, OrderItem, Favorites, Picture
 from views.user import crypt_password
->>>>>> > Added Favorites table into base_test
 from peewee import SqliteDatabase
 from tempfile import mkdtemp
 import shutil
