@@ -18,3 +18,4 @@ class TestPicture(BaseTest):
 
         resp = self.app.get('/pictures/{}'.format(picture1.uuid))
         assert resp.status_code == OK
+
