@@ -62,7 +62,6 @@ class User(BaseModel):
     def get_schema(cls):
         return UserSchema()
 
-
     def verify_password(self, origin_password):
         return pbkdf2_sha256.verify(origin_password, self.password)
 

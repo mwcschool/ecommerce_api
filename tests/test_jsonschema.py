@@ -1,9 +1,8 @@
-import json
 import uuid
-from models import BaseModel, Item, User, Address
-from .base_test import BaseTest
+from models import Item, User, Address
 from jsonschema import ValidationError
 import pytest
+
 
 class TestValidateJsonschema:
     def test_validate_item_json__success(self):
@@ -26,7 +25,6 @@ class TestValidateJsonschema:
             'availability': 11,
         }
 
-
         with pytest.raises(ValidationError):
             Item.verify_json(data)
 
@@ -41,7 +39,6 @@ class TestValidateJsonschema:
         with pytest.raises(ValidationError):
             Item.verify_json(data)
 
-
     def test_validate_user_json__success(self):
         data = {
             'first_name': 'Anna',
@@ -51,7 +48,6 @@ class TestValidateJsonschema:
             }
 
         User.verify_json(data)
-
 
     def test_validate_user_json__failure_wrong_type_field(self):
         data = {
@@ -64,7 +60,6 @@ class TestValidateJsonschema:
         with pytest.raises(ValidationError):
             User.verify_json(data)
 
-
     def test_validate_user_json__failure_missing_field(self):
         data = {
             'first_name': 'Anna',
@@ -72,11 +67,8 @@ class TestValidateJsonschema:
             'password': '1234567',
             }
 
-
-
         with pytest.raises(ValidationError):
             User.verify_json(data)
-
 
     def test_validate_address_json__success(self):
         data = {
@@ -90,7 +82,6 @@ class TestValidateJsonschema:
 
         Address.verify_json(data)
 
-
     def test_validate_address_json__failure_wrong_type_field(self):
         data = {
             'user': str(uuid.uuid4()),
@@ -103,7 +94,6 @@ class TestValidateJsonschema:
 
         with pytest.raises(ValidationError):
             Address.verify_json(data)
-
 
     def test_validate_address_json__failure_missing_field(self):
         data = {
