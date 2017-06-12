@@ -28,6 +28,7 @@ class TestFavorites(BaseTest):
             price=number,
             description='{}{}'.format('description_', number),
             category='{}{}'.format('category_', number),
+            availability=number,
         )
 
     def test_get__favorites(self):
