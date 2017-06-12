@@ -28,6 +28,12 @@ Push the content of your repository on Heroku
 ```
 git push heroku master
 ```
+Create a .env file with the follwing environment variables
+```
+PYTHONPATH=.
+FLASK_APP=app.py
+FLASK_DEBUG=1
+```
 ## Demo scripts
 These scripts create fake contents in the database for local testing purpose.
 
