@@ -1,11 +1,14 @@
 import json
+from werkzeug.datastructures import FileStorage
 from http.client import CREATED
 from http.client import NO_CONTENT
 from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
 from models import Item
+import hashlib
 import uuid
+import os
 
 from .base_test import BaseTest
 
@@ -325,3 +328,105 @@ class TestItems(BaseTest):
 
         assert item_old.availability == 0
         assert item_old.reload().availability == 1
+
+    def test_create_item_pictures__success(self):
+        test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
+
+        item = self.create_item()
+
+        picture_data = {
+            'title': 'Example image',
+            'file': FileStorage(open(test_image_path, 'rb')),
+        }
+
+        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
+                             content_type='multipart/form-data', data=picture_data)
+
+        assert resp.status_code == CREATED
+
+        image_from_server = json.loads(resp.data.decode())
+        assert image_from_server['title'] == picture_data['title']
+        assert image_from_server['extension'] == 'jpg'
+
+        server_image_path = os.path.join(
+            self.temp_dir, 'items', str(item.uuid), '{}.jpg'.format(image_from_server['uuid']))
+
+        test_image_hash = hashlib.sha256(open(test_image_path, 'rb').read()).digest()
+        server_image_hash = hashlib.sha256(open(server_image_path, 'rb').read()).digest()
+        assert test_image_hash == server_image_hash
+
+    def test_create_item_pictures__failure_empty_title_only_spaces(self):
+        test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
+
+        item = self.create_item()
+
+        picture_data = {
+            'title': '  ',
+            'file': FileStorage(open(test_image_path, 'rb')),
+        }
+
+        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
+                             content_type='multipart/form-data', data=picture_data)
+        assert resp.status_code == BAD_REQUEST
+
+    def test_create_item_pictures__failure_missing_image(self):
+        item = self.create_item()
+
+        picture_data = {
+            'title': 'Example image',
+            'file': None,
+        }
+
+        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
+                             content_type='multipart/form-data', data=picture_data)
+        assert resp.status_code == BAD_REQUEST
+
+    def test_create_item_pictures__failure_non_existing_item(self):
+        test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
+
+        picture_data = {
+            'title': 'Example image',
+            'file': FileStorage(open(test_image_path, 'rb')),
+        }
+
+        resp = self.app.post('/items/{}/pictures'.format(uuid.uuid4),
+                             content_type='multipart/form-data', data=picture_data)
+        assert resp.status_code == NOT_FOUND
+
+    def test_create_item_pictures__failure_not_an_image(self):
+        test_image_path = os.path.join('.', 'tests', 'images', 'not_an_image.log')
+
+        item = self.create_item()
+
+        picture_data = {
+            'title': 'Example image',
+            'file': FileStorage(open(test_image_path, 'rb')),
+        }
+
+        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
+                             content_type='multipart/form-data', data=picture_data)
+        assert resp.status_code == BAD_REQUEST
+
+    def test_get_item_pictures__success(self):
+        item = self.create_item()
+
+        image1 = self.create_item_picture(item)
+        image2 = self.create_item_picture(item)
+
+        resp = self.app.get('/items/{}/pictures'.format(item.uuid))
+
+        assert resp.status_code == OK
+        assert json.loads(resp.data.decode()) == [image1.json(), image2.json()]
+
+    def test_get_item_pictures__success_empty_pictures(self):
+        item = self.create_item()
+
+        resp = self.app.get('/items/{}/pictures'.format(item.uuid))
+
+        assert resp.status_code == OK
+        assert json.loads(resp.data.decode()) == []
+
+    def test_get_item_pictures__failure_non_existing_item(self):
+        resp = self.app.get('/items/{}/pictures'.format(uuid.uuid4()))
+
+        assert resp.status_code == NOT_FOUND

@@ -103,12 +103,12 @@ class OrderItem(BaseModel):
 class Picture(BaseModel):
     uuid = UUIDField(unique=True)
     title = CharField()
-    exstension = CharField()
+    extension = CharField()
     item = ForeignKeyField(Item, related_name="pictures")
 
     def json(self):
         return {
             'uuid': str(self.uuid),
-            'title': self.name,
+            'title': self.title,
             'extension': self.extension,
         }

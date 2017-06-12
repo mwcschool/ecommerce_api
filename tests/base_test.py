@@ -1,9 +1,15 @@
-from models import Item, User, Address, Order, OrderItem
-from views.user import crypt_password
+from models import Item, User, Address, Order, OrderItem, Picture
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 from peewee import SqliteDatabase
+from tempfile import mkdtemp
+import shutil
+
+from views.user import crypt_password
 from app import app
 import base64
 import uuid
+import os
 
 
 class BaseTest:
@@ -11,13 +17,21 @@ class BaseTest:
     def setup_class(cls):
         database = SqliteDatabase(':memory:')
 
-        cls.tables = [Item, User, Address, Order, OrderItem]
+        cls.tables = [Item, User, Address, Order, OrderItem, Picture]
         for table in cls.tables:
             table._meta.database = database
             table.create_table()
 
+        cls.temp_dir = mkdtemp()
+
         app.config['TESTING'] = True
+        app.config['UPLOADS_FOLDER'] = cls.temp_dir
+
         cls.app = app.test_client()
+
+    @classmethod
+    def teardown_class(cls):
+        shutil.rmtree(cls.temp_dir)
 
     def setup_method(self):
         for table in self.tables:
@@ -43,6 +57,32 @@ class BaseTest:
             category=category,
             availability=availability,
         )
+
+    def create_item_picture(self, item=None, title="Picture title"):
+        if not item:
+            item = self.create_item()
+
+        # TODO: Add option for different images and extensions?
+        extension = 'jpg'
+
+        picture = Picture.create(
+            uuid=uuid.uuid4(),
+            title=title,
+            extension=extension,
+            item=item
+        )
+
+        config = app.config
+        with open(os.path.join('.', 'tests', 'images', 'test_image.jpg'), 'rb') as image:
+            image = FileStorage(image)
+
+            save_path = os.path.join('.', config['UPLOADS_FOLDER'], 'items', str(item.uuid))
+            new_filename = secure_filename('.'.join([str(picture.uuid), extension]))
+
+            os.makedirs(save_path, exist_ok=True)
+
+            image.save(os.path.join(save_path, new_filename))
+        return picture
 
     def create_order(self, user=None, items=None):
         '''Parameter format:
