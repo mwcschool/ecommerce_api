@@ -1,6 +1,6 @@
 from peewee import Model, SqliteDatabase, Check
 from peewee import DecimalField, TextField, CharField
-from peewee import UUIDField, ForeignKeyField, IntegerField
+from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField
 from schemas import ItemSchema, UserSchema, AddressSchema
 from passlib.hash import pbkdf2_sha256
 
@@ -43,6 +43,7 @@ class User(BaseModel):
     last_name = CharField()
     email = CharField(unique=True)
     password = CharField()
+    superuser = BooleanField(default=False)
 
     @classmethod
     def get_schema(cls):
