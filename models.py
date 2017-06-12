@@ -5,6 +5,7 @@ from schemas import ItemSchema, UserSchema, AddressSchema
 from passlib.hash import pbkdf2_sha256
 import uuid
 from jsonschema import validate
+from marshmallow_jsonschema import JSONSchema
 
 database = SqliteDatabase('database.db')
 
@@ -21,11 +22,11 @@ class BaseModel(Model):
     def get_schema(cls):
         raise NotImplementedError
 
-    def verify_json(jsondata, schema):
-        try:
-            validate(jsondata, schema)
-        except ValidationError as e:
-            raise e
+    @classmethod
+    def verify_json(cls, json):
+        schema = cls.get_schema()
+        json_schema = JSONSchema().dump(schema).data
+        validate(json, json_schema)
 
     def json(self):
         schema = self.get_schema()
@@ -60,6 +61,7 @@ class User(BaseModel):
     @classmethod
     def get_schema(cls):
         return UserSchema()
+
 
     def verify_password(self, origin_password):
         return pbkdf2_sha256.verify(origin_password, self.password)
