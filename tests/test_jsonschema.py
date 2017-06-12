@@ -106,3 +106,9 @@ class TestValidateJsonschema:
 
         with pytest.raises(ValidationError):
             Address.verify_json(data)
+
+    def test_validate_favorites_json__success(self):
+        data = {
+            'user': str(uuid.uuid4()),
+            'item': str(uuid.uuid4()),
+        }
