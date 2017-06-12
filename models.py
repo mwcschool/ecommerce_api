@@ -138,6 +138,10 @@ class Picture(BaseModel):
     extension = CharField()
     item = ForeignKeyField(Item, related_name="pictures")
 
+    @classmethod
+    def get_schema(cls):
+        return FavoritesSchema()
+
     def json(self):
         return {
             'uuid': str(self.uuid),
