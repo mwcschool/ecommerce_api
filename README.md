@@ -26,7 +26,7 @@ heroku create
 ```
 Push the content of your repository on Heroku
 ```
-git push heroku master
+git push heroku name_of_your_branch:master
 ```
 Create a .env file with the follwing environment variables
 ```
