@@ -18,8 +18,18 @@ Then, install the required modules with the command
 pip3 install -r requirements.txt
 ```
 
+## Heroku Support
+From terminal, navigate to the root directory of your application
+Install Heroku command line tool and launch the following command
+```
+heroku create
+```
+Push the content of your repository on Heroku
+```
+git push heroku master
+```
 ## Demo scripts
-These scripts create fake contents in the database for testing purpose.
+These scripts create fake contents in the database for local testing purpose.
 
 `init-db.py` initialize the database by deleting existing tables and creating new ones.
 `demo-content.py` inserts random contents in database tables created by `init-db.py`.
