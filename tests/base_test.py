@@ -1,6 +1,6 @@
-from models import Item, User, Address, Order, OrderItem, Picture
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
+from models import Item, User, Address, Order, OrderItem, Favorites, Picture
 from peewee import SqliteDatabase
 from tempfile import mkdtemp
 import shutil
@@ -17,7 +17,7 @@ class BaseTest:
     def setup_class(cls):
         database = SqliteDatabase(':memory:')
 
-        cls.tables = [Item, User, Address, Order, OrderItem, Picture]
+        cls.tables = [Item, User, Address, Order, OrderItem, Favorites, Picture]
         for table in cls.tables:
             table._meta.database = database
             table.create_table()

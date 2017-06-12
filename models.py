@@ -3,6 +3,7 @@ from peewee import DecimalField, TextField, CharField
 from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField
 from schemas import ItemSchema, UserSchema, AddressSchema
 from passlib.hash import pbkdf2_sha256
+import uuid
 
 database = SqliteDatabase('database.db')
 
@@ -22,6 +23,10 @@ class BaseModel(Model):
     def json(self):
         schema = self.get_schema()
         return schema.dump(self).data
+
+    @classmethod
+    def count(cls):
+        return cls.select().count()
 
 
 class Item(BaseModel):
@@ -51,6 +56,21 @@ class User(BaseModel):
 
     def verify_password(self, origin_password):
         return pbkdf2_sha256.verify(origin_password, self.password)
+
+    def favorite_items(self):
+        return [favorite.item.json() for favorite in self.favorites]
+
+    def add_favorite(self, item):
+        favorite = Favorites.create(
+            uuid=uuid.uuid4(),
+            user=self,
+            item=item,
+        )
+        return favorite
+
+    def remove_favorite(self, item):
+        Favorites.delete().where(Favorites.item == item, Favorites.user == self).execute()
+        return None
 
 
 class Address(BaseModel):
@@ -111,4 +131,17 @@ class Picture(BaseModel):
             'uuid': str(self.uuid),
             'title': self.title,
             'extension': self.extension,
+        }
+
+
+class Favorites(BaseModel):
+    uuid = UUIDField(unique=True)
+    user = ForeignKeyField(User, related_name="favorites")
+    item = ForeignKeyField(Item, related_name="favorites")
+
+    def json(self):
+        return {
+            'uuid': str(self.uuid),
+            'user': str(self.user.uuid),
+            'item': str(self.item.uuid)
         }
