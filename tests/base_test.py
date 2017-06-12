@@ -1,7 +1,6 @@
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from models import Item, User, Address, Order, OrderItem, Favorites, Picture
-from views.user import crypt_password
 from peewee import SqliteDatabase
 from tempfile import mkdtemp
 import shutil
