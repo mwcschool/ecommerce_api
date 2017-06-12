@@ -16,7 +16,6 @@ database = ''
 if ENVIRONMENT == 'dev':
     database = SqliteDatabase('database.db')
 else:
-    urlparse.uses_netloc.append('postgres')
     url_db = urlparse(os.getenv('DATABASE_URL'))
 
     database = PostgresqlDatabase(
