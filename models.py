@@ -4,6 +4,7 @@ from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField
 from schemas import ItemSchema, UserSchema, AddressSchema
 from passlib.hash import pbkdf2_sha256
 import uuid
+from jsonschema import validate
 
 database = SqliteDatabase('database.db')
 
@@ -19,6 +20,12 @@ class BaseModel(Model):
     @classmethod
     def get_schema(cls):
         raise NotImplementedError
+
+    def verify_json(jsondata, schema):
+        try:
+            validate(jsondata, schema)
+        except ValidationError as e:
+            raise e
 
     def json(self):
         schema = self.get_schema()
