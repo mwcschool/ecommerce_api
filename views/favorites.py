@@ -13,8 +13,6 @@ from flask import g
 class FavoritesResource(Resource):
     @auth.login_required
     def get(self):
-        # TODO: we will have a user from auth here.
-
         return g.current_user.favorite_items(), OK
 
     @auth.login_required
@@ -35,8 +33,6 @@ class FavoritesResource(Resource):
 class FavoriteResource(Resource):
     @auth.login_required
     def delete(self, item_id):
-        # TODO: we will have a user from auth here.
-
         try:
             item = Item.get(Item.uuid == item_id)
         except Item.DoesNotExist:
