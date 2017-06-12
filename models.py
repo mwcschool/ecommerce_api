@@ -114,6 +114,17 @@ class Address(BaseModel):
         return AddressSchema()
 
 
+class Picture(BaseModel):
+    uuid = UUIDField(unique=True)
+    title = CharField()
+    extension = CharField()
+    item = ForeignKeyField(Item, related_name="pictures")
+
+    @classmethod
+    def get_schema(cls):
+        return PictureSchema()
+
+
 class Order(BaseModel):
     uuid = UUIDField(unique=True)
     total_price = DecimalField(max_digits=20)
@@ -133,13 +144,6 @@ class OrderItem(BaseModel):
     @classmethod
     def get_schema(cls):
         return OrderItemSchema()
-
-
-class Picture(BaseModel):
-    uuid = UUIDField(unique=True)
-    title = CharField()
-    extension = CharField()
-    item = ForeignKeyField(Item, related_name="pictures")
 
     def json(self):
         return {
