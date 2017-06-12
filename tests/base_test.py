@@ -145,11 +145,9 @@ class BaseTest:
             phone=phone,
         )
 
-    def create_item_picture(self, item=None, title="Picture title"):
+    def create_item_picture(self, item=None, title='Picture title', extension='jpg'):
         if not item:
             item = self.create_item()
-
-        extension = 'png'
 
         picture = Picture.create(
             uuid=uuid.uuid4(),
