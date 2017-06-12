@@ -108,6 +108,8 @@ class TestItems(BaseTest):
         assert len(Item.select()) == 0
 
     def test_create_item__failure_field_wrong_type(self):
+        user = self.create_user()
+
         new_item_data = {
             'name': 'Item one',
             'price': 'Ten',
