@@ -3,3 +3,6 @@ database.db
 __pycache__
 *.pyc
 /images/
+.env
+.DS_Store
+venv/
