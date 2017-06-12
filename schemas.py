@@ -12,7 +12,7 @@ def check_negative_number(value):
 
 
 class ItemSchema(Schema):
-    uuid = fields.UUID(required=True, dump_only=True)
+    uuid = fields.UUID(dump_only=True)
     name = fields.Str(required=True, validate=check_empty_str)
     price = fields.Decimal(required=True, validate=check_negative_number)
     description = fields.Str(required=True, validate=check_empty_str)
@@ -21,7 +21,7 @@ class ItemSchema(Schema):
 
 
 class UserSchema(Schema):
-    uuid = fields.UUID(required=True, dump_only=True)
+    uuid = fields.UUID(dump_only=True)
     first_name = fields.Str(required=True, validate=check_empty_str)
     last_name = fields.Str(required=True, validate=check_empty_str)
     email = fields.Str(required=True, validate=check_empty_str)
@@ -29,7 +29,7 @@ class UserSchema(Schema):
 
 
 class AddressSchema(Schema):
-    uuid = fields.UUID(required=True, dump_only=True)
+    uuid = fields.UUID(dump_only=True)
     user = fields.UUID(required=True, attribute='user.uuid')
     nation = fields.Str(required=True, validate=check_empty_str)
     city = fields.Str(required=True, validate=check_empty_str)
