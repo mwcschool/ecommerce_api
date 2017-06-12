@@ -56,3 +56,10 @@ class FavoritesSchema(Schema):
     uuid = fields.UUID(dump_only=True)
     user = fields.UUID(required=True, attribute='user.uuid')
     item = fields.UUID(required=True, attribute='item.uuid')
+
+
+class PictureSchema(Schema):
+    uuid = fields.UUID(required=True, dump_only=True)
+    title = fields.Str(required=True, validate=check_empty_str)
+    extension = fields.Str(required=True, validate=check_empty_str)
+    item = fields.UUID(required=True, attribute="item.uuid")
