@@ -13,3 +13,4 @@ marshmallow-jsonschema==0.3.0
 simplejson==3.10.0
 gunicorn==19.7.1
 jsonschema==2.6.0
+psycopg2==2.7.1
