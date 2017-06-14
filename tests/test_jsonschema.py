@@ -1,5 +1,5 @@
 import uuid
-from models import Item, User, Address
+from models import Item, User, Address, Favorites
 from jsonschema import ValidationError
 import pytest
 
@@ -112,3 +112,22 @@ class TestValidateJsonschema:
             'user': str(uuid.uuid4()),
             'item': str(uuid.uuid4()),
         }
+
+        Favorites.verify_json(data)
+
+    def test_validate_favorites_json__failure_wrong_type_field(self):
+        data = {
+            'user': int(uuid.uuid4()),
+            'item': str(uuid.uuid4()),
+        }
+
+        with pytest.raises(ValidationError):
+            Favorites.verify_json(data)
+
+    def test_validate_favorites_json__failure_missing_field(self):
+        data = {
+            'item': str(uuid.uuid4()),
+        }
+
+        with pytest.raises(ValidationError):
+            Favorites.verify_json(data)
