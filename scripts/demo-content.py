@@ -13,6 +13,7 @@ def main():
     seed(args.seed)
     fake = Factory.create('it_IT')
     fake.seed(args.seed)
+    os.urandom(seed)
 
     items_list = []
     users_list = []
