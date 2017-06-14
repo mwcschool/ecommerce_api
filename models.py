@@ -138,7 +138,6 @@ class Picture(BaseModel):
     extension = CharField()
     item = ForeignKeyField(Item, related_name="pictures")
 
-
     def json(self):
         return {
             'uuid': str(self.uuid),
