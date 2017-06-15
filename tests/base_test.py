@@ -145,7 +145,7 @@ class BaseTest:
             phone=phone,
         )
 
-    def create_item_picture(self, item=None, title='Picture title', extension='jpg'):
+    def create_item_picture(self, item=None, title='Picture title', extension='jpeg'):
         if not item:
             item = self.create_item()
 
@@ -161,7 +161,7 @@ class BaseTest:
         with open(os.path.join('.', 'tests', 'images', 'test_image.png'), 'rb') as image:
             image = FileStorage(image)
             save_path = os.path.join('.', config['UPLOADS_FOLDER'], 'items', str(item.uuid))
-            new_filename = secure_filename('.'.join([str(picture.uuid), extension]))
+            new_filename = secure_filename('.'.join([str(picture.uuid), picture.extension]))
 
             os.makedirs(save_path, exist_ok=True)
 
