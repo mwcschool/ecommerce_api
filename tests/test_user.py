@@ -28,6 +28,7 @@ class Testuser(BaseTest):
         assert len(query) == 1
         assert query.get().json() == json.loads(resp.data.decode())
         assert not user_from_db.superuser
+        assert user_from_db.status == 'enable'
 
     def test_post__success(self):
         data = {
@@ -154,7 +155,7 @@ class Testuser(BaseTest):
 
     def test_delete_user__success(self):
         user = self.create_user()
-        user2 = self.create_user("email2@domain.com")
+        self.create_user("email2@domain.com")
 
         resp = self.open_with_auth(
             '/users/{}'.format(user.uuid), 'delete', user.email, 'p4ssw0rd', data='')
