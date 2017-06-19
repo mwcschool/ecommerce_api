@@ -192,15 +192,7 @@ class TestItems(BaseTest):
 
     def test_modify_item__failure_user_is_not_superuser(self):
         user = self.create_user()
-        item_id = uuid.uuid4()
-        item = Item.create(
-            uuid=item_id,
-            name='item',
-            price=10,
-            description='info product',
-            category='product category',
-            availability=20
-        )
+        item = self.create_item()
 
         new_data = {
             'name': 'item',
@@ -211,24 +203,15 @@ class TestItems(BaseTest):
         }
 
         resp = self.open_with_auth(
-            '/items/{}'.format(item_id), 'put', user.email, 'p4ssw0rd', data=new_data)
+            '/items/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=new_data)
         assert resp.status_code == UNAUTHORIZED
 
-        item_from_db = Item.get(uuid=item_id).json()
+        item_from_db = Item.get(uuid=item.uuid).json()
         assert item.json() == item_from_db
 
     def test_modify_item__success(self):
         user = self.create_user(superuser=True)
-        static_id = uuid.uuid4()
-        item = Item.create(
-            uuid=static_id,
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
-
+        item = self.create_item()
         new_item_data = {
             'name': 'Item one',
             'price': 10,
@@ -250,18 +233,8 @@ class TestItems(BaseTest):
         assert new_item_data == item_from_server
 
     def test_modify_item__failure_invalid_field_value(self):
-        static_id = uuid.uuid4()
         user = self.create_user(superuser=True)
-
-        item = Item.create(
-            uuid=static_id,
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
-
+        item = self.create_item()
         new_item_data = {
             'name': 'Item one',
             'price': 10,
@@ -276,16 +249,7 @@ class TestItems(BaseTest):
 
     def test_modify_item__failure_empty_field_only_spaces(self):
         user = self.create_user(superuser=True)
-
-        item = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
-
+        item = self.create_item()
         modified_content = {
             'name': '      ',
             'price': 10,
@@ -302,15 +266,7 @@ class TestItems(BaseTest):
 
     def test_modify_item__failure_missing_argument(self):
         user = self.create_user(superuser=True)
-
-        item = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
+        item = self.create_item()
         modified_content = {
             'name': 'Item two',
             'price': 10,
@@ -325,15 +281,7 @@ class TestItems(BaseTest):
 
     def test_modify_item__failure_field_wrong_type(self):
         user = self.create_user(superuser=True)
-        item = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
-
+        item = self.create_item()
         modified_content = {
             'name': 'Item one',
             'price': 'Ten',
