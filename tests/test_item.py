@@ -135,14 +135,7 @@ class TestItems(BaseTest):
         assert resp.status_code == NOT_FOUND
 
     def test_get_item__failure_non_existing_item(self):
-        Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
+        self.create_item()
 
         resp = self.app.get('/items/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
@@ -176,16 +169,7 @@ class TestItems(BaseTest):
 
     def test_modify_item__success(self):
         user = self.create_user()
-        static_id = uuid.uuid4()
-
-        Item.create(
-            uuid=static_id,
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
+        item = self.create_item()
 
         new_item_data = {
             'name': 'Item one',
@@ -196,7 +180,7 @@ class TestItems(BaseTest):
         }
 
         resp = self.open_with_auth(
-            'items/{}'.format(static_id), 'put', user.email, 'p4ssw0rd', data=new_item_data)
+            'items/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == OK
 
         item_from_server = json.loads(resp.data.decode())
@@ -208,17 +192,8 @@ class TestItems(BaseTest):
         assert new_item_data == item_from_server
 
     def test_modify_item__failure_invalid_field_value(self):
-        static_id = uuid.uuid4()
         user = self.create_user()
-
-        Item.create(
-            uuid=static_id,
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
+        item = self.create_item()
 
         new_item_data = {
             'name': 'Item one',
@@ -229,20 +204,12 @@ class TestItems(BaseTest):
         }
 
         resp = self.open_with_auth(
-            '/items/{}'.format(static_id), 'put', user.email, 'p4ssw0rd', data=new_item_data)
+            '/items/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_item__failure_empty_field_only_spaces(self):
         user = self.create_user()
-
-        item = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
+        item = self.create_item()
 
         modified_content = {
             'name': '      ',
@@ -260,15 +227,7 @@ class TestItems(BaseTest):
 
     def test_modify_item__failure_missing_argument(self):
         user = self.create_user()
-
-        item = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
+        item = self.create_item()
 
         modified_content = {
             'name': 'Item two',
@@ -284,14 +243,7 @@ class TestItems(BaseTest):
 
     def test_modify_item__failure_field_wrong_type(self):
         user = self.create_user()
-        item = Item.create(
-            uuid=uuid.uuid4(),
-            name='Item one',
-            price=5,
-            description='Description one',
-            category='Category one',
-            availability=11
-        )
+        item = self.create_item()
 
         modified_content = {
             'name': 'Item one',
