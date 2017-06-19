@@ -1,7 +1,8 @@
 from peewee import Model, SqliteDatabase, PostgresqlDatabase, Check
 from peewee import DecimalField, TextField, CharField
 from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField
-from schemas import ItemSchema, UserSchema, AddressSchema, OrderSchema, OrderItemSchema
+from schemas import ItemSchema, UserSchema, AddressSchema
+from schemas import OrderSchema, OrderItemSchema, FavoritesSchema
 from passlib.hash import pbkdf2_sha256
 from jsonschema import validate
 from marshmallow_jsonschema import JSONSchema
@@ -150,6 +151,10 @@ class Favorites(BaseModel):
     uuid = UUIDField(unique=True)
     user = ForeignKeyField(User, related_name="favorites")
     item = ForeignKeyField(Item, related_name="favorites")
+
+    @classmethod
+    def get_schema(cls):
+        return FavoritesSchema()
 
     def json(self):
         return {

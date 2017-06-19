@@ -49,3 +49,9 @@ class OrderSchema(Schema):
     total_price = fields.Decimal(required=True)
     user = fields.Nested(UserSchema, only=["uuid"])
     items = fields.Nested(OrderItemSchema, many=True, attribute='order_items')
+
+
+class FavoritesSchema(Schema):
+    uuid = fields.UUID(dump_only=True)
+    user = fields.UUID(required=True, attribute='user.uuid')
+    item = fields.UUID(required=True, attribute='item.uuid')
