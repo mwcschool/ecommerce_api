@@ -73,6 +73,8 @@ class User(BaseModel):
     email = CharField(unique=True)
     password = CharField()
     superuser = BooleanField(default=False)
+    status = CharField(default='enable', constraints=[Check(
+        "status IN ('deleted','blocked','enable')")])
 
     @classmethod
     def get_schema(cls):
