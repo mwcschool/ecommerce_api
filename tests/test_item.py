@@ -269,11 +269,11 @@ class TestItems(BaseTest):
         }
 
         expected_new_data = {
-            'name' : 'Item one',
-            'price' : 10,
-            'description' : item.description,
-            'category' : item.category,
-            'availability' : item.availability,
+            'name': 'Item one',
+            'price': 10,
+            'description': item.description,
+            'category': item.category,
+            'availability': item.availability,
         }
 
         resp = self.open_with_auth(
