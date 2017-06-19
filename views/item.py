@@ -124,8 +124,9 @@ class ItemResource(Resource):
         except ValueError:
             return None, BAD_REQUEST
 
-        if args["availability"] < 0:
-            return None, BAD_REQUEST
+        if args["availability"] is not None:
+            if args['availability'] < 0:
+                return None, BAD_REQUEST
 
         for value in args.keys():
             if args[value] is not None:
