@@ -128,9 +128,9 @@ class ItemResource(Resource):
             if args['availability'] < 0:
                 return None, BAD_REQUEST
 
-        for value in args.keys():
-            if args[value] is not None:
-                obj.value = args[value]
+        for attr in args.keys():
+            if args.get(attr) is not None:
+                setattr(obj, attr, args[attr])
 
         obj.save()
 
