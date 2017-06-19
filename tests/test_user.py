@@ -179,20 +179,3 @@ class Testuser(BaseTest):
         resp = self.open_with_auth(
             '/users/{}'.format(user.uuid), 'delete', user2.email, 'p4ssw0rd', data='')
         assert resp.status_code == UNAUTHORIZED
-
-    def test_put__failed_user_is_deleted(self):
-        user = self.create_user()
-        user.status = 'deleted'
-        user.save()
-
-        data = {
-            'first_name': 'anna',
-            'last_name': 'Marini',
-            'email': 'giovanni@mariani.com',
-            'password': '1234567'
-        }
-
-        resp = self.open_with_auth(
-            '/users/{}'.format(user.uuid), 'put', user.email, 'p4ssw0rd', data=data)
-
-        assert resp.status_code == NOT_FOUND
