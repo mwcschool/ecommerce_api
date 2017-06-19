@@ -28,12 +28,22 @@ Push the content of your repository on Heroku
 ```
 git push heroku name_of_your_branch:master
 ```
-Create a .env file with the follwing environment variables
+Create a .env file with the following environment variables
 ```
 PYTHONPATH=.
 FLASK_APP=app.py
 FLASK_DEBUG=1
+ENVIRONMENT=dev
 ```
+Install PostgreSQL addon on Heroku with the command
+```
+heroku addons:create heroku-postgresql:hobby-dev
+```
+Set a config var for Heroku server with the command
+```
+heroku config:set ENVIRONMENT=production
+```
+
 ## Demo scripts
 These scripts create fake contents in the database for local testing purpose.
 
