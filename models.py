@@ -56,7 +56,7 @@ class BaseModel(Model):
 class Item(BaseModel):
     uuid = UUIDField(unique=True)
     name = CharField()
-    price = DecimalField(max_digits=20, decimal_places=2)
+    price = DecimalField(max_digits=20)
     description = TextField()
     category = CharField()
     availability = IntegerField(constraints=[Check('availability >= 0')])
@@ -113,7 +113,7 @@ class Address(BaseModel):
 
 class Order(BaseModel):
     uuid = UUIDField(unique=True)
-    total_price = DecimalField(max_digits=20, decimal_places=2)
+    total_price = DecimalField(max_digits=20)
     user = ForeignKeyField(User, related_name="orders")
 
     @classmethod
@@ -125,7 +125,7 @@ class OrderItem(BaseModel):
     order = ForeignKeyField(Order, related_name="order_items")
     item = ForeignKeyField(Item)
     quantity = IntegerField()
-    subtotal = DecimalField(max_digits=20, decimal_places=2)
+    subtotal = DecimalField(max_digits=20)
 
     @classmethod
     def get_schema(cls):
