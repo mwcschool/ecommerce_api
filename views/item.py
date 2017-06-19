@@ -76,7 +76,7 @@ class ItemResource(Resource):
     @auth.login_required
     def put(self, uuid):
         try:
-            obj = Item.get(uuid=uuid)
+            obj = Item.get(Item.uuid == uuid)
         except Item.DoesNotExist:
             return None, NOT_FOUND
 
@@ -104,6 +104,8 @@ class ItemResource(Resource):
 
         return obj.json(), OK
 
+    @auth.login_required
+    def patch(self, uuid):
 
 class ItemPicturesResource(Resource):
     def get(self, item_id):
