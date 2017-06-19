@@ -45,6 +45,7 @@ class Testuser(BaseTest):
         assert query.get().json() == json.loads(resp.data.decode())
         user_from_db = query.get()
         assert not user_from_db.superuser
+        assert user_from_db.status == 'enable'
 
     def test_post__empty_field(self):
         data = {
@@ -158,11 +159,9 @@ class Testuser(BaseTest):
         resp = self.open_with_auth(
             '/users/{}'.format(user.uuid), 'delete', user.email, 'p4ssw0rd', data='')
 
-        all_users = User.select()
-        user_from_db = all_users.get()
         assert resp.status_code == NO_CONTENT
-        assert len(all_users) == 1
-        assert user_from_db.uuid == user2.uuid
+        assert len(User.select()) == 2
+        assert User.get(uuid=user.uuid).status == 'deleted'
 
     def test_delete__userid_not_exist(self):
         self.create_user()
@@ -171,6 +170,7 @@ class Testuser(BaseTest):
             '/users/{}'.format(uuid.uuid4), 'delete', 'ciao@libero.it', 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
         assert len(User.select()) == 1
+        assert User.get().status == 'enable'
 
     def test_delete_user__unauthorized_for_delete_another_user(self):
         user = self.create_user()
@@ -179,3 +179,20 @@ class Testuser(BaseTest):
         resp = self.open_with_auth(
             '/users/{}'.format(user.uuid), 'delete', user2.email, 'p4ssw0rd', data='')
         assert resp.status_code == UNAUTHORIZED
+
+    def test_put__failed_user_is_deleted(self):
+        user = self.create_user()
+        user.status = 'deleted'
+        user.save()
+
+        data = {
+            'first_name': 'anna',
+            'last_name': 'Marini',
+            'email': 'giovanni@mariani.com',
+            'password': '1234567'
+        }
+
+        resp = self.open_with_auth(
+            '/users/{}'.format(user.uuid), 'put', user.email, 'p4ssw0rd', data=data)
+
+        assert resp.status_code == NOT_FOUND
