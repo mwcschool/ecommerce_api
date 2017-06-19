@@ -81,5 +81,7 @@ class UserResource(Resource):
         if obj != g.current_user:
             return '', UNAUTHORIZED
 
-        obj.delete_instance()
+        obj.status = 'deleted'
+        obj.save()
+
         return None, NO_CONTENT
