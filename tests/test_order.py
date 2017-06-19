@@ -75,12 +75,13 @@ class TestOrders(BaseTest):
         assert order_from_db == order_from_server
 
         order_from_server.pop('uuid')
-        assert order_from_server['user'] == str(new_order_data['user'])
+
+        assert order_from_server['user']['uuid'] == str(new_order_data['user'])
         assert len(order_from_server['items']) == 2
 
         order_items_ids = [str(self.item1.uuid), str(self.item2.uuid)]
-        assert order_from_server['items'][0]['uuid'] in order_items_ids
-        assert order_from_server['items'][1]['uuid'] in order_items_ids
+        assert order_from_server['items'][0]['item'] in order_items_ids
+        assert order_from_server['items'][1]['item'] in order_items_ids
 
         order_total = (self.item1.price * 2) + self.item2.price
         assert order_from_server['total_price'] == order_total
