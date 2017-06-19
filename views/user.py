@@ -50,6 +50,9 @@ class UserResource(Resource):
         except User.DoesNotExist:
             return None, NOT_FOUND
 
+        if obj.status == "deleted":
+            return None, NOT_FOUND
+
         if obj != g.current_user:
             return '', UNAUTHORIZED
 
@@ -78,8 +81,13 @@ class UserResource(Resource):
         except User.DoesNotExist:
             return None, NOT_FOUND
 
+        if obj.status == "deleted":
+            return None, NOT_FOUND
+
         if obj != g.current_user:
             return '', UNAUTHORIZED
 
-        obj.delete_instance()
+        obj.status = 'deleted'
+        obj.save()
+
         return None, NO_CONTENT
