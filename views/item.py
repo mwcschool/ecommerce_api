@@ -112,11 +112,11 @@ class ItemResource(Resource):
             return None, NOT_FOUND
 
         parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str, required=True)
-        parser.add_argument('price', type=int, required=True)
-        parser.add_argument('description', type=str, required=True)
-        parser.add_argument('category', type=str, required=True)
-        parser.add_argument('availability', type=int, required=True)
+        parser.add_argument('name', type=str)
+        parser.add_argument('price', type=int)
+        parser.add_argument('description', type=str)
+        parser.add_argument('category', type=str)
+        parser.add_argument('availability', type=int)
         args = parser.parse_args(strict=True)
 
         try:
@@ -127,8 +127,9 @@ class ItemResource(Resource):
         if args["availability"] < 0:
             return None, BAD_REQUEST
 
-        for value in ['name', 'price', 'description', 'category', 'availability']:
-            obj.value = args[value]
+        for value in args.keys():
+            if args[value] is not None:
+                obj.value = args[value]
 
         obj.save()
 
