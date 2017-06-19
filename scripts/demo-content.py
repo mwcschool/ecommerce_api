@@ -7,8 +7,9 @@ import os
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('seed', type=int, default=os.urandom(10))
+    parser.add_argument('--seed', type=int, default=os.urandom(10))
     args = parser.parse_args()
+
     database.connect()
 
     seed(args.seed)
