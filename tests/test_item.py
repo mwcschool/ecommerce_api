@@ -259,6 +259,35 @@ class TestItems(BaseTest):
         item_from_db = Item.get(uuid=item.uuid).json()
         assert item.json() == item_from_db
 
+    def test_modify_item_patch__success(self):
+        user = self.create_user()
+        item = self.create_item()
+
+        new_item_data = {
+            'name': 'Item one',
+            'price': 10,
+        }
+
+        expected_new_data = {
+            'name' : 'Item one',
+            'price' : 10,
+            'description' : item.description,
+            'category' : item.category,
+            'availability' : item.availability,
+        }
+
+        resp = self.open_with_auth(
+            'items/{}'.format(item.uuid), 'patch', user.email, 'p4ssw0rd', data=new_item_data)
+        assert resp.status_code == OK
+
+        item_from_server = json.loads(resp.data.decode())
+        item_from_db = Item.get(Item.uuid == item_from_server['uuid']).json()
+
+        assert item_from_db == item_from_server
+
+        item_from_server.pop('uuid')
+        assert expected_new_data == item_from_server
+
     def test_reload(self):
         item = self.create_item(availability=5)
         assert item.availability == 5
