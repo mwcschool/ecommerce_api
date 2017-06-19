@@ -26,6 +26,7 @@ class UserSchema(Schema):
     last_name = fields.Str(required=True, validate=check_empty_str)
     email = fields.Str(required=True, validate=check_empty_str)
     password = fields.Str(required=True, validate=check_empty_str, load_only=True)
+    status = fields.Str(validate=check_empty_str, dump_only=True)
 
 
 class AddressSchema(Schema):
