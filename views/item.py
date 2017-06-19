@@ -41,16 +41,16 @@ class ItemsResource(Resource):
         except ValueError:
             return None, BAD_REQUEST
 
-        if args["availability"] < 0:
+        if args['availability'] < 0:
             return None, BAD_REQUEST
 
         obj = Item.create(
             uuid=uuid.uuid4(),
-            name=args["name"],
-            price=args["price"],
-            description=args["description"],
-            category=args["category"],
-            availability=args["availability"]
+            name=args['name'],
+            price=args['price'],
+            description=args['description'],
+            category=args['category'],
+            availability=args['availability']
         )
 
         return obj.json(), CREATED
@@ -92,14 +92,14 @@ class ItemResource(Resource):
         except ValueError:
             return None, BAD_REQUEST
 
-        if args["availability"] < 0:
+        if args['availability'] < 0:
             return None, BAD_REQUEST
 
-        obj.name = args["name"]
-        obj.price = args["price"]
-        obj.description = args["description"]
-        obj.category = args["category"]
-        obj.availability = args["availability"]
+        obj.name = args['name']
+        obj.price = args['price']
+        obj.description = args['description']
+        obj.category = args['category']
+        obj.availability = args['availability']
         obj.save()
 
         return obj.json(), OK
@@ -124,7 +124,7 @@ class ItemResource(Resource):
         except ValueError:
             return None, BAD_REQUEST
 
-        if args["availability"] is not None:
+        if args['availability'] is not None:
             if args['availability'] < 0:
                 return None, BAD_REQUEST
 
@@ -164,7 +164,7 @@ class ItemPicturesResource(Resource):
         extension = image.filename.rsplit('.', 1)[1].lower()
         config = current_app.config
         if '.' in image.filename and extension not in config['ALLOWED_EXTENSIONS']:
-            abort(400, message="Extension not supported.")
+            abort(400, message='Extension not supported.')
 
         picture = Picture.create(
             uuid=uuid.uuid4(),
