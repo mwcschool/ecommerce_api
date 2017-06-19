@@ -58,32 +58,6 @@ class BaseTest:
             availability=availability,
         )
 
-    def create_item_picture(self, item=None, title="Picture title"):
-        if not item:
-            item = self.create_item()
-
-        # TODO: Add option for different images and extensions?
-        extension = 'jpg'
-
-        picture = Picture.create(
-            uuid=uuid.uuid4(),
-            title=title,
-            extension=extension,
-            item=item
-        )
-
-        config = app.config
-        with open(os.path.join('.', 'tests', 'images', 'test_image.jpg'), 'rb') as image:
-            image = FileStorage(image)
-
-            save_path = os.path.join('.', config['UPLOADS_FOLDER'], 'items', str(item.uuid))
-            new_filename = secure_filename('.'.join([str(picture.uuid), extension]))
-
-            os.makedirs(save_path, exist_ok=True)
-
-            image.save(os.path.join(save_path, new_filename))
-        return picture
-
     def create_order(self, user=None, items=None):
         '''Parameter format:
 
