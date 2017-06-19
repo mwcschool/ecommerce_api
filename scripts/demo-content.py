@@ -7,13 +7,13 @@ import os
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('seed', type=int, const=os.urandom(seed))
+    parser.add_argument('seed', type=int, default=os.urandom(10))
     args = parser.parse_args()
     database.connect()
+
     seed(args.seed)
     fake = Factory.create('it_IT')
     fake.seed(args.seed)
-    os.urandom(seed)
 
     items_list = []
     users_list = []
