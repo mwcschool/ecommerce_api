@@ -1,15 +1,16 @@
 from flask_restful import Resource
-from http.client import OK, NOT_FOUND, NO_CONTENT
+from http.client import NOT_FOUND, NO_CONTENT
 from flask import send_from_directory, current_app
-from models import Picture, Item
+from models import Picture
 from werkzeug.utils import secure_filename
 import os
+
 
 class PictureResource(Resource):
 
     def get(self, uuid):
         try:
-            picture =  Picture.get(Picture.uuid == uuid)
+            picture = Picture.get(Picture.uuid == uuid)
         except Picture.DoesNotExist:
             return None, NOT_FOUND
 
@@ -19,7 +20,6 @@ class PictureResource(Resource):
                 'items',
                 str(picture.item.uuid),
             ),
-
             secure_filename('.'.join([str(picture.uuid), picture.extension]))
         )
 
