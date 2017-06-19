@@ -17,7 +17,7 @@ def verify_pw(email, password):
     if user.verify_password(password):
         g.current_user = user
 
-        if g.current_user.status == 'blocked':
+        if g.current_user.status != 'enable':
             return False
 
         return True
