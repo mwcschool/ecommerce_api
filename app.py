@@ -10,6 +10,7 @@ from views.order import OrderResource, OrdersResource
 from views.user import UserResource, UsersResource
 from views.address import AddressResource, AddressesResource
 from views.favorites import FavoritesResource, FavoriteResource
+from views.picture import PictureResource
 
 
 app = Flask(__name__)
@@ -49,3 +50,4 @@ api.add_resource(AddressesResource, '/addresses/')
 api.add_resource(AddressResource, '/addresses/<uuid:address_id>')
 api.add_resource(FavoritesResource, '/favorites/')
 api.add_resource(FavoriteResource, '/favorites/<uuid:item_id>')
+api.add_resource(PictureResource, '/pictures/<uuid:uuid>')
