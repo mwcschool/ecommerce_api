@@ -50,9 +50,6 @@ class UserResource(Resource):
         except User.DoesNotExist:
             return None, NOT_FOUND
 
-        if obj.status == "deleted":
-            return None, NOT_FOUND
-
         if obj != g.current_user:
             return '', UNAUTHORIZED
 
@@ -79,9 +76,6 @@ class UserResource(Resource):
         try:
             obj = User.get(uuid=uuid)
         except User.DoesNotExist:
-            return None, NOT_FOUND
-
-        if obj.status == "deleted":
             return None, NOT_FOUND
 
         if obj != g.current_user:
