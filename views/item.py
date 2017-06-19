@@ -106,6 +106,34 @@ class ItemResource(Resource):
 
     @auth.login_required
     def patch(self, uuid):
+        try:
+            obj = Item.get(Item.uuid == uuid)
+        except Item.DoesNotExist:
+            return None, NOT_FOUND
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str, required=True)
+        parser.add_argument('price', type=int, required=True)
+        parser.add_argument('description', type=str, required=True)
+        parser.add_argument('category', type=str, required=True)
+        parser.add_argument('availability', type=int, required=True)
+        args = parser.parse_args(strict=True)
+
+        try:
+            utils.non_empty_str(args['name'], 'name')
+        except ValueError:
+            return None, BAD_REQUEST
+
+        if args["availability"] < 0:
+            return None, BAD_REQUEST
+
+        for value in ['name', 'price', 'description', 'category', 'availability']:
+            obj.value = args[value]
+
+        obj.save()
+
+        return obj.json(), OK
+
 
 class ItemPicturesResource(Resource):
     def get(self, item_id):
