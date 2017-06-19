@@ -19,15 +19,6 @@ pip3 install -r requirements.txt
 ```
 
 ## Heroku Support
-From terminal, navigate to the root directory of your application
-Install Heroku command line tool and launch the following command
-```
-heroku create
-```
-Push the content of your repository on Heroku
-```
-git push heroku name_of_your_branch:master
-```
 Create a .env file with the following environment variables
 ```
 PYTHONPATH=.
@@ -35,13 +26,15 @@ FLASK_APP=app.py
 FLASK_DEBUG=1
 ENVIRONMENT=dev
 ```
-Install PostgreSQL addon on Heroku with the command
+
+Install Heroku toolbelt.
 ```
-heroku addons:create heroku-postgresql:hobby-dev
+wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh
 ```
-Set a config var for Heroku server with the command
+
+In order to launch the server:
 ```
-heroku config:set ENVIRONMENT=production
+heroku local -f Procfile.dev
 ```
 
 ## Demo scripts
