@@ -5,12 +5,12 @@ def drop_tables():
     database.connect()
 
     # Initialize db by deleting all tables
-    Item.drop_table(fail_silently=True)
-    User.drop_table(fail_silently=True)
-    Address.drop_table(fail_silently=True)
-    Order.drop_table(fail_silently=True)
-    OrderItem.drop_table(fail_silently=True)
-    Picture.drop_table(fail_silently=True)
+    Item.drop_table(fail_silently=True, cascade=True)
+    User.drop_table(fail_silently=True, cascade=True)
+    Address.drop_table(fail_silently=True, cascade=True)
+    Order.drop_table(fail_silently=True, cascade=True)
+    OrderItem.drop_table(fail_silently=True, cascade=True)
+    Picture.drop_table(fail_silently=True, cascade=True)
 
     database.close()
 
