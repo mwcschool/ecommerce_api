@@ -191,7 +191,7 @@ class TestItems(BaseTest):
         assert resp.status_code == NOT_FOUND
 
     def test_modify_item__failure_user_is_not_superuser(self):
-        user = self.create_user(superuser=True)
+        user = self.create_user()
         item_id = uuid.uuid4()
         item = Item.create(
             uuid=item_id,
