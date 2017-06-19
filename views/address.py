@@ -74,6 +74,25 @@ class AddressResource(Resource):
         else:
             return '', BAD_REQUEST
 
+    def patch(self, address_id, to_modified_fiel):
+        try:
+            address = (
+                Address.select()
+                .where(Address.uuid == address_id)
+                .where(Address.user == g.current_user)
+                .get())
+        except Address.DoesNotExist:
+            return None, NOT_FOUND
+
+        parse = reqparse.RequestParser()
+        parser.add_argument('to_modified_fiel', type=utils.non_empty_str, required=True)
+        args = parser.parse_args(strict=True)
+
+         for parm in ['nation', 'city', 'postal_code', 'local_address', 'phone']:
+            if len(args[parm]) < 3:
+                return '', BAD_REQUEST
+
+
     @auth.login_required
     def delete(self, address_id):
         try:
