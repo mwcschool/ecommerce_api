@@ -15,7 +15,6 @@ def main():
     fake.seed(args.seed)
     os.urandom(seed)
 
-
     items_list = []
     users_list = []
 
