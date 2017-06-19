@@ -1,7 +1,7 @@
 from peewee import Model, SqliteDatabase, Check
 from peewee import DecimalField, TextField, CharField
 from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField
-from schemas import ItemSchema, UserSchema, AddressSchema
+from schemas import ItemSchema, UserSchema, AddressSchema, OrderSchema, OrderItemSchema
 from passlib.hash import pbkdf2_sha256
 import uuid
 from jsonschema import validate
@@ -100,25 +100,9 @@ class Order(BaseModel):
     total_price = DecimalField()
     user = ForeignKeyField(User, related_name="orders")
 
-    def json(self):
-        return {
-            'uuid': str(self.uuid),
-            'total_price': float(self.total_price),
-            'user': str(self.user.uuid),
-            'items': self._get_order_items(),
-        }
-
-    def _get_order_items(self):
-        data = []
-        for order_item in self.order_items:
-            item = order_item.item
-            data.append({
-                'uuid': str(item.uuid),
-                'name': item.name,
-                'quantity': order_item.quantity,
-                'subtotal': float(order_item.subtotal),
-            })
-        return data
+    @classmethod
+    def get_schema(cls):
+        return OrderSchema()
 
 
 class OrderItem(BaseModel):
@@ -126,6 +110,10 @@ class OrderItem(BaseModel):
     item = ForeignKeyField(Item)
     quantity = IntegerField()
     subtotal = DecimalField()
+
+    @classmethod
+    def get_schema(cls):
+        return OrderItemSchema()
 
 
 class Picture(BaseModel):

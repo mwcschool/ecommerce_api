@@ -36,3 +36,16 @@ class AddressSchema(Schema):
     postal_code = fields.Str(required=True, validate=check_empty_str)
     local_address = fields.Str(required=True, validate=check_empty_str)
     phone = fields.Str(required=True, validate=check_empty_str)
+
+
+class OrderItemSchema(Schema):
+    item = fields.UUID(required=True, dump_only=True, attribute='item.uuid')
+    quantity = fields.Integer(as_string=False)
+    subtotal = fields.Decimal(required=True, dump_only=True)
+
+
+class OrderSchema(Schema):
+    uuid = fields.UUID(required=True, dump_only=True)
+    total_price = fields.Decimal(required=True)
+    user = fields.Nested(UserSchema, only=["uuid"])
+    items = fields.Nested(OrderItemSchema, many=True, attribute='order_items')

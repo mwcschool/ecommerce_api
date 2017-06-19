@@ -107,7 +107,7 @@ class BaseTest:
         total_price = 0
 
         for item in items:
-            total_price = float(item[0].price * item[1])
+            total_price += float(item[0].price * item[1])
 
         order = Order.create(
             uuid=uuid.uuid4(),
