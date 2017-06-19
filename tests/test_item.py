@@ -5,6 +5,7 @@ from http.client import NO_CONTENT
 from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
+from http.client import UNAUTHORIZED
 from models import Item
 import hashlib
 import uuid
@@ -27,8 +28,21 @@ class TestItems(BaseTest):
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == [item1.json(), item2.json()]
 
-    def test_create_item__success(self):
+    def test_create_item__failure_user_is_not_superuser(self):
         user = self.create_user()
+        new_item_data = {
+            'name': 'Product',
+            'price': 123,
+            'description': 'Info',
+            'category': 'Domestici',
+            'availability': 5
+        }
+        resp = self.open_with_auth(
+            '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
+        assert resp.status_code == UNAUTHORIZED
+
+    def test_create_item__success(self):
+        user = self.create_user(superuser=True)
 
         new_item_data = {
             'name': 'Item one',
@@ -52,7 +66,7 @@ class TestItems(BaseTest):
         assert item_from_server == new_item_data
 
     def test_create_item__failure_invalid_field_value(self):
-        user = self.create_user()
+        user = self.create_user(superuser=True)
         new_item_data = {
             'name': 'Item one',
             'price': 15,
@@ -63,10 +77,11 @@ class TestItems(BaseTest):
 
         resp = self.open_with_auth(
             '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
+
         assert resp.status_code == BAD_REQUEST
 
     def test_create_item__failure_empty_field(self):
-        user = self.create_user()
+        user = self.create_user(superuser=True)
 
         new_item_data = {
             'name': '',
@@ -81,7 +96,7 @@ class TestItems(BaseTest):
         assert len(Item.select()) == 0
 
     def test_create_item__failure_empty_field_only_spaces(self):
-        user = self.create_user()
+        user = self.create_user(superuser=True)
 
         new_item_data = {
             'name': '    ',
@@ -96,7 +111,7 @@ class TestItems(BaseTest):
         assert Item.count() == 0
 
     def test_create_item__failure_missing_field(self):
-        user = self.create_user()
+        user = self.create_user(superuser=True)
 
         new_item_data = {
             'name': 'Item one',
@@ -108,7 +123,7 @@ class TestItems(BaseTest):
         assert len(Item.select()) == 0
 
     def test_create_item__failure_field_wrong_type(self):
-        user = self.create_user()
+        user = self.create_user(superuser=True)
 
         new_item_data = {
             'name': 'Item one',
@@ -140,8 +155,16 @@ class TestItems(BaseTest):
         resp = self.app.get('/items/{}'.format(uuid.uuid4()))
         assert resp.status_code == NOT_FOUND
 
-    def test_delete_item__success(self):
+    def test_delete_item__failure_user_is_not_superuser(self):
         user = self.create_user()
+        new_item = self.create_item()
+        resp = self.open_with_auth(
+            '/items/{}'.format(new_item.uuid), 'delete', user.email, 'p4ssw0rd', data='')
+        assert resp.status_code == UNAUTHORIZED
+        assert len(Item.select()) == 1
+
+    def test_delete_item__success(self):
+        user = self.create_user(superuser=True)
         item1 = self.create_item()
 
         resp = self.open_with_auth(
@@ -152,7 +175,7 @@ class TestItems(BaseTest):
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__failure_not_found(self):
-        user = self.create_user()
+        user = self.create_user(superuser=True)
         self.create_item()
 
         resp = self.open_with_auth(
@@ -161,15 +184,50 @@ class TestItems(BaseTest):
         assert len(Item.select()) == 1
 
     def test_delete_item__failure_non_existing_empty_items(self):
-        user = self.create_user()
+        user = self.create_user(superuser=True)
 
         resp = self.open_with_auth(
             'items/{}'.format(uuid.uuid4()), 'delete', user.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
 
+    def test_modify_item__failure_user_is_not_superuser(self):
+        user = self.create_user(superuser=True)
+        item_id = uuid.uuid4()
+        item = Item.create(
+            uuid=item_id,
+            name='item',
+            price=10,
+            description='info product',
+            category='product category',
+            availability=20
+        )
+
+        new_data = {
+            'name': 'item',
+            'price': 10,
+            'description': 'info product',
+            'category': 'product category',
+            'avaibility': 1
+        }
+
+        resp = self.open_with_auth(
+            '/items/{}'.format(item_id), 'put', user.email, 'p4ssw0rd', data=new_data)
+        assert resp.status_code == UNAUTHORIZED
+
+        item_from_db = Item.get(uuid=item_id).json()
+        assert item.json() == item_from_db
+
     def test_modify_item__success(self):
-        user = self.create_user()
-        item = self.create_item()
+        user = self.create_user(superuser=True)
+        static_id = uuid.uuid4()
+        item = Item.create(
+            uuid=static_id,
+            name='Item one',
+            price=5,
+            description='Description one',
+            category='Category one',
+            availability=11
+        )
 
         new_item_data = {
             'name': 'Item one',
@@ -192,8 +250,17 @@ class TestItems(BaseTest):
         assert new_item_data == item_from_server
 
     def test_modify_item__failure_invalid_field_value(self):
-        user = self.create_user()
-        item = self.create_item()
+        static_id = uuid.uuid4()
+        user = self.create_user(superuser=True)
+
+        item = Item.create(
+            uuid=static_id,
+            name='Item one',
+            price=5,
+            description='Description one',
+            category='Category one',
+            availability=11
+        )
 
         new_item_data = {
             'name': 'Item one',
@@ -208,8 +275,16 @@ class TestItems(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_item__failure_empty_field_only_spaces(self):
-        user = self.create_user()
-        item = self.create_item()
+        user = self.create_user(superuser=True)
+
+        item = Item.create(
+            uuid=uuid.uuid4(),
+            name='Item one',
+            price=5,
+            description='Description one',
+            category='Category one',
+            availability=11
+        )
 
         modified_content = {
             'name': '      ',
@@ -226,9 +301,16 @@ class TestItems(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_item__failure_missing_argument(self):
-        user = self.create_user()
-        item = self.create_item()
+        user = self.create_user(superuser=True)
 
+        item = Item.create(
+            uuid=uuid.uuid4(),
+            name='Item one',
+            price=5,
+            description='Description one',
+            category='Category one',
+            availability=11
+        )
         modified_content = {
             'name': 'Item two',
             'price': 10,
@@ -242,8 +324,15 @@ class TestItems(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_modify_item__failure_field_wrong_type(self):
-        user = self.create_user()
-        item = self.create_item()
+        user = self.create_user(superuser=True)
+        item = Item.create(
+            uuid=uuid.uuid4(),
+            name='Item one',
+            price=5,
+            description='Description one',
+            category='Category one',
+            availability=11
+        )
 
         modified_content = {
             'name': 'Item one',
@@ -280,7 +369,22 @@ class TestItems(BaseTest):
         assert item_old.availability == 0
         assert item_old.reload().availability == 1
 
+    def test_create_item_picture__failure_user_is_not_superuser(self):
+        user = self.create_user()
+        test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
+        item = self.create_item()
+        picture_data = {
+            'title': 'Example image',
+            'file': FileStorage(open(test_image_path, 'rb')),
+        }
+
+        resp = self.open_with_auth(
+            '/items/{}/pictures'.format(item.uuid), 'post', user.email, 'p4ssw0rd',
+            data=picture_data, content_type='multipart/form-data')
+        assert resp.status_code == UNAUTHORIZED
+
     def test_create_item_pictures__success(self):
+        user = self.create_user(superuser=True)
         test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
 
         item = self.create_item()
@@ -289,10 +393,9 @@ class TestItems(BaseTest):
             'title': 'Example image',
             'file': FileStorage(open(test_image_path, 'rb')),
         }
-
-        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
-                             content_type='multipart/form-data', data=picture_data)
-
+        resp = self.open_with_auth(
+            '/items/{}/pictures'.format(item.uuid), 'post', user.email, 'p4ssw0rd',
+            data=picture_data, content_type='multipart/form-data')
         assert resp.status_code == CREATED
 
         image_from_server = json.loads(resp.data.decode())
@@ -307,6 +410,7 @@ class TestItems(BaseTest):
         assert test_image_hash == server_image_hash
 
     def test_create_item_pictures__failure_empty_title_only_spaces(self):
+        user = self.create_user(superuser=True)
         test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
 
         item = self.create_item()
@@ -316,11 +420,13 @@ class TestItems(BaseTest):
             'file': FileStorage(open(test_image_path, 'rb')),
         }
 
-        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
-                             content_type='multipart/form-data', data=picture_data)
+        resp = self.open_with_auth(
+            '/items/{}/pictures'.format(item.uuid), 'post', user.email,
+            'p4ssw0rd', data=picture_data, content_type='multipart/form-data')
         assert resp.status_code == BAD_REQUEST
 
     def test_create_item_pictures__failure_missing_image(self):
+        user = self.create_user(superuser=True)
         item = self.create_item()
 
         picture_data = {
@@ -328,11 +434,13 @@ class TestItems(BaseTest):
             'file': None,
         }
 
-        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
-                             content_type='multipart/form-data', data=picture_data)
+        resp = self.open_with_auth(
+            '/items/{}/pictures'.format(item.uuid), 'post', user.email, 'p4ssw0rd',
+            data=picture_data, content_type='multipart/form-data')
         assert resp.status_code == BAD_REQUEST
 
     def test_create_item_pictures__failure_non_existing_item(self):
+        user = self.create_user(superuser=True)
         test_image_path = os.path.join('.', 'tests', 'images', 'test_image.jpg')
 
         picture_data = {
@@ -340,11 +448,13 @@ class TestItems(BaseTest):
             'file': FileStorage(open(test_image_path, 'rb')),
         }
 
-        resp = self.app.post('/items/{}/pictures'.format(uuid.uuid4),
-                             content_type='multipart/form-data', data=picture_data)
+        resp = self.open_with_auth(
+            '/items/{}/pictures'.format(uuid.uuid4), 'post', user.email, 'p4ssw0rd',
+            data=picture_data, content_type='multipart/form-data')
         assert resp.status_code == NOT_FOUND
 
     def test_create_item_pictures__failure_not_an_image(self):
+        user = self.create_user(superuser=True)
         test_image_path = os.path.join('.', 'tests', 'images', 'not_an_image.log')
 
         item = self.create_item()
@@ -354,8 +464,9 @@ class TestItems(BaseTest):
             'file': FileStorage(open(test_image_path, 'rb')),
         }
 
-        resp = self.app.post('/items/{}/pictures'.format(item.uuid),
-                             content_type='multipart/form-data', data=picture_data)
+        resp = self.open_with_auth(
+            '/items/{}/pictures'.format(item.uuid), 'post', user.email, 'p4ssw0rd',
+            data=picture_data, content_type='multipart/form-data')
         assert resp.status_code == BAD_REQUEST
 
     def test_get_item_pictures__success(self):
