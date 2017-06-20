@@ -1,7 +1,8 @@
 from http.client import CREATED, NO_CONTENT, NOT_FOUND, BAD_REQUEST, UNAUTHORIZED
 import json
 import uuid
-from models import User
+from models import User, Reset
+import pytest
 
 from .base_test import BaseTest
 
@@ -180,3 +181,35 @@ class Testuser(BaseTest):
         resp = self.open_with_auth(
             '/users/{}'.format(user.uuid), 'delete', user2.email, 'p4ssw0rd', data='')
         assert resp.status_code == UNAUTHORIZED
+
+    def test_reset_password__success(self):
+        temp_user = self.create_user(email="tryresetemail@domain.com")
+
+        data = {
+            'email': temp_user.email,
+        }
+
+        resp = self.app.post('/users/reset/', data=data)
+
+        assert Reset.get(Reset.user == temp_user)
+        assert resp.status_code == NO_CONTENT
+
+    def test_reset_password__failure_badformatted_email(self):
+        data = {
+            'email': 'tryresetemaildomain.com',
+        }
+
+        resp = self.app.post('/users/reset/', data=data)
+
+        assert resp.status_code == BAD_REQUEST
+
+    def test_reset_password__failure_user_not_exist(self):
+        temp_email = 'tryresetemail@domain.com'
+        data = {
+            'email': temp_email,
+        }
+
+        resp = self.app.post('/users/reset/', data=data)
+        assert resp.status_code == NO_CONTENT
+        with pytest.raises(User.DoesNotExist):
+            User.get(User.email == temp_email)
