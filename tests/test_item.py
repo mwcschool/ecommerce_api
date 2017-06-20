@@ -302,6 +302,22 @@ class TestItems(BaseTest):
             '/items/{}'.format(item.uuid), 'patch', user.email, 'p4ssw0rd', data=new_item_data)
         assert resp.status_code == BAD_REQUEST
 
+    def test_modify_item_patch__failure_empty_field_only_spaces(self):
+        user = self.create_user()
+        item = self.create_item()
+
+        modified_content = {
+            'name': '      ',
+            'price': 10,
+            'availability': 11
+        }
+
+        resp = self.open_with_auth(
+            'items/{}'.format(item.uuid), 'patch', user.email, 'p4ssw0rd', data=modified_content)
+        item_from_db = Item.get(Item.uuid == item.uuid).json()
+        assert item.json() == item_from_db
+        assert resp.status_code == BAD_REQUEST
+
     def test_reload(self):
         item = self.create_item(availability=5)
         assert item.availability == 5
