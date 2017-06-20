@@ -7,10 +7,11 @@ from models import database
 
 from views.item import ItemResource, ItemsResource, ItemPicturesResource
 from views.order import OrderResource, OrdersResource
-from views.user import UserResource, UsersResource
+from views.user import UserResource, UsersResource, ResetResource
 from views.address import AddressResource, AddressesResource
 from views.favorites import FavoritesResource, FavoriteResource
 from views.picture import PictureResource
+from views.user_reset import PasswordResetResource
 
 
 app = Flask(__name__)
