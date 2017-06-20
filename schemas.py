@@ -60,5 +60,5 @@ class FavoritesSchema(Schema):
 
 class PictureSchema(Schema):
     uuid = fields.UUID(required=True, dump_only=True)
-    title = fields.Str(required=True, validate=check_empty_str, dump_only=True)
-    extension = fields.Str(required=True, validate=check_empty_str, dump_only=True)
+    title = fields.Str(required=True, validate=check_empty_str)
+    extension = fields.Str(required=True, validate=check_empty_str)

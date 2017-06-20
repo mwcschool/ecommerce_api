@@ -152,10 +152,6 @@ class OrderItem(BaseModel):
             'extension': self.extension,
         }
 
-        @classmethod
-        def get_schema(cls):
-            return PictureSchema()
-
 
 class Favorites(BaseModel):
     uuid = UUIDField(unique=True)
