@@ -1,13 +1,7 @@
-import uuid
-from models import User, Reset
-import auth
-from flask import g
-from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, UNAUTHORIZED
+from models import Reset
 from flask_restful import Resource, reqparse
-import re
-from passlib.hash import pbkdf2_sha256
 import utils
-from views.user import valid_email, crypt_password
+from http.client import NOT_FOUND
 
 
 class PasswordResetResource(Resource):
@@ -18,6 +12,6 @@ class PasswordResetResource(Resource):
         args = parser.parse_args(strict=True)
 
         try:
-            reset_code = Reset.get(Reset.uuid == args['code'])
+            Reset.get(Reset.uuid == args['code'])
         except (Reset.DoesNotExists):
             return None, NOT_FOUND
