@@ -176,6 +176,6 @@ class Reset(BaseModel):
         return {
             'uuid': str(self.uuid),
             'user': str(self.user.uuid),
-            'expiration_date': str(expiration_date),
-            'enable': str(enable),
+            'expiration_date': str(self.expiration_date),
+            'enable': str(self.enable),
         }
