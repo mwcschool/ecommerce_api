@@ -5,6 +5,12 @@ from http.client import NOT_FOUND, OK
 from datetime import datetime
 
 
+def crypt_password(password):
+    crypt = pbkdf2_sha256.hash(password)
+
+    return crypt
+
+
 class PasswordResetResource(Resource):
     def post(self):
         parser = parser = reqparse.RequestParser()
@@ -23,7 +29,7 @@ class PasswordResetResource(Resource):
         user = reset_code.user
 
         reset_code.enable = False
-        user.password = args['password']
+        user.password = crypt_password(args['password'])
 
         reset_code.save()
         user.save()
