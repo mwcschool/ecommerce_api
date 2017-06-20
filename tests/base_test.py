@@ -52,7 +52,7 @@ class BaseTest:
     def create_reset(self, user=None):
 
         if not user:
-            user = create_user()
+            user = self.create_user()
 
         return Reset.create(
             uuid=uuid.uuid4(),
