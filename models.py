@@ -2,7 +2,7 @@ from peewee import Model, SqliteDatabase, PostgresqlDatabase, Check
 from peewee import DecimalField, TextField, CharField
 from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField
 from schemas import OrderSchema, OrderItemSchema, FavoritesSchema
-from schemas import ItemSchema, UserSchema, AddressSchema
+from schemas import ItemSchema, UserSchema, AddressSchema, PictureSchema
 from passlib.hash import pbkdf2_sha256
 from jsonschema import validate
 from marshmallow_jsonschema import JSONSchema
