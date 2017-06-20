@@ -96,12 +96,18 @@ class ResetResource(Resource):
         if not valid_email(args['email']):
             return None, BAD_REQUEST
 
-        query = User.select(email)
-        if args[email] in query:
-            Reset.create(
-                uuid=uuid.uuid4(),
-                user=User.get(User.email == args[email]),
-                expiration_date=datetime.now() + timedelta(hours=1)
-            )
+        try:
+            user = User.get(User.email == args['email'])
+        except user.DoesNotExist:
+            return None, NO_CONTENT
+
+        Reset.update(enable=False).where(Reset.user == user)
+        Reset.execute()
+
+        Reset.create(
+            uuid=uuid.uuid4(),
+            user=User.get(User.email == args[email]),
+            expiration_date=datetime.now() + timedelta(hours=1)
+        )
 
         return None, NO_CONTENT
