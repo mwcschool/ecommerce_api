@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse
 import utils
 from http.client import NOT_FOUND, OK
 from datetime import datetime
+from passlib.hash import pbkdf2_sha256
 
 
 def crypt_password(password):
