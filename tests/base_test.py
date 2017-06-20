@@ -38,13 +38,14 @@ class BaseTest:
             table.delete().execute()
 
     def create_user(self, email="email@domain.com", first_name="First Name",
-                    last_name="Last name", password="p4ssw0rd"):
+                    last_name="Last name", password="p4ssw0rd", superuser=False):
         return User.create(
             uuid=uuid.uuid4(),
             first_name=first_name,
             last_name=last_name,
             email=email,
             password=crypt_password(password),
+            superuser=superuser,
         )
 
     def create_item(self, name="Item name", price=7,
@@ -143,7 +144,10 @@ class BaseTest:
 
         return picture
 
-    def open_with_auth(self, url, method, email, password, data):
+    def open_with_auth(self, url, method, email, password, data, content_type=None):
+        headers = {'Authorization': 'Basic ' + base64.b64encode(
+            bytes(email + ":" + password, 'ascii')).decode('ascii')}
+
         return self.app.open(
-            url, method=method, headers={'Authorization': 'Basic ' + base64.b64encode(
-                bytes(email + ":" + password, 'ascii')).decode('ascii')}, data=data)
+            url, method=method, headers=headers, data=data, content_type=content_type
+        )

@@ -6,7 +6,8 @@ from http.client import NO_CONTENT
 from http.client import NOT_FOUND
 from http.client import OK
 from http.client import BAD_REQUEST
-from flask import current_app
+from http.client import UNAUTHORIZED
+from flask import current_app, g
 import uuid
 import os
 
@@ -29,6 +30,9 @@ class ItemsResource(Resource):
 
     @auth.login_required
     def post(self):
+        if not g.current_user.superuser:
+            return None, UNAUTHORIZED
+
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True)
         parser.add_argument('price', type=int, required=True)
@@ -65,6 +69,9 @@ class ItemResource(Resource):
 
     @auth.login_required
     def delete(self, uuid):
+        if not g.current_user.superuser:
+            return None, UNAUTHORIZED
+
         try:
             item = Item.get(Item.uuid == uuid)
         except Item.DoesNotExist:
@@ -75,6 +82,9 @@ class ItemResource(Resource):
 
     @auth.login_required
     def put(self, uuid):
+        if not g.current_user.superuser:
+            return None, UNAUTHORIZED
+
         try:
             obj = Item.get(uuid=uuid)
         except Item.DoesNotExist:
@@ -114,7 +124,11 @@ class ItemPicturesResource(Resource):
 
         return [pic.json() for pic in item.pictures], OK
 
+    @auth.login_required
     def post(self, item_id):
+        if not g.current_user.superuser:
+            return None, UNAUTHORIZED
+
         try:
             item = Item.get(Item.uuid == item_id)
         except Item.DoesNotExist:
