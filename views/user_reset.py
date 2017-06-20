@@ -12,6 +12,18 @@ class PasswordResetResource(Resource):
         args = parser.parse_args(strict=True)
 
         try:
-            Reset.get(Reset.uuid == args['code'])
+            reset_code = Reset.get(Reset.uuid == args['code']
+                                   and Reset.enable == True
+                                   and Reset.expiration_date > datetime.now()
+                                   )
         except (Reset.DoesNotExists):
             return None, NOT_FOUND
+
+        user = reset_code.user
+
+        reset_code.enable = False
+        user.password = args['password']
+
+        reset_code.save()
+        user.save()
+        return None, OK
