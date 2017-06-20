@@ -1,7 +1,7 @@
 from models import Reset
 from flask_restful import Resource, reqparse
 import utils
-from http.client import NOT_FOUND, OK
+from http.client import NOT_FOUND, OK, BAD_REQUEST
 from datetime import datetime
 from passlib.hash import pbkdf2_sha256
 
@@ -26,6 +26,9 @@ class PasswordResetResource(Resource):
                                    )
         except (Reset.DoesNotExists):
             return None, NOT_FOUND
+
+        if not len(args['password']) > 6:
+            return None, BAD_REQUEST
 
         user = reset_code.user
 
