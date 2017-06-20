@@ -288,6 +288,20 @@ class TestItems(BaseTest):
         item_from_server.pop('uuid')
         assert expected_new_data == item_from_server
 
+    def test_modify_patch__failure_invalid_field_value(self):
+        user = self.create_user()
+        item = self.create_item()
+
+        new_item_data = {
+            'name': 'Item one',
+            'price': 10,
+            'availability': -8
+        }
+
+        resp = self.open_with_auth(
+            '/items/{}'.format(item.uuid), 'patch', user.email, 'p4ssw0rd', data=new_item_data)
+        assert resp.status_code == BAD_REQUEST
+
     def test_reload(self):
         item = self.create_item(availability=5)
         assert item.availability == 5
