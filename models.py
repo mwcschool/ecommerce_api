@@ -1,6 +1,6 @@
 from peewee import Model, SqliteDatabase, PostgresqlDatabase, Check
 from peewee import DecimalField, TextField, CharField
-from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField
+from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField, DateTimeField
 from schemas import ItemSchema, UserSchema, AddressSchema
 from schemas import OrderSchema, OrderItemSchema, FavoritesSchema
 from passlib.hash import pbkdf2_sha256
