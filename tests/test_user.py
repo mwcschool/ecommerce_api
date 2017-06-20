@@ -182,7 +182,7 @@ class Testuser(BaseTest):
             '/users/{}'.format(user.uuid), 'delete', user2.email, 'p4ssw0rd', data='')
         assert resp.status_code == UNAUTHORIZED
 
-    def test_reset_password__success(self):
+    def test_reset_password_request__success(self):
         temp_user = self.create_user(email="tryresetemail@domain.com")
 
         data = {
@@ -194,7 +194,7 @@ class Testuser(BaseTest):
         assert Reset.get(Reset.user == temp_user)
         assert resp.status_code == NO_CONTENT
 
-    def test_reset_password__failure_badformatted_email(self):
+    def test_reset_password_request__failure_badformatted_email(self):
         data = {
             'email': 'tryresetemaildomain.com',
         }
@@ -203,7 +203,7 @@ class Testuser(BaseTest):
 
         assert resp.status_code == BAD_REQUEST
 
-    def test_reset_password__failure_user_not_exist(self):
+    def test_reset_password_request__failure_user_not_exist(self):
         temp_email = 'tryresetemail@domain.com'
         data = {
             'email': temp_email,
