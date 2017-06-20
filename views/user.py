@@ -7,6 +7,7 @@ from flask_restful import Resource, reqparse
 import re
 from passlib.hash import pbkdf2_sha256
 import utils
+from datetime import datetime, timedelta
 
 
 def valid_email(email):
@@ -98,15 +99,14 @@ class ResetResource(Resource):
 
         try:
             user = User.get(User.email == args['email'])
-        except user.DoesNotExist:
+        except User.DoesNotExist:
             return None, NO_CONTENT
 
-        Reset.update(enable=False).where(Reset.user == user)
-        Reset.execute()
+        Reset.update(enable=False).where(Reset.user == user).execute()
 
         Reset.create(
             uuid=uuid.uuid4(),
-            user=User.get(User.email == args[email]),
+            user=User.get(User.email == args['email']),
             expiration_date=datetime.now() + timedelta(hours=1)
         )
 
