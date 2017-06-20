@@ -221,7 +221,7 @@ class TestItems(BaseTest):
 
         resp = self.open_with_auth(
             'items/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=modified_content)
-        item_from_db = Item.get(Item.uuid == item.uuid).json()
+        item_from_db = item.reload().json()
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
@@ -237,7 +237,7 @@ class TestItems(BaseTest):
 
         resp = self.open_with_auth(
             'items/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=modified_content)
-        item_from_db = Item.get(Item.uuid == item.uuid).json()
+        item_from_db = item.reload().json()
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
@@ -256,7 +256,7 @@ class TestItems(BaseTest):
             'items/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=modified_content)
         assert resp.status_code == BAD_REQUEST
 
-        item_from_db = Item.get(uuid=item.uuid).json()
+        item_from_db = item.reload().json()
         assert item.json() == item_from_db
 
     def test_modify_item_patch__success(self):
@@ -314,7 +314,7 @@ class TestItems(BaseTest):
 
         resp = self.open_with_auth(
             'items/{}'.format(item.uuid), 'patch', user.email, 'p4ssw0rd', data=modified_content)
-        item_from_db = Item.get(Item.uuid == item.uuid).json()
+        item_from_db = item.reload().json()
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
@@ -331,7 +331,7 @@ class TestItems(BaseTest):
             'items/{}'.format(item.uuid), 'patch', user.email, 'p4ssw0rd', data=modified_content)
         assert resp.status_code == BAD_REQUEST
 
-        item_from_db = Item.get(uuid=item.uuid).json()
+        item_from_db = item.reload().json()
         assert item.json() == item_from_db
 
     def test_reload(self):
