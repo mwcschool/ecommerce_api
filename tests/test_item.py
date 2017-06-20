@@ -288,7 +288,7 @@ class TestItems(BaseTest):
         item_from_server.pop('uuid')
         assert expected_new_data == item_from_server
 
-    def test_modify_patch__failure_invalid_field_value(self):
+    def test_modify_item_patch__failure_invalid_field_value(self):
         user = self.create_user()
         item = self.create_item()
 
