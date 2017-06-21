@@ -154,7 +154,7 @@ class BaseTest:
 
         return picture
 
-    def open_without_auth(self, url, method, data, content_type='application/json'):
+    def open(self, url, method, data, content_type='application/json'):
         if content_type == 'application/json':
             data = json.dumps(data, cls=UUIDEncoder)
 
