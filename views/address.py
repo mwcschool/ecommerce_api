@@ -99,7 +99,7 @@ class AddressResource(Resource):
                     return '', BAD_REQUEST
                 else:
                     setattr(address, param, args[param])
-                    address.save()
+        address.save()
 
         return address.json(), OK
 
