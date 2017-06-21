@@ -16,7 +16,7 @@ class AddressesResource(Resource):
         try:
             Address.verify_json(json)
         except ValidationError as err:
-            return {"message": err.message}, NOT_FOUND
+            return {"message": err.message}, BAD_REQUEST
 
         address = Address.create(
             uuid=uuid.uuid4(),
