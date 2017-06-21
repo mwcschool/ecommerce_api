@@ -220,3 +220,50 @@ class TestAddress(BaseTest):
         resp = self.open_with_auth(
             '/addresses/{}'.format(address.uuid), 'delete', user2.email, 'p4ssw0rd', data='')
         assert resp.status_code == NOT_FOUND
+
+    def test_patch__all_fields_succeed(self):
+        data_address = self.create_address(self.user)
+
+        new_data_address = {
+            'nation': 'Germania',
+            'city': 'Berlino',
+            'postal_code': '05100',
+            'local_address': 'Via Roma 15',
+            'phone': '33333333333',
+        }
+
+        current_user = User.get(User.email == self.user.email)
+
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address.uuid), 'patch', self.user.email, 'p4ssw0rd',
+            data=new_data_address)
+
+        new_data_address['user'] = str(current_user.uuid)
+        address_from_db = Address.get()
+
+        expected_data = {
+            'user': str(address_from_db.user.uuid),
+            'nation': address_from_db.nation,
+            'city': address_from_db.city,
+            'postal_code': address_from_db.postal_code,
+            'local_address': address_from_db.local_address,
+            'phone': address_from_db.phone,
+        }
+
+        assert resp.status_code == OK
+        assert expected_data == new_data_address
+        assert address_from_db.json() == json.loads(resp.data.decode())
+
+    def test_patch_sigle_succeed(self):
+        data_address = self.create_address(self.user)
+
+        new_data_address = {
+            'nation': 'kamchatka',
+        }
+
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address.uuid), 'patch', self.user.email, 'p4ssw0rd',
+            data=new_data_address)
+
+        assert resp.status_code == OK
+
