@@ -74,7 +74,8 @@ class AddressResource(Resource):
         else:
             return '', BAD_REQUEST
 
-    def patch(self, address_id, to_modified_fiel):
+    @auth.login_required
+    def patch(self, address_id):
         try:
             address = (
                 Address.select()
@@ -84,13 +85,23 @@ class AddressResource(Resource):
         except Address.DoesNotExist:
             return None, NOT_FOUND
 
-        parse = reqparse.RequestParser()
-        parser.add_argument('to_modified_fiel', type=utils.non_empty_str, required=True)
+        parser = reqparse.RequestParser()
+        parser.add_argument('nation', type=utils.non_empty_str)
+        parser.add_argument('city', type=utils.non_empty_str)
+        parser.add_argument('postal_code', type=utils.non_empty_str)
+        parser.add_argument('local_address', type=utils.non_empty_str)
+        parser.add_argument('phone', type=utils.non_empty_str)
         args = parser.parse_args(strict=True)
 
-         for parm in ['nation', 'city', 'postal_code', 'local_address', 'phone']:
-            if len(args[parm]) < 3:
-                return '', BAD_REQUEST
+        for param in ['nation', 'city', 'postal_code', 'local_address', 'phone']:
+            if args.get(param) and args.get(param) != getattr(address, param):
+                if len(args[param]) < 3:
+                    return '', BAD_REQUEST
+                else:
+                    setattr(address, param, args[param])
+                    address.save()
+
+        return address.json(), OK
 
 
     @auth.login_required
