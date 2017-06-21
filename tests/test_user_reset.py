@@ -1,61 +1,102 @@
 from models import User, Reset
-from flask_restful import Resource, reqparse
-import utils
-from http.client import NOT_FOUND, OK
-from datetime import datetime
-from passlib.hash import pbkdf2_sha256
-from models import User
-from views.user import crypt_password
+from http.client import NOT_FOUND, OK, BAD_REQUEST
+import uuid
+import pytest
+from datetime import datetime, timedelta
 
 from .base_test import BaseTest
 
 
 class TestUserReset(BaseTest):
+    def test_reset_password__success(self):
+        temp_user = self.create_user(email="tryresetemail@domain.com")
+        temp_reset = self.create_reset(temp_user)
 
+        data = {
+            'code': temp_reset.uuid,
+            'password': "newpassword_test",
+        }
 
-	# class PasswordResetResource(Resource):
-	#     def post(self):
-	#         parser = parser = reqparse.RequestParser()
-	#         parser.add_argument('code', type=utils.non_empty_str, required=True)
-	#         parser.add_argument('password', type=utils.non_empty_str, required=True)
-	#         args = parser.parse_args(strict=True)
+        resp = self.app.post('/resets/', data=data)
 
-	#         try:
-	#             reset_code = Reset.get(Reset.uuid == args['code']
-	#                                    and Reset.enable
-	#                                    and Reset.expiration_date > datetime.now()
-	#                                    )
-	#         except (Reset.DoesNotExists):
-	#             return None, NOT_FOUND
+        assert resp.status_code == OK
 
-	#         user = reset_code.user
+        new_temp_user = User.get(User.id == temp_reset.user)
+        assert new_temp_user.verify_password(data['password'])
 
-	#         reset_code.enable = False
-	#         user.password = crypt_password(args['password'])
+    def test_reset_password__failure_reset_instance_not_enabled(self):
+        temp_user = self.create_user(email="tryresetemail@domain.com")
+        temp_reset = self.create_reset(temp_user)
+        temp_reset.enable = False
+        temp_reset.save()
 
-	#         reset_code.save()
-	#         user.save()
-	#         return None, OK
+        data = {
+            'code': temp_reset.uuid,
+            'password': "newpassword_test",
+        }
 
+        resp = self.app.post('/resets/', data=data)
 
+        assert resp.status_code == NOT_FOUND
+        assert User.get() == temp_user
+        assert not temp_reset.enable
 
-	def test_reset_password__success(self):
-		temp_user = self.create_user(email="tryresetemail@domain.com")
-		temp_reset = self.create_reset(temp_user)
+    def test_reset_password__failure_reset_instance_not_exist(self):
+        temp_uuid = uuid.uuid4()
+        data = {
+            'code': temp_uuid,
+            'password': "newpassword_test",
+        }
 
+        self.app.post('/resets/', data=data)
 
-		data = {
-			'code': temp_reset.uuid,
-			'password': "newpassword_test",
-		}
+        with pytest.raises(Reset.DoesNotExist):
+            Reset.get(Reset.uuid == temp_uuid)
 
-		resp = self.app.post('/resets/', data=data)
+    def test_reset_password__failure_reset_instance_expired(self):
+        temp_user = self.create_user(email="tryresetemail@domain.com")
+        temp_reset = self.create_reset(temp_user)
 
-		assert resp.status_code == OK
+        temp_reset.expiration_date = (datetime.now() - timedelta(hours=1))
+        temp_reset.save()
 
+        data = {
+            'code': temp_reset.uuid,
+            'password': "newpassword_test",
+        }
 
-		new_temp_user = User.get(User.id == temp_reset.user)
-		assert new_temp_user.verify_password(data['password'])
+        resp = self.app.post('/resets/', data=data)
 
-	def test_reset_password__failure_reset_instance_not_enabled():
-		pass
+        print(temp_reset.expiration_date)
+
+        assert resp.status_code == NOT_FOUND
+
+    def test_reset_password__failure_password_length_unacceptable(self):
+        temp_user = self.create_user(email="tryresetemail@domain.com")
+        temp_reset = self.create_reset(temp_user)
+
+        data = {
+            'code': temp_reset.uuid,
+            'password': "pwd_t",
+        }
+
+        resp = self.app.post('/resets/', data=data)
+
+        assert resp.status_code == BAD_REQUEST
+
+    def test_reset_password__failure_user_is_superuser(self):
+        temp_user = self.create_user(email="tryresetemail@domain.com")
+        temp_reset = self.create_reset(temp_user)
+        temp_user.superuser = True
+        temp_user.save()
+
+        data = {
+            'code': temp_reset.uuid,
+            'password': "newpassword_test",
+        }
+
+        resp = self.app.post('/resets/', data=data)
+
+        assert resp.status_code == NOT_FOUND
+        assert User.get() == temp_user
+        assert temp_user.superuser
