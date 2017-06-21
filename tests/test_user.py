@@ -14,7 +14,7 @@ class Testuser(BaseTest):
             'email': 'emailprova@pippo.it',
             'password': '1234567'
         }
-        resp = self.app.post('/users/', data=data)
+        resp = self.open_without_auth('/users/', 'post', data=data)
         query = User.select()
         user_from_db = User.get()
         expected_data = {
@@ -40,7 +40,7 @@ class Testuser(BaseTest):
 
         user1 = self.create_user()
 
-        resp = self.app.post('/users/', data=data)
+        resp = self.open_without_auth('/users/', 'post', data=data)
         query = User.select().where(User.uuid != user1.uuid)
         assert resp.status_code == CREATED
         assert query.get().json() == json.loads(resp.data.decode())
@@ -56,7 +56,7 @@ class Testuser(BaseTest):
             'password': '1234'
         }
 
-        resp = self.app.post('/users/', data=data)
+        resp = self.open_without_auth('/users/', 'post', data=data)
         assert resp.status_code == BAD_REQUEST
         assert len(User.select()) == 0
 
@@ -67,7 +67,7 @@ class Testuser(BaseTest):
             'password': '123456'
         }
 
-        resp = self.app.post('/users/', data=data)
+        resp = self.open_without_auth('/users/', 'post', data=data)
         assert resp.status_code == BAD_REQUEST
         assert len(User.select()) == 0
 
