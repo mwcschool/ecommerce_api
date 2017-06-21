@@ -9,7 +9,17 @@ from views.user import crypt_password
 from app import app
 import base64
 import uuid
+from uuid import UUID
 import os
+import simplejson as json
+
+
+class UUIDEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, UUID):
+            return str(obj)
+
+        return obj.__dict__
 
 
 class BaseTest:
@@ -144,7 +154,18 @@ class BaseTest:
 
         return picture
 
-    def open_with_auth(self, url, method, email, password, data, content_type=None):
+    def open(self, url, method, data, content_type='application/json'):
+        if content_type == 'application/json':
+            data = json.dumps(data, cls=UUIDEncoder)
+
+        return self.app.open(
+            url, method=method, data=data, content_type=content_type
+        )
+
+    def open_with_auth(self, url, method, email, password, data, content_type='application/json'):
+        if content_type == 'application/json':
+            data = json.dumps(data, cls=UUIDEncoder)
+
         headers = {'Authorization': 'Basic ' + base64.b64encode(
             bytes(email + ":" + password, 'ascii')).decode('ascii')}
 

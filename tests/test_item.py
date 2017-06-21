@@ -16,7 +16,7 @@ from .base_test import BaseTest
 
 class TestItems(BaseTest):
     def test_get_items__empty(self):
-        resp = self.app.get('/items/')
+        resp = self.open('/items/', 'get', data='')
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == []
 
@@ -24,7 +24,7 @@ class TestItems(BaseTest):
         item1 = self.create_item()
         item2 = self.create_item()
 
-        resp = self.app.get('/items/')
+        resp = self.open('/items/', 'get', data='')
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == [item1.json(), item2.json()]
 
@@ -139,20 +139,20 @@ class TestItems(BaseTest):
     def test_get__item(self):
         item1 = self.create_item()
 
-        resp = self.app.get('/items/{}'.format(item1.uuid))
+        resp = self.open('/items/{}'.format(item1.uuid), 'get', data='')
         assert resp.status_code == OK
 
         item_from_server = json.loads(resp.data.decode())
         assert item_from_server == item1.json()
 
     def test_get_item__empty(self):
-        resp = self.app.get('/items/{}'.format(uuid.uuid4()))
+        resp = self.open('/items/{}'.format(uuid.uuid4()), 'get', data='')
         assert resp.status_code == NOT_FOUND
 
     def test_get_item__failure_non_existing_item(self):
         self.create_item()
 
-        resp = self.app.get('/items/{}'.format(uuid.uuid4()))
+        resp = self.open('/items/{}'.format(uuid.uuid4()), 'get', data='')
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__failure_user_is_not_superuser(self):
@@ -171,7 +171,7 @@ class TestItems(BaseTest):
             'items/{}'.format(item1.uuid), 'delete', user.email, 'p4ssw0rd', data='')
         assert resp.status_code == NO_CONTENT
         assert Item.count() == 0
-        resp = self.app.get('item/{}'.format(item1.uuid))
+        resp = self.open('item/{}'.format(item1.uuid), 'get', data='')
         assert resp.status_code == NOT_FOUND
 
     def test_delete_item__failure_not_found(self):
@@ -498,7 +498,7 @@ class TestItems(BaseTest):
         image1 = self.create_item_picture(item)
         image2 = self.create_item_picture(item)
 
-        resp = self.app.get('/items/{}/pictures'.format(item.uuid))
+        resp = self.open('/items/{}/pictures'.format(item.uuid), 'get', data='')
 
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == [image1.json(), image2.json()]
@@ -506,12 +506,12 @@ class TestItems(BaseTest):
     def test_get_item_pictures__success_empty_pictures(self):
         item = self.create_item()
 
-        resp = self.app.get('/items/{}/pictures'.format(item.uuid))
+        resp = self.open('/items/{}/pictures'.format(item.uuid), 'get', data='')
 
         assert resp.status_code == OK
         assert json.loads(resp.data.decode()) == []
 
     def test_get_item_pictures__failure_non_existing_item(self):
-        resp = self.app.get('/items/{}/pictures'.format(uuid.uuid4()))
+        resp = self.open('/items/{}/pictures'.format(uuid.uuid4()), 'get', data='')
 
         assert resp.status_code == NOT_FOUND
