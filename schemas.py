@@ -31,7 +31,7 @@ class UserSchema(Schema):
 
 class AddressSchema(Schema):
     uuid = fields.UUID(dump_only=True)
-    user = fields.UUID(required=True, attribute='user.uuid')
+    user = fields.UUID(attribute='user.uuid', dump_only=True)
     nation = fields.Str(required=True, validate=check_empty_str)
     city = fields.Str(required=True, validate=check_empty_str)
     postal_code = fields.Str(required=True, validate=check_empty_str)
