@@ -171,11 +171,3 @@ class Reset(BaseModel):
     user = ForeignKeyField(User)
     expiration_date = DateTimeField()
     enable = BooleanField(default=True)
-
-    def json(self):
-        return {
-            'uuid': str(self.uuid),
-            'user': str(self.user.uuid),
-            'expiration_date': str(self.expiration_date),
-            'enable': str(self.enable),
-        }
