@@ -85,10 +85,8 @@ class TestUserReset(BaseTest):
         assert resp.status_code == BAD_REQUEST
 
     def test_reset_password__failure_user_is_superuser(self):
-        temp_user = self.create_user(email="tryresetemail@domain.com")
+        temp_user = self.create_user(email="tryresetemail@domain.com", superuser=True)
         temp_reset = self.create_reset(temp_user)
-        temp_user.superuser = True
-        temp_user.save()
 
         data = {
             'code': temp_reset.uuid,
