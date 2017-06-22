@@ -20,8 +20,8 @@ class TestUserReset(BaseTest):
 
         assert resp.status_code == OK
 
-        new_temp_user = User.get(User.id == temp_reset.user)
-        assert new_temp_user.verify_password(data['password'])
+        temp_user = temp_user.reload()
+        assert temp_user.verify_password(data['password'])
 
     def test_reset_password__failure_reset_instance_not_enabled(self):
         temp_user = self.create_user(email="tryresetemail@domain.com")
