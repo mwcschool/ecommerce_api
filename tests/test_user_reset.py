@@ -1,7 +1,6 @@
 from models import User, Reset
 from http.client import NOT_FOUND, OK, BAD_REQUEST
 import uuid
-import pytest
 from datetime import datetime, timedelta
 
 from .base_test import BaseTest
@@ -48,10 +47,9 @@ class TestUserReset(BaseTest):
             'password': "newpassword_test",
         }
 
-        self.app.post('/resets/', data=data)
+        resp = self.app.post('/resets/', data=data)
 
-        with pytest.raises(Reset.DoesNotExist):
-            Reset.get(Reset.uuid == temp_uuid)
+        assert resp.status_code == NOT_FOUND
 
     def test_reset_password__failure_reset_instance_expired(self):
         temp_user = self.create_user(email="tryresetemail@domain.com")
