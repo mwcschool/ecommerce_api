@@ -1,6 +1,6 @@
 from peewee import Model, SqliteDatabase, PostgresqlDatabase, Check
 from peewee import DecimalField, TextField, CharField
-from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField
+from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField, DateTimeField
 from schemas import ItemSchema, UserSchema, AddressSchema
 from schemas import OrderSchema, OrderItemSchema, FavoritesSchema
 from passlib.hash import pbkdf2_sha256
@@ -163,4 +163,19 @@ class Favorites(BaseModel):
             'uuid': str(self.uuid),
             'user': str(self.user.uuid),
             'item': str(self.item.uuid)
+        }
+
+
+class Reset(BaseModel):
+    uuid = UUIDField(unique=True)
+    user = ForeignKeyField(User)
+    expiration_date = DateTimeField()
+    enable = BooleanField(default=True)
+
+    def json(self):
+        return {
+            'uuid': str(self.uuid),
+            'user': str(self.user.uuid),
+            'expiration_date': str(self.expiration_date),
+            'enable': str(self.enable),
         }
