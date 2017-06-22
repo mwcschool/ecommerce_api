@@ -6,7 +6,7 @@ from tempfile import mkdtemp
 import shutil
 from datetime import datetime, timedelta
 
-from views.user import crypt_password
+from auth import crypt_password
 from app import app
 import base64
 import uuid
