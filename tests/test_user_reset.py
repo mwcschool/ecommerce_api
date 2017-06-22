@@ -1,4 +1,4 @@
-from models import User, Reset
+from models import User
 from http.client import NOT_FOUND, OK, BAD_REQUEST
 import uuid
 from datetime import datetime, timedelta
@@ -25,9 +25,7 @@ class TestUserReset(BaseTest):
 
     def test_reset_password__failure_reset_instance_not_enabled(self):
         temp_user = self.create_user(email="tryresetemail@domain.com")
-        temp_reset = self.create_reset(temp_user)
-        temp_reset.enable = False
-        temp_reset.save()
+        temp_reset = self.create_reset(user=temp_user, enable=False)
 
         data = {
             'code': temp_reset.uuid,
@@ -38,7 +36,6 @@ class TestUserReset(BaseTest):
 
         assert resp.status_code == NOT_FOUND
         assert User.get() == temp_user
-        assert not temp_reset.enable
 
     def test_reset_password__failure_reset_instance_not_exist(self):
         temp_uuid = uuid.uuid4()

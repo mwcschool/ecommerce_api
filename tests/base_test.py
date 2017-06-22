@@ -59,7 +59,8 @@ class BaseTest:
             superuser=superuser,
         )
 
-    def create_reset(self, user=None, expiration_date=datetime.now() + timedelta(hours=1)):
+    def create_reset(self, user=None, enable=True,
+                     expiration_date=datetime.now() + timedelta(hours=1)):
 
         if not user:
             user = self.create_user()
@@ -68,6 +69,7 @@ class BaseTest:
             uuid=uuid.uuid4(),
             user=user,
             expiration_date=expiration_date,
+            enable=enable
         )
 
     def create_item(self, name="Item name", price=7,
