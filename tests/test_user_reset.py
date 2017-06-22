@@ -99,4 +99,3 @@ class TestUserReset(BaseTest):
 
         assert resp.status_code == NOT_FOUND
         assert User.get() == temp_user
-        assert temp_user.superuser
