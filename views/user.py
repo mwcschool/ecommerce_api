@@ -99,7 +99,7 @@ class ResetResource(Resource):
 
         Reset.create(
             uuid=uuid.uuid4(),
-            user=User.get(User.email == args['email']),
+            user=user,
             expiration_date=datetime.now() + timedelta(hours=1)
         )
 
