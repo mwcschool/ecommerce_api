@@ -3,13 +3,7 @@ from flask_restful import Resource, reqparse
 import utils
 from http.client import NOT_FOUND, OK, BAD_REQUEST
 from datetime import datetime
-from passlib.hash import pbkdf2_sha256
-
-
-def crypt_password(password):
-    crypt = pbkdf2_sha256.hash(password)
-
-    return crypt
+import auth
 
 
 class PasswordResetResource(Resource):
@@ -36,7 +30,7 @@ class PasswordResetResource(Resource):
             return None, BAD_REQUEST
 
         reset_code.enable = False
-        user.password = crypt_password(args['password'])
+        user.password = auth.crypt_password(args['password'])
 
         reset_code.save()
         user.save()
