@@ -55,10 +55,9 @@ class TestUserReset(BaseTest):
 
     def test_reset_password__failure_reset_instance_expired(self):
         temp_user = self.create_user(email="tryresetemail@domain.com")
-        temp_reset = self.create_reset(temp_user)
-
-        temp_reset.expiration_date = (datetime.now() - timedelta(hours=1))
-        temp_reset.save()
+        temp_reset = self.create_reset(
+            user=temp_user,
+            expiration_date=datetime.now() - timedelta(hours=1))
 
         data = {
             'code': temp_reset.uuid,
