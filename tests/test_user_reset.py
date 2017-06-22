@@ -65,9 +65,6 @@ class TestUserReset(BaseTest):
         }
 
         resp = self.app.post('/resets/', data=data)
-
-        print(temp_reset.expiration_date)
-
         assert resp.status_code == NOT_FOUND
 
     def test_reset_password__failure_password_length_unacceptable(self):
