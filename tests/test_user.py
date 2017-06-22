@@ -222,10 +222,6 @@ class Testuser(BaseTest):
         }
 
         self.app.post('/users/reset/', data=data)
-        self.app.post('/users/reset/', data=data)
-
-        Reset.update(enable=True)
-
         resp = self.app.post('/users/reset/', data=data)
 
         assert len(Reset.select().where(Reset.enable)) == 1
