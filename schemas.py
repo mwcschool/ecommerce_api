@@ -56,3 +56,10 @@ class FavoritesSchema(Schema):
     uuid = fields.UUID(dump_only=True)
     user = fields.UUID(required=True, attribute='user.uuid')
     item = fields.UUID(required=True, attribute='item.uuid')
+
+class ResetRequestSchema(Schema):
+    email = fields.Str(read_only=True, required=True, validate=check_empty_str)
+
+class ResetTokenSchema(Schema):
+    uuid = fields.UUID(read_only=True, required=True)
+    password = fields.Str(read_only=True, required=True, validate=check_empty_str)
