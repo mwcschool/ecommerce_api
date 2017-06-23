@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, ValidationError
+from marshmallow import Schema, fields, ValidationError, validate
 
 
 def check_empty_str(value):
@@ -57,9 +57,11 @@ class FavoritesSchema(Schema):
     user = fields.UUID(required=True, attribute='user.uuid')
     item = fields.UUID(required=True, attribute='item.uuid')
 
+
 class ResetRequestSchema(Schema):
-    email = fields.Str(read_only=True, required=True, validate=check_empty_str)
+    email = fields.Str(read_only=True, required=True, validate=validate.Length(min=1))
+
 
 class ResetTokenSchema(Schema):
     uuid = fields.UUID(read_only=True, required=True)
-    password = fields.Str(read_only=True, required=True, validate=check_empty_str)
+    password = fields.Str(read_only=True, required=True, validate=validate.Length(min=7))
