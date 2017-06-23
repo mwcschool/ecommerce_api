@@ -3,6 +3,7 @@ from peewee import DecimalField, TextField, CharField
 from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField, DateTimeField
 from schemas import ItemSchema, UserSchema, AddressSchema
 from schemas import OrderSchema, OrderItemSchema, FavoritesSchema
+from schemas import ResetTokenSchema
 from passlib.hash import pbkdf2_sha256
 from jsonschema import validate
 from marshmallow_jsonschema import JSONSchema
@@ -171,3 +172,7 @@ class Reset(BaseModel):
     user = ForeignKeyField(User)
     expiration_date = DateTimeField()
     enable = BooleanField(default=True)
+
+    @classmethod
+    def get_schema(cls):
+        return ResetTokenSchema()
