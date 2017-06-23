@@ -3,10 +3,13 @@ from models import User, Reset
 import auth
 from flask import g
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, UNAUTHORIZED
-from flask_restful import Resource, reqparse
+from flask_restful import Resource, reqparse, request
 import re
 import utils
 from datetime import datetime, timedelta
+from schemas import ResetRequestSchema
+from marshmallow_jsonschema import JSONSchema
+from jsonschema import validate
 
 
 def valid_email(email):
@@ -83,9 +86,8 @@ class UserResource(Resource):
 
 class ResetResource(Resource):
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('email', type=utils.non_empty_str, required=True)
-        args = parser.parse_args(strict=True)
+        args = request.form
+        validate(args, JSONSchema().dump(ResetRequestSchema()).data)
 
         if not valid_email(args['email']):
             return None, BAD_REQUEST
