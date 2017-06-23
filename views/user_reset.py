@@ -1,22 +1,25 @@
 from models import Reset
-from flask_restful import Resource, reqparse
+from flask_restful import Resource, reqparse, request
 import utils
 from http.client import NOT_FOUND, OK, BAD_REQUEST
 from datetime import datetime
 import auth
+from jsonschema import ValidationError
 
 
 class PasswordResetResource(Resource):
     def post(self):
-        parser = parser = reqparse.RequestParser()
-        parser.add_argument('code', type=utils.non_empty_str, required=True)
-        parser.add_argument('password', type=utils.non_empty_str, required=True)
-        args = parser.parse_args(strict=True)
+        args = request.form
 
         try:
-            user = Reset.get(Reset.uuid == args['code']).user
+            Reset.verify_json(args)
+        except ValidationError:
+            return None, BAD_REQUEST
+
+        try:
+            user = Reset.get(Reset.uuid == args['uuid']).user
             reset_code = Reset.select()\
-                .where(Reset.uuid == args['code'])\
+                .where(Reset.uuid == args['uuid'])\
                 .where(Reset.enable)\
                 .where(Reset.expiration_date > datetime.now()).get()
 
@@ -25,9 +28,6 @@ class PasswordResetResource(Resource):
 
         if user.superuser:
             return None, NOT_FOUND
-
-        if not len(args['password']) > 6:
-            return None, BAD_REQUEST
 
         reset_code.enable = False
         user.password = auth.crypt_password(args['password'])
