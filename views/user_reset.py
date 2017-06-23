@@ -1,6 +1,5 @@
 from models import Reset
-from flask_restful import Resource, reqparse, request
-import utils
+from flask_restful import Resource, request
 from http.client import NOT_FOUND, OK, BAD_REQUEST
 from datetime import datetime
 import auth

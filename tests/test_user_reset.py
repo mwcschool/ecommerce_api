@@ -91,7 +91,7 @@ class TestUserReset(BaseTest):
 
     def test_reset_password__failure_uuid_not_inserted(self):
         temp_user = self.create_user(email="tryresetemail@domain.com")
-        temp_reset = self.create_reset(temp_user)
+        self.create_reset(temp_user)
 
         data = {
             'password': "newpassword_test",
