@@ -12,7 +12,7 @@ class TestUserReset(BaseTest):
         temp_reset = self.create_reset(temp_user)
 
         data = {
-            'code': temp_reset.uuid,
+            'uuid': temp_reset.uuid,
             'password': "newpassword_test",
         }
 
@@ -28,7 +28,7 @@ class TestUserReset(BaseTest):
         temp_reset = self.create_reset(user=temp_user, enable=False)
 
         data = {
-            'code': temp_reset.uuid,
+            'uuid': temp_reset.uuid,
             'password': "newpassword_test",
         }
 
@@ -40,7 +40,7 @@ class TestUserReset(BaseTest):
     def test_reset_password__failure_reset_instance_not_exist(self):
         temp_uuid = uuid.uuid4()
         data = {
-            'code': temp_uuid,
+            'uuid': temp_uuid,
             'password': "newpassword_test",
         }
 
@@ -55,7 +55,7 @@ class TestUserReset(BaseTest):
             expiration_date=datetime.now() - timedelta(hours=1))
 
         data = {
-            'code': temp_reset.uuid,
+            'uuid': temp_reset.uuid,
             'password': "newpassword_test",
         }
 
@@ -67,7 +67,7 @@ class TestUserReset(BaseTest):
         temp_reset = self.create_reset(temp_user)
 
         data = {
-            'code': temp_reset.uuid,
+            'uuid': temp_reset.uuid,
             'password': "pwd_t",
         }
 
@@ -80,7 +80,7 @@ class TestUserReset(BaseTest):
         temp_reset = self.create_reset(temp_user)
 
         data = {
-            'code': temp_reset.uuid,
+            'uuid': temp_reset.uuid,
             'password': "newpassword_test",
         }
 
