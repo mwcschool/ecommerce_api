@@ -88,3 +88,27 @@ class TestUserReset(BaseTest):
 
         assert resp.status_code == NOT_FOUND
         assert User.get() == temp_user
+
+    def test_reset_password__failure_uuid_not_inserted(self):
+        temp_user = self.create_user(email="tryresetemail@domain.com")
+        temp_reset = self.create_reset(temp_user)
+
+        data = {
+            'password': "newpassword_test",
+        }
+
+        resp = self.app.post('/resets/', data=data)
+
+        assert resp.status_code == BAD_REQUEST
+
+    def test_reset_password__failure_password_not_inserted(self):
+        temp_user = self.create_user(email="tryresetemail@domain.com")
+        temp_reset = self.create_reset(temp_user)
+
+        data = {
+            'uuid': temp_reset.uuid,
+        }
+
+        resp = self.app.post('/resets/', data=data)
+
+        assert resp.status_code == BAD_REQUEST
