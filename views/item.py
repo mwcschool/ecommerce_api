@@ -15,7 +15,7 @@ from models import Item, Picture
 import utils
 import auth
 
-from marshmallow import ValidationError
+from jsonschema import ValidationError
 
 
 
@@ -48,13 +48,11 @@ class ItemsResource(Resource):
                 return None, BAD_REQUEST
         except KeyError:
             return None, BAD_REQUEST
-# --------------
+
         try:
             Item.verify_json(jsondata)
         except ValidationError as ver_json_error:
-            return {ver_json_error.message}, BAD_REQUEST
-
-        # ---------------
+            return ver_json_error.message, BAD_REQUEST
 
         obj = Item.create(
             uuid=uuid.uuid4(),
