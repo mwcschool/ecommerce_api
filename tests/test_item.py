@@ -201,7 +201,7 @@ class TestItems(BaseTest):
             'price': 10,
             'description': 'info product',
             'category': 'product category',
-            'avaibility': 1
+            'availability': 1
         }
 
         resp = self.open_with_auth(
