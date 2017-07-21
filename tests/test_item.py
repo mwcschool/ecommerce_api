@@ -115,7 +115,8 @@ class TestItems(BaseTest):
 
         new_item_data = {
             'name': 'Item one',
-            'description': 'Description one'
+            'description': 'Description one',
+            'availability': 11
         }
         resp = self.open_with_auth(
             '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
