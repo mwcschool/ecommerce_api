@@ -235,7 +235,8 @@ class TestAddress(BaseTest):
         current_user = User.get(User.email == self.user.email)
 
         resp = self.open_with_auth(
-            '/addresses/{}'.format(data_address.uuid), 'patch', self.user.email, 'p4ssw0rd',
+            '/addresses/{}'.format(data_address.uuid),
+            'patch', self.user.email, 'p4ssw0rd',
             data=new_data_address)
 
         new_data_address['user'] = str(current_user.uuid)
@@ -258,12 +259,37 @@ class TestAddress(BaseTest):
         data_address = self.create_address(self.user)
 
         new_data_address = {
-            'nation': 'kamchatka',
+            'city': 'Reykjavik',
+        }
+
+        current_user = User.get(User.email == self.user.email)
+
+        resp = self.open_with_auth(
+            '/addresses/{}'.format(data_address.uuid),
+             'patch', self.user.email, 'p4ssw0rd',
+            data=new_data_address)
+
+        address_from_db = Address.get()
+
+        expected_data = {
+            'city': address_from_db.city,
+        }
+
+        assert resp.status_code == OK
+        assert expected_data == new_data_address
+        assert address_from_db.json() == json.loads(resp.data.decode())
+
+    def test_patch_modify_empty_field(self):
+        data_address = self.create_address(self.user)
+
+        new_data_address = {
+            'nation': '',
         }
 
         resp = self.open_with_auth(
-            '/addresses/{}'.format(data_address.uuid), 'patch', self.user.email, 'p4ssw0rd',
+            '/addresses/{}'.format(data_address.uuid),
+            'patch', self.user.email, 'p4ssw0rd',
             data=new_data_address)
 
-        assert resp.status_code == OK
+        assert resp.status_code == BAD_REQUEST
 
