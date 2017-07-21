@@ -18,7 +18,6 @@ import auth
 from jsonschema import ValidationError
 
 
-
 def non_empty_string(string):
     string = str(string).strip()
     if string:
