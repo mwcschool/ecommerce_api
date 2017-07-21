@@ -103,7 +103,6 @@ class AddressResource(Resource):
 
         return address.json(), OK
 
-
     @auth.login_required
     def delete(self, address_id):
         try:
