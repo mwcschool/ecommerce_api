@@ -114,11 +114,11 @@ class ItemResource(Resource):
         except ValidationError as ver_json_error:
             return ver_json_error.message, BAD_REQUEST
 
-        obj.name = args['name']
-        obj.price = args['price']
-        obj.description = args['description']
-        obj.category = args['category']
-        obj.availability = args['availability']
+        obj.name = jsondata['name']
+        obj.price = jsondata['price']
+        obj.description = jsondata['description']
+        obj.category = jsondata['category']
+        obj.availability = jsondata['availability']
         obj.save()
 
         return obj.json(), OK
