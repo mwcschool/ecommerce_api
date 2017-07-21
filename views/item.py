@@ -18,6 +18,7 @@ import auth
 from marshmallow import ValidationError
 
 
+
 def non_empty_string(string):
     string = str(string).strip()
     if string:
@@ -42,13 +43,18 @@ class ItemsResource(Resource):
         except ValueError:
             return None, BAD_REQUEST
 
-        if jsondata['availability'] < 0:
+        try:
+            if jsondata['availability'] < 0:
+                return None, BAD_REQUEST
+        except KeyError:
             return None, BAD_REQUEST
-
+# --------------
         try:
             Item.verify_json(jsondata)
         except ValidationError as ver_json_error:
-            return ver_json_error.message, BAD_REQUEST
+            return {ver_json_error.message}, BAD_REQUEST
+
+        # ---------------
 
         obj = Item.create(
             uuid=uuid.uuid4(),
