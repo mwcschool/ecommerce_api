@@ -1,23 +1,18 @@
-from marshmallow import Schema, fields, ValidationError, validate
+from marshmallow import Schema, fields, validate , ValidationError
 
 
 def check_empty_str(value):
     if str(value).strip() == '':
-        raise ValidationError('String field must not be empty')
-
-
-def check_negative_number(value):
-    if value < 0:
-        raise ValidationError('Number must be greater than or equal to zero')
+        return False
 
 
 class ItemSchema(Schema):
     uuid = fields.UUID(dump_only=True)
     name = fields.Str(required=True, validate=check_empty_str)
-    price = fields.Decimal(required=True, validate=check_negative_number)
+    price = fields.Decimal(required=True, validate=validate.Range(min=0))
     description = fields.Str(required=True, validate=check_empty_str)
     category = fields.Str(required=True, validate=check_empty_str)
-    availability = fields.Int(required=True, validate=check_negative_number)
+    availability = fields.Int(required=True, validate=validate.Range(min=0))
 
 
 class UserSchema(Schema):
