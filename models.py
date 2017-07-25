@@ -40,8 +40,12 @@ class BaseModel(Model):
         raise NotImplementedError
 
     @classmethod
-    def verify_json(cls, json):
-        schema = cls.get_schema()
+    def get_partial_schema(cls):
+        return cls.get_schema()
+
+    @classmethod
+    def verify_json(cls, json, partial=False):
+        schema = cls.get_partial_schema() if partial else cls.get_schema()
         json_schema = JSONSchema().dump(schema).data
         validate(json, json_schema)
 
@@ -66,6 +70,9 @@ class Item(BaseModel):
     def get_schema(cls):
         return ItemSchema()
 
+    @classmethod
+    def get_partial_schema(cls):
+        return PartialItemSchema()
 
 class User(BaseModel):
     uuid = UUIDField(unique=True)
