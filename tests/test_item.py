@@ -266,6 +266,23 @@ class TestItems(BaseTest):
         assert item.json() == item_from_db
         assert resp.status_code == BAD_REQUEST
 
+    def test_modify_item__failure_empty_field(self):
+        user = self.create_user(superuser=True)
+        item = self.create_item()
+        modified_content = {
+            'name': 'Item One',
+            'price': 10,
+            'description': '',
+            'category': 'Category two',
+            'availability': 11
+        }
+
+        resp = self.open_with_auth(
+            'items/{}'.format(item.uuid), 'put', user.email, 'p4ssw0rd', data=modified_content)
+        item_from_db = item.reload().json()
+        assert item.json() == item_from_db
+        assert resp.status_code == BAD_REQUEST
+
     def test_modify_item__failure_missing_argument(self):
         user = self.create_user(superuser=True)
         item = self.create_item()
