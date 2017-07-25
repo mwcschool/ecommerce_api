@@ -3,7 +3,7 @@ from models import User
 import auth
 from flask import g, request
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, UNAUTHORIZED
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 import re
 from passlib.hash import pbkdf2_sha256
 from jsonschema.exceptions import ValidationError
@@ -67,7 +67,6 @@ class UserResource(Resource):
 
     @auth.login_required
     def delete(self, uuid):
-        json = request.get_json()
         try:
             user = User.get(uuid=uuid)
         except User.DoesNotExist:
