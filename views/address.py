@@ -37,8 +37,7 @@ class AddressResource(Resource):
         try:
             address = (
                 Address.select()
-                .where(Address.uuid == address_id)
-                .where(Address.user == g.current_user)
+                .where(Address.uuid == address_id, Address.user == g.current_user)
                 .get())
         except Address.DoesNotExist:
             return None, NOT_FOUND
@@ -51,8 +50,7 @@ class AddressResource(Resource):
         try:
             address = (
                 Address.select()
-                .where(Address.uuid == address_id)
-                .where(Address.user == g.current_user)
+                .where(Address.uuid == address_id, Address.user == g.current_user)
                 .get())
         except Address.DoesNotExist:
             return None, NOT_FOUND
