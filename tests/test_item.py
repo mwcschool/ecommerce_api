@@ -115,7 +115,8 @@ class TestItems(BaseTest):
 
         new_item_data = {
             'name': 'Item one',
-            'description': 'Description one'
+            'description': 'Description one',
+            'availability': 11
         }
         resp = self.open_with_auth(
             '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
@@ -129,7 +130,8 @@ class TestItems(BaseTest):
             'name': 'Item one',
             'price': 'Ten',
             'description': 'Description one',
-            'category': 'Category one'
+            'category': 'Category one',
+            'availability': 11
         }
         resp = self.open_with_auth(
             '/items/', 'post', user.email, 'p4ssw0rd', data=new_item_data)
@@ -199,7 +201,7 @@ class TestItems(BaseTest):
             'price': 10,
             'description': 'info product',
             'category': 'product category',
-            'avaibility': 1
+            'availability': 1
         }
 
         resp = self.open_with_auth(

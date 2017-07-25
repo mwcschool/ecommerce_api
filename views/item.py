@@ -1,4 +1,4 @@
-from flask_restful import Resource, reqparse, abort
+from flask_restful import Resource, reqparse, abort, request
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from http.client import CREATED
@@ -14,6 +14,8 @@ import os
 from models import Item, Picture
 import utils
 import auth
+
+from jsonschema import ValidationError
 
 
 def non_empty_string(string):
@@ -33,28 +35,31 @@ class ItemsResource(Resource):
         if not g.current_user.superuser:
             return None, UNAUTHORIZED
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str, required=True)
-        parser.add_argument('price', type=int, required=True)
-        parser.add_argument('description', type=str, required=True)
-        parser.add_argument('category', type=str, required=True)
-        parser.add_argument('availability', type=int, required=True)
-        args = parser.parse_args(strict=True)
+        jsondata = request.get_json()
+
         try:
-            utils.non_empty_str(args['name'], 'name')
+            utils.non_empty_str(jsondata['name'], 'name')
         except ValueError:
             return None, BAD_REQUEST
 
-        if args['availability'] < 0:
+        try:
+            if jsondata['availability'] < 0:
+                return None, BAD_REQUEST
+        except KeyError:
             return None, BAD_REQUEST
+
+        try:
+            Item.verify_json(jsondata)
+        except ValidationError as ver_json_error:
+            return ver_json_error.message, BAD_REQUEST
 
         obj = Item.create(
             uuid=uuid.uuid4(),
-            name=args['name'],
-            price=args['price'],
-            description=args['description'],
-            category=args['category'],
-            availability=args['availability']
+            name=jsondata['name'],
+            price=jsondata['price'],
+            description=jsondata['description'],
+            category=jsondata['category'],
+            availability=jsondata['availability']
         )
 
         return obj.json(), CREATED
@@ -90,26 +95,29 @@ class ItemResource(Resource):
         except Item.DoesNotExist:
             return None, NOT_FOUND
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str, required=True)
-        parser.add_argument('price', type=int, required=True)
-        parser.add_argument('description', type=str, required=True)
-        parser.add_argument('category', type=str, required=True)
-        parser.add_argument('availability', type=int, required=True)
-        args = parser.parse_args(strict=True)
+        jsondata = request.get_json()
+
         try:
-            utils.non_empty_str(args['name'], 'name')
+            utils.non_empty_str(jsondata['name'], 'name')
         except ValueError:
             return None, BAD_REQUEST
 
-        if args['availability'] < 0:
+        try:
+            if jsondata['availability'] < 0:
+                return None, BAD_REQUEST
+        except KeyError:
             return None, BAD_REQUEST
 
-        obj.name = args['name']
-        obj.price = args['price']
-        obj.description = args['description']
-        obj.category = args['category']
-        obj.availability = args['availability']
+        try:
+            Item.verify_json(jsondata)
+        except ValidationError as ver_json_error:
+            return ver_json_error.message, BAD_REQUEST
+
+        obj.name = jsondata['name']
+        obj.price = jsondata['price']
+        obj.description = jsondata['description']
+        obj.category = jsondata['category']
+        obj.availability = jsondata['availability']
         obj.save()
 
         return obj.json(), OK
