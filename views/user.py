@@ -6,7 +6,7 @@ from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, UNAUTHORIZE
 from flask_restful import Resource, reqparse
 import re
 from passlib.hash import pbkdf2_sha256
-from marshmallow import ValidationError
+from jsonschema.exceptions import ValidationError
 
 
 def valid_email(email):
@@ -25,7 +25,7 @@ class UsersResource(Resource):
         try:
             User.verify_json(json_data)
         except ValidationError as err:
-            return {'message': err.message}, NOT_FOUND
+            return {'message': err.message}, BAD_REQUEST
 
         if valid_email(json_data['email']) and len(json_data['password']) > 6:
             obj = User.create(
@@ -46,10 +46,11 @@ class UserResource(Resource):
     def put(self, uuid):
         json_data = request.get_json()
         try:
-            obj = User.verify_json(json_data)
+            User.verify_json(json_data)
         except ValidationError as err:
-            return None, NOT_FOUND
+            return None, BAD_REQUEST
 
+        obj = User.get(uuid=uuid)
         if obj != g.current_user:
             return '', UNAUTHORIZED
 
@@ -68,8 +69,8 @@ class UserResource(Resource):
     def delete(self, uuid):
         json_data = request.get_json()
         try:
-            obj = User.verify_json(json_data)
-        except ValidationError:
+            obj = User.get(uuid=uuid)
+        except User.DoesNotExist:
             return None, NOT_FOUND
 
         if obj != g.current_user:
