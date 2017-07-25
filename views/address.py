@@ -1,35 +1,31 @@
 import uuid
 from models import Address
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, OK
-from flask_restful import Resource, reqparse
-from flask import g
-import utils
+from flask_restful import Resource
+from flask import g, request
 import auth
+from jsonschema import ValidationError
+
+# import utils
 
 
 class AddressesResource(Resource):
     @auth.login_required
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('nation', type=utils.non_empty_str, required=True)
-        parser.add_argument('city', type=utils.non_empty_str, required=True)
-        parser.add_argument('postal_code', type=utils.non_empty_str, required=True)
-        parser.add_argument('local_address', type=utils.non_empty_str, required=True)
-        parser.add_argument('phone', type=utils.non_empty_str, required=True)
-        args = parser.parse_args(strict=True)
-
-        for parm in ['nation', 'city', 'postal_code', 'local_address', 'phone']:
-            if len(args[parm]) < 3:
-                return '', BAD_REQUEST
+        json = request.get_json()
+        try:
+            Address.verify_json(json)
+        except ValidationError as err:
+            return {"message": err.message}, BAD_REQUEST
 
         address = Address.create(
             uuid=uuid.uuid4(),
             user=g.current_user,
-            nation=args['nation'],
-            city=args['city'],
-            postal_code=args['postal_code'],
-            local_address=args['local_address'],
-            phone=args['phone'],
+            nation=json['nation'],
+            city=json['city'],
+            postal_code=json['postal_code'],
+            local_address=json['local_address'],
+            phone=json['phone'],
         )
 
         return address.json(), CREATED
@@ -51,6 +47,7 @@ class AddressResource(Resource):
 
     @auth.login_required
     def put(self, address_id):
+        json = request.get_json()
         try:
             address = (
                 Address.select()
@@ -60,24 +57,17 @@ class AddressResource(Resource):
         except Address.DoesNotExist:
             return None, NOT_FOUND
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('nation', type=utils.non_empty_str, required=True)
-        parser.add_argument('city', type=utils.non_empty_str, required=True)
-        parser.add_argument('postal_code', type=utils.non_empty_str, required=True)
-        parser.add_argument('local_address', type=utils.non_empty_str, required=True)
-        parser.add_argument('phone', type=utils.non_empty_str, required=True)
-        args = parser.parse_args(strict=True)
-
-        for parm in ['nation', 'city', 'postal_code', 'local_address', 'phone']:
-            if len(args[parm]) < 3:
-                return '', BAD_REQUEST
+        try:
+            Address.verify_json(json)
+        except ValidationError as err:
+            return {"message": err.message}, BAD_REQUEST
 
         if address.user.uuid == g.current_user.uuid:
-            address.nation = args['nation']
-            address.city = args['city']
-            address.postal_code = args['postal_code']
-            address.local_address = args['local_address']
-            address.phone = args['phone']
+            address.nation = json['nation']
+            address.city = json['city']
+            address.postal_code = json['postal_code']
+            address.local_address = json['local_address']
+            address.phone = json['phone']
             address.save()
 
             return address.json(), CREATED

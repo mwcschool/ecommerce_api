@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, ValidationError
+from marshmallow import Schema, fields, ValidationError, validate
 
 
 def check_empty_str(value):
@@ -31,12 +31,12 @@ class UserSchema(Schema):
 
 class AddressSchema(Schema):
     uuid = fields.UUID(dump_only=True)
-    user = fields.UUID(required=True, attribute='user.uuid')
-    nation = fields.Str(required=True, validate=check_empty_str)
-    city = fields.Str(required=True, validate=check_empty_str)
-    postal_code = fields.Str(required=True, validate=check_empty_str)
-    local_address = fields.Str(required=True, validate=check_empty_str)
-    phone = fields.Str(required=True, validate=check_empty_str)
+    user = fields.UUID(attribute='user.uuid', dump_only=True)
+    nation = fields.Str(required=True, validate=validate.Length(min=1))
+    city = fields.Str(required=True, validate=validate.Length(min=1))
+    postal_code = fields.Str(required=True, validate=validate.Length(min=1))
+    local_address = fields.Str(required=True, validate=validate.Length(min=1))
+    phone = fields.Str(required=True, validate=validate.Length(min=1))
 
 
 class OrderItemSchema(Schema):
