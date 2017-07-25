@@ -117,26 +117,22 @@ class ItemResource(Resource):
         except Item.DoesNotExist:
             return None, NOT_FOUND
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str)
-        parser.add_argument('price', type=int)
-        parser.add_argument('description', type=str)
-        parser.add_argument('category', type=str)
-        parser.add_argument('availability', type=int)
-        args = parser.parse_args(strict=True)
+        jsondata = request.get_json()
 
         try:
-            utils.non_empty_str(args['name'], 'name')
+            utils.non_empty_str(jsondata['name'], 'name')
         except ValueError:
             return None, BAD_REQUEST
 
-        if args['availability'] is not None:
-            if args['availability'] < 0:
-                return None, BAD_REQUEST
 
-        for attr in args.keys():
-            if args.get(attr) is not None:
-                setattr(obj, attr, args[attr])
+        for key, value in jsondata.items():
+            setattr(obj, key, value)
+
+
+        try:
+            Item.verify_json(obj.json())
+        except ValidationError as ver_json_error:
+            return ver_json_error.message, BAD_REQUEST
 
         obj.save()
 
