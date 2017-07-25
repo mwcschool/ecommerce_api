@@ -2,7 +2,7 @@ from peewee import Model, SqliteDatabase, PostgresqlDatabase, Check
 from peewee import DecimalField, TextField, CharField
 from peewee import UUIDField, ForeignKeyField, IntegerField, BooleanField
 from schemas import ItemSchema, UserSchema, AddressSchema
-from schemas import OrderSchema, OrderItemSchema, FavoritesSchema
+from schemas import OrderSchema, OrderItemSchema, FavoritesSchema, ItemPatchSchema
 from passlib.hash import pbkdf2_sha256
 from jsonschema import validate
 from marshmallow_jsonschema import JSONSchema
@@ -40,9 +40,15 @@ class BaseModel(Model):
         raise NotImplementedError
 
     @classmethod
-    def verify_json(cls, json):
-        schema = cls.get_schema()
+    def get_partial_schema(cls):
+        return cls.get_schema()
+
+    @classmethod
+    def verify_json(cls, json, partial=False):
+        schema = cls.get_partial_schema() if partial else cls.get_schema()
         json_schema = JSONSchema().dump(schema).data
+        if partial:
+            del json_schema['required']
         validate(json, json_schema)
 
     def json(self):
@@ -65,6 +71,10 @@ class Item(BaseModel):
     @classmethod
     def get_schema(cls):
         return ItemSchema()
+
+    @classmethod
+    def get_partial_schema(cls):
+        return ItemPatchSchema()
 
 
 class User(BaseModel):

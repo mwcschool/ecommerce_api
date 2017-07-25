@@ -15,6 +15,15 @@ class ItemSchema(Schema):
     availability = fields.Int(required=True, validate=validate.Range(min=0))
 
 
+class ItemPatchSchema(Schema):
+    uuid = fields.UUID(dump_only=True)
+    name = fields.Str(validate=check_empty_str)
+    price = fields.Decimal(validate=validate.Range(min=0))
+    description = fields.Str(validate=check_empty_str)
+    category = fields.Str(validate=check_empty_str)
+    availability = fields.Int(validate=validate.Range(min=0))
+
+
 class UserSchema(Schema):
     uuid = fields.UUID(dump_only=True)
     first_name = fields.Str(required=True, validate=check_empty_str)
