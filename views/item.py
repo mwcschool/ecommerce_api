@@ -124,10 +124,8 @@ class ItemResource(Resource):
         except ValueError:
             return None, BAD_REQUEST
 
-
         for key, value in jsondata.items():
             setattr(obj, key, value)
-
 
         try:
             Item.verify_json(obj.json())
