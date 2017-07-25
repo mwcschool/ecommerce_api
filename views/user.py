@@ -10,6 +10,7 @@ import utils
 from marshmallow import ValidationError
 
 
+
 def valid_email(email):
     return re.match('[a-z]{3,}(?P<at>@)[a-z]{3,}(?P<point>\.)[a-z]{2,}', email)
 
@@ -45,26 +46,20 @@ class UsersResource(Resource):
 class UserResource(Resource):
     @auth.login_required
     def put(self, uuid):
+        json_data = request.get_json()
         try:
-            obj = User.get(uuid=uuid)
-        except User.DoesNotExist:
+            obj = User.verify_json(json_data)
+        except ValidationError as err:
             return None, NOT_FOUND
 
         if obj != g.current_user:
             return '', UNAUTHORIZED
 
-        #parser = reqparse.RequestParser()
-        #parser.add_argument('first_name', type=utils.non_empty_str, required=True)
-        #parser.add_argument('last_name', type=utils.non_empty_str, required=True)
-        #parser.add_argument('email', type=utils.non_empty_str, required=True)
-        #parser.add_argument('password', type=utils.non_empty_str, required=True)
-        #args = parser.parse_args(strict=True)
-
-        if valid_email(args['email']) is not None and len(args['password']) > 6:
-            obj.first_name = args['first_name']
-            obj.last_name = args['last_name']
-            obj.email = args['email']
-            obj.password = crypt_password(args['password'])
+        if valid_email(json_data['email']) is not None and len(json_data['password']) > 6:
+            obj.first_name = json_data['first_name']
+            obj.last_name = json_data['last_name']
+            obj.email = json_data['email']
+            obj.password = crypt_password(json_data['password'])
             obj.save()
 
             return obj.json(), CREATED
