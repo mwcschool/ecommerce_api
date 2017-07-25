@@ -37,8 +37,7 @@ class AddressResource(Resource):
         try:
             address = (
                 Address.select()
-                .where(Address.uuid == address_id)
-                .where(Address.user == g.current_user)
+                .where(Address.uuid == address_id, Address.user == g.current_user)
                 .get())
         except Address.DoesNotExist:
             return None, NOT_FOUND
@@ -51,8 +50,7 @@ class AddressResource(Resource):
         try:
             address = (
                 Address.select()
-                .where(Address.uuid == address_id)
-                .where(Address.user == g.current_user)
+                .where(Address.uuid == address_id, Address.user == g.current_user)
                 .get())
         except Address.DoesNotExist:
             return None, NOT_FOUND
@@ -73,6 +71,32 @@ class AddressResource(Resource):
             return address.json(), CREATED
         else:
             return '', BAD_REQUEST
+
+    @auth.login_required
+    def patch(self, address_id):
+        json = request.get_json()
+        try:
+            address = (
+                Address.select()
+                .where(Address.uuid == address_id, Address.user == g.current_user)
+                .get())
+        except Address.DoesNotExist:
+            return None, NOT_FOUND
+
+        try:
+            Address.verify_json(json)
+        except ValidationError as err:
+            return {"message": err.message}, BAD_REQUEST
+
+        for param in ['nation', 'city', 'postal_code', 'local_address', 'phone']:
+            if json[param]:
+                if len(json[param]) < 3:
+                    return '', BAD_REQUEST
+                else:
+                    setattr(address, param, json[param])
+        address.save()
+
+        return address.json(), OK
 
     @auth.login_required
     def delete(self, address_id):
