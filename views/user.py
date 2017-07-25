@@ -6,9 +6,7 @@ from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, UNAUTHORIZE
 from flask_restful import Resource, reqparse
 import re
 from passlib.hash import pbkdf2_sha256
-import utils
 from marshmallow import ValidationError
-
 
 
 def valid_email(email):
@@ -68,9 +66,10 @@ class UserResource(Resource):
 
     @auth.login_required
     def delete(self, uuid):
+        json_data = request.get_json()
         try:
-            obj = User.get(uuid=uuid)
-        except User.DoesNotExist:
+            obj = User.verify_json(json_data)
+        except ValidationError:
             return None, NOT_FOUND
 
         if obj != g.current_user:
