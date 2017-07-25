@@ -43,12 +43,6 @@ class ItemsResource(Resource):
             return None, BAD_REQUEST
 
         try:
-            if jsondata['availability'] < 0:
-                return None, BAD_REQUEST
-        except KeyError:
-            return None, BAD_REQUEST
-
-        try:
             Item.verify_json(jsondata)
         except ValidationError as ver_json_error:
             return ver_json_error.message, BAD_REQUEST
@@ -100,12 +94,6 @@ class ItemResource(Resource):
         try:
             utils.non_empty_str(jsondata['name'], 'name')
         except ValueError:
-            return None, BAD_REQUEST
-
-        try:
-            if jsondata['availability'] < 0:
-                return None, BAD_REQUEST
-        except KeyError:
             return None, BAD_REQUEST
 
         try:
