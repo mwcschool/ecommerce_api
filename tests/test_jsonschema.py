@@ -28,6 +28,30 @@ class TestValidateJsonschema:
         with pytest.raises(ValidationError):
             Item.verify_json(data)
 
+    def test_validate_item_json__failure_invalid_field_value(self):
+        data = {
+            'name': 'Item one',
+            'price': 15,
+            'description': 'desc1',
+            'category': 'poligoni',
+            'availability': -8,
+        }
+
+        with pytest.raises(ValidationError):
+            Item.verify_json(data)
+
+    def test_validate_item_json__failure_invalid_field_value_2(self):
+        data = {
+            'name': 'Item one',
+            'price': -35,
+            'description': 'desc1',
+            'category': 'poligoni',
+            'availability': 11,
+        }
+
+        with pytest.raises(ValidationError):
+            Item.verify_json(data)
+
     def test_validate_item_json__failure_missing_field(self):
         data = {
             'name': 'Item one',
