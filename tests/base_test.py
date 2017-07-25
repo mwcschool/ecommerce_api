@@ -1,11 +1,12 @@
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
-from models import Item, User, Address, Order, OrderItem, Favorites, Picture
+from models import Item, User, Address, Order, OrderItem, Favorites, Picture, Reset
 from peewee import SqliteDatabase
 from tempfile import mkdtemp
 import shutil
+from datetime import datetime, timedelta
 
-from views.user import crypt_password
+from auth import crypt_password
 from app import app
 import base64
 import uuid
@@ -27,7 +28,7 @@ class BaseTest:
     def setup_class(cls):
         database = SqliteDatabase(':memory:')
 
-        cls.tables = [Item, User, Address, Order, OrderItem, Favorites, Picture]
+        cls.tables = [Item, User, Address, Order, OrderItem, Favorites, Picture, Reset]
         for table in cls.tables:
             table._meta.database = database
             table.create_table()
@@ -56,6 +57,19 @@ class BaseTest:
             email=email,
             password=crypt_password(password),
             superuser=superuser,
+        )
+
+    def create_reset(self, user=None, enable=True,
+                     expiration_date=datetime.now() + timedelta(hours=1)):
+
+        if not user:
+            user = self.create_user()
+
+        return Reset.create(
+            uuid=uuid.uuid4(),
+            user=user,
+            expiration_date=expiration_date,
+            enable=enable
         )
 
     def create_item(self, name="Item name", price=7,

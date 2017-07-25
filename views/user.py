@@ -1,22 +1,19 @@
 import uuid
-from models import User
+from models import User, Reset
 import auth
 from flask import g
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, UNAUTHORIZED
-from flask_restful import Resource, reqparse
+from flask_restful import Resource, reqparse, request
 import re
-from passlib.hash import pbkdf2_sha256
 import utils
+from datetime import datetime, timedelta
+from schemas import ResetRequestSchema
+from marshmallow_jsonschema import JSONSchema
+from jsonschema import validate
 
 
 def valid_email(email):
     return re.match('[a-z]{3,}(?P<at>@)[a-z]{3,}(?P<point>\.)[a-z]{2,}', email)
-
-
-def crypt_password(password):
-    crypt = pbkdf2_sha256.hash(password)
-
-    return crypt
 
 
 class UsersResource(Resource):
@@ -34,7 +31,7 @@ class UsersResource(Resource):
                 first_name=args['first_name'],
                 last_name=args['last_name'],
                 email=args['email'],
-                password=crypt_password(args['password'])
+                password=auth.crypt_password(args['password'])
             )
 
             return obj.json(), CREATED
@@ -64,7 +61,7 @@ class UserResource(Resource):
             obj.first_name = args['first_name']
             obj.last_name = args['last_name']
             obj.email = args['email']
-            obj.password = crypt_password(args['password'])
+            obj.password = auth.crypt_password(args['password'])
             obj.save()
 
             return obj.json(), CREATED
@@ -83,5 +80,29 @@ class UserResource(Resource):
 
         obj.status = 'deleted'
         obj.save()
+
+        return None, NO_CONTENT
+
+
+class ResetResource(Resource):
+    def post(self):
+        args = request.form
+        validate(args, JSONSchema().dump(ResetRequestSchema()).data)
+
+        if not valid_email(args['email']):
+            return None, BAD_REQUEST
+
+        try:
+            user = User.get(User.email == args['email'])
+        except User.DoesNotExist:
+            return None, NO_CONTENT
+
+        Reset.update(enable=False).where(Reset.user == user).execute()
+
+        Reset.create(
+            uuid=uuid.uuid4(),
+            user=user,
+            expiration_date=datetime.now() + timedelta(hours=1)
+        )
 
         return None, NO_CONTENT
