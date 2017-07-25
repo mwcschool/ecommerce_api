@@ -21,22 +21,22 @@ def crypt_password(password):
 
 class UsersResource(Resource):
     def post(self):
-        json_data = request.get_json()
+        json = request.get_json()
         try:
-            User.verify_json(json_data)
+            User.verify_json(json)
         except ValidationError as err:
             return {'message': err.message}, BAD_REQUEST
 
-        if valid_email(json_data['email']) and len(json_data['password']) > 6:
-            obj = User.create(
+        if valid_email(json['email']) and len(json['password']) > 6:
+            user = User.create(
                 uuid=uuid.uuid4(),
-                first_name=json_data['first_name'],
-                last_name=json_data['last_name'],
-                email=json_data['email'],
-                password=crypt_password(json_data['password'])
+                first_name=json['first_name'],
+                last_name=json['last_name'],
+                email=json['email'],
+                password=crypt_password(json['password'])
             )
 
-            return obj.json(), CREATED
+            return user.json(), CREATED
         else:
             return '', BAD_REQUEST
 
@@ -44,39 +44,39 @@ class UsersResource(Resource):
 class UserResource(Resource):
     @auth.login_required
     def put(self, uuid):
-        json_data = request.get_json()
+        json = request.get_json()
         try:
-            User.verify_json(json_data)
+            User.verify_json(json)
         except ValidationError as err:
             return None, BAD_REQUEST
 
-        obj = User.get(uuid=uuid)
-        if obj != g.current_user:
+        user = User.get(uuid=uuid)
+        if user != g.current_user:
             return '', UNAUTHORIZED
 
-        if valid_email(json_data['email']) is not None and len(json_data['password']) > 6:
-            obj.first_name = json_data['first_name']
-            obj.last_name = json_data['last_name']
-            obj.email = json_data['email']
-            obj.password = crypt_password(json_data['password'])
-            obj.save()
+        if valid_email(json['email']) is not None and len(json['password']) > 6:
+            user.first_name = json['first_name']
+            user.last_name = json['last_name']
+            user.email = json['email']
+            user.password = crypt_password(json['password'])
+            user.save()
 
-            return obj.json(), CREATED
+            return user.json(), CREATED
         else:
             return '', BAD_REQUEST
 
     @auth.login_required
     def delete(self, uuid):
-        json_data = request.get_json()
+        json = request.get_json()
         try:
-            obj = User.get(uuid=uuid)
+            user = User.get(uuid=uuid)
         except User.DoesNotExist:
             return None, NOT_FOUND
 
-        if obj != g.current_user:
+        if user != g.current_user:
             return '', UNAUTHORIZED
 
-        obj.status = 'deleted'
-        obj.save()
+        user.status = 'deleted'
+        user.save()
 
         return None, NO_CONTENT
