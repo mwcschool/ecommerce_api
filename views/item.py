@@ -128,7 +128,7 @@ class ItemResource(Resource):
             setattr(obj, key, value)
 
         try:
-            Item.verify_json(obj.json())
+            Item.verify_json(jsondata, partial=True)
         except ValidationError as ver_json_error:
             return ver_json_error.message, BAD_REQUEST
 
