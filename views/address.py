@@ -89,7 +89,7 @@ class AddressResource(Resource):
             return {"message": err.message}, BAD_REQUEST
 
         for param in ['nation', 'city', 'postal_code', 'local_address', 'phone']:
-            if json[param] and json[param] != getattr(address, param):
+            if json[param]:
                 if len(json[param]) < 3:
                     return '', BAD_REQUEST
                 else:
