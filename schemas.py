@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate
 
+
 class ItemSchema(Schema):
     uuid = fields.UUID(dump_only=True)
     name = fields.Str(required=True, validate=validate.Length(min=1))
