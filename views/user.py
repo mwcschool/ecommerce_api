@@ -1,12 +1,12 @@
 import uuid
 from models import User
 import auth
-from flask import g
+from flask import g, request
 from http.client import CREATED, NOT_FOUND, NO_CONTENT, BAD_REQUEST, UNAUTHORIZED
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 import re
 from passlib.hash import pbkdf2_sha256
-import utils
+from jsonschema.exceptions import ValidationError
 
 
 def valid_email(email):
@@ -21,23 +21,22 @@ def crypt_password(password):
 
 class UsersResource(Resource):
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('first_name', type=utils.non_empty_str, required=True)
-        parser.add_argument('last_name', type=utils.non_empty_str, required=True)
-        parser.add_argument('email', type=utils.non_empty_str, required=True)
-        parser.add_argument('password', type=utils.non_empty_str, required=True)
-        args = parser.parse_args(strict=True)
+        json = request.get_json()
+        try:
+            User.verify_json(json)
+        except ValidationError as err:
+            return {'message': err.message}, BAD_REQUEST
 
-        if valid_email(args['email']) and len(args['password']) > 6:
-            obj = User.create(
+        if valid_email(json['email']) and len(json['password']) > 6:
+            user = User.create(
                 uuid=uuid.uuid4(),
-                first_name=args['first_name'],
-                last_name=args['last_name'],
-                email=args['email'],
-                password=crypt_password(args['password'])
+                first_name=json['first_name'],
+                last_name=json['last_name'],
+                email=json['email'],
+                password=crypt_password(json['password'])
             )
 
-            return obj.json(), CREATED
+            return user.json(), CREATED
         else:
             return '', BAD_REQUEST
 
@@ -45,43 +44,38 @@ class UsersResource(Resource):
 class UserResource(Resource):
     @auth.login_required
     def put(self, uuid):
+        json = request.get_json()
         try:
-            obj = User.get(uuid=uuid)
-        except User.DoesNotExist:
-            return None, NOT_FOUND
+            User.verify_json(json)
+        except ValidationError as err:
+            return None, BAD_REQUEST
 
-        if obj != g.current_user:
+        user = User.get(uuid=uuid)
+        if user != g.current_user:
             return '', UNAUTHORIZED
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('first_name', type=utils.non_empty_str, required=True)
-        parser.add_argument('last_name', type=utils.non_empty_str, required=True)
-        parser.add_argument('email', type=utils.non_empty_str, required=True)
-        parser.add_argument('password', type=utils.non_empty_str, required=True)
-        args = parser.parse_args(strict=True)
+        if valid_email(json['email']) is not None and len(json['password']) > 6:
+            user.first_name = json['first_name']
+            user.last_name = json['last_name']
+            user.email = json['email']
+            user.password = crypt_password(json['password'])
+            user.save()
 
-        if valid_email(args['email']) is not None and len(args['password']) > 6:
-            obj.first_name = args['first_name']
-            obj.last_name = args['last_name']
-            obj.email = args['email']
-            obj.password = crypt_password(args['password'])
-            obj.save()
-
-            return obj.json(), CREATED
+            return user.json(), CREATED
         else:
             return '', BAD_REQUEST
 
     @auth.login_required
     def delete(self, uuid):
         try:
-            obj = User.get(uuid=uuid)
+            user = User.get(uuid=uuid)
         except User.DoesNotExist:
             return None, NOT_FOUND
 
-        if obj != g.current_user:
+        if user != g.current_user:
             return '', UNAUTHORIZED
 
-        obj.status = 'deleted'
-        obj.save()
+        user.status = 'deleted'
+        user.save()
 
         return None, NO_CONTENT
